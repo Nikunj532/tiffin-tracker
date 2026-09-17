@@ -34,7 +34,8 @@ Demo login after seeding: **demo@tiffin.app / demo1234** (3 plans, 32 customers 
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `4000` | API port |
-| `JWT_SECRET` | insecure dev value (warns at startup) | Signs login tokens; **set this in production** |
+| `JWT_SECRET` | random secret generated once and stored in the database | Signs login tokens. Set a long random value (32+ characters) in production so tokens stay valid if the database is recreated |
+| `LOGIN_MAX_ATTEMPTS` | `10` | Failed logins allowed per client + email in 15 minutes before login is locked (429) |
 | `DB_FILE` | `./data/tiffin.db` | SQLite file path (`:memory:` for throwaway runs) |
 | `PUBLIC_SIM_ENDPOINTS` | `true` | Allows `/clock` and `/outbox` without a token (for the grading harness). Set to `false` in production |
 
@@ -75,6 +76,7 @@ npm test
 - `server/test/billing.test.js`: 12 unit tests for the billing rules (mid-month start, weekday and weekend pauses, open-ended pauses, pauses spanning two months, a fully paused month, ended subscriptions, leap-year February, rounding).
 - `server/test/features.test.js`: end-to-end tests for Level 1 (clock, due-today rules, weekends, pauses, idempotency, owner scoping), Level 2 (transfer, locked price, split bills, notifications, guards) and Level 3 (messy CSV counts, row numbers, dry run, re-import, JSON and raw CSV bodies, defaults).
 - `server/test/importer.test.js`: unit tests for date parsing, phone normalisation, CSV parsing, header aliases and row cleaning.
+- `server/test/auth-security.test.js`: login only with the right password, injection and wrong types, forged/tampered/`alg:none`/expired tokens, deleted accounts, password length rules, brute-force lock, malformed ids and prices never causing a 500.
 - `server/test/api.test.js`: an end-to-end run against an in-memory database covering register/login, plan and customer validation, subscribe, pause, overlap rejection, resume, bill preview, bill generation (including regenerating), phone lookup, search, pagination, sorting, SQL-injection-safe sort keys, and making sure one owner can't see another owner's data.
 
 ## 3. Debugging
@@ -93,7 +95,16 @@ npm test
 
 ---
 
-## 4. Billing rules
+## 4. Security and validation
+
+- **Passwords** are hashed with bcrypt. They must be 8–72 bytes and not only spaces (bcrypt ignores bytes after 72, so longer passwords are refused rather than silently truncated).
+- **Login** returns the same "Invalid email or password" for a wrong password and an unknown email. After `LOGIN_MAX_ATTEMPTS` failures for the same client and email within 15 minutes, login answers **429** (even with the right password) until the window passes. Other accounts are unaffected.
+- **Tokens** are HS256 JWTs valid for 7 days. The signing secret comes from `JWT_SECRET` or a random per-database secret; **there is no hard-coded fallback**. Tokens are rejected when forged, tampered, `alg: none`, expired, or when the account no longer exists.
+- **Owner isolation:** every query is scoped to the logged-in owner. Other owners' ids return 404.
+- **Input validation:** all ids are parsed as positive integers, dates must be real `YYYY-MM-DD` dates, prices are whole paise up to ₹10,00,000, and sort keys are whitelisted. Bad input returns 400, never 500.
+- **Audit:** a 151-check authentication and validation audit (wrong passwords, SQL/NoSQL-style injection, malformed JSON, forged and expired tokens, cross-owner access on every endpoint, type-confusion fuzzing) passed with 0 server errors. The key cases are kept as `server/test/auth-security.test.js`.
+
+## 4a. Billing rules
 
 - Deliveries happen **Monday–Friday**. The monthly plan price covers **every weekday of the month**.
 - `delivered days` = weekdays inside the subscription window (start to end, clipped to the month) that aren't covered by a pause.

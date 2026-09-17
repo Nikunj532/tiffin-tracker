@@ -97,7 +97,26 @@ Before writing code I pinned down the questions the brief leaves open, because e
   2. A test asserted that a failed transfer to a new customer rolls back, but the request failed validation *before* the transaction began, so the test proved nothing. I removed the misleading assertion rather than keep a test that couldn't fail.
   3. Searching the outbox for "transferred" missed the "transferred in" message (its text says "is now yours"), so the test now filters by message `type`.
 
-## 7. Trade-offs and what I'd do with more time
+## 7. Authentication and validation audit
+
+I wrote an audit script that attacks a freshly seeded server configured the way the app actually runs locally (no `JWT_SECRET` set) and records every non-4xx or wrongly accepted response. It covered: registration and login with wrong, blank, oversized, unicode and wrongly typed values; SQL and NoSQL-style injection strings; broken JSON and wrong content types; forged, tampered, `alg: none` and expired tokens; every protected endpoint without a token; a second owner trying to read, edit, delete, pause, transfer or subscribe the first owner's data; and type-confusion fuzzing on every data endpoint. The first run gave **139 passed / 8 failed**, which came down to six real problems:
+
+| # | Problem found | Impact | Fix |
+|---|---|---|---|
+| 1 | With `JWT_SECRET` unset, tokens were signed with the hard-coded `dev-only-secret-change-me`, which is visible in the public repo. A token signed with it **logged in as demo@tiffin.app without a password**. | Critical: full account takeover | Removed the fallback. Without `JWT_SECRET`, a random 384-bit secret is generated once and stored in the database's `settings` table (so logins survive restarts). Verification is pinned to HS256. |
+| 2 | bcrypt only uses the first 72 bytes, so a different password sharing the first 72 characters logged in. | Weakened passwords | Registration refuses passwords over 72 bytes, and login rejects them before comparing. |
+| 3 | A validly signed token for a user id that doesn't exist caused a **500** (foreign-key failure when creating a plan). | Crash | `requireAuth` now checks the account still exists and returns 401. |
+| 4 | `plan_id` or `to_customer_id` sent as an object or array crashed with **500** ("Unknown named parameter"): the SQLite driver treats objects as named-parameter maps. | Crash | A shared `toId()` parses ids as positive integers, and anything else becomes a 400. |
+| 5 | A plan price of `1e20` passed `Number.isInteger` and was saved. | Bad data | Prices are capped at ₹10,00,000/month. |
+| 6 | Nothing limited password guessing. | Brute force | Per client+email throttle: after 10 failures in 15 minutes login returns 429 (even with the right password, so the lock gives an attacker nothing). Other accounts are unaffected. |
+
+Also tightened: passwords that are only spaces are refused, and the register form shows the 8–72 character rule.
+
+**After the fixes:** the audit passed 151/151 (4 brute-force checks added) with 0 server errors. A token issued before a restart still worked afterwards. In the browser, three owners (two newly registered plus demo) each landed in their own business, while a wrong password, an SQL-injection login, random details and empty fields all stayed on the login page with no token stored. The key cases are now permanent tests in `auth-security.test.js` (28 tests total).
+
+**Known limits (deliberate for this scope):** logging out deletes the token in the browser but doesn't revoke it on the server, so a stolen token works until it expires (7 days). The login throttle is in memory, so it resets on restart and isn't shared across multiple servers. Registration reveals whether an email is already registered, which is normal for sign-up forms.
+
+## 8. Trade-offs and what I'd do with more time
 
 - **Public holidays** aren't modelled. The next step would be a per-owner `holidays` table that `computeBill` subtracts from both the numerator and the denominator.
 - **Per-day pricing** (e.g. the owner wants ₹150/day flat) would be a second billing strategy on the plan. The pure function makes that a small change.

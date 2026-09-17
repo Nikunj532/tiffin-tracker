@@ -67,7 +67,7 @@ export function Register() {
         <label>Your name<input required value={form.name} onChange={set('name')} /></label>
         <label>Tiffin service name<input placeholder="e.g. Maa Ki Rasoi" value={form.business_name} onChange={set('business_name')} /></label>
         <label>Email<input type="email" required autoComplete="email" value={form.email} onChange={set('email')} /></label>
-        <label>Password<input type="password" required minLength={8} autoComplete="new-password" value={form.password} onChange={set('password')} /></label>
+        <label>Password<input type="password" required minLength={8} maxLength={72} autoComplete="new-password" value={form.password} onChange={set('password')} /><span className="muted small">8 to 72 characters</span></label>
         <button className="btn" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button>
         <p className="muted small">Already registered? <Link to="/login">Log in</Link></p>
       </form>

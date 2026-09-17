@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 
 export class HttpError extends Error {
@@ -21,21 +22,58 @@ export const h = (fn) => (req, res, next) => {
   }
 };
 
+let secret = null;
+let userExists = () => false;
+
+/**
+ * Set up token signing for this database. Uses JWT_SECRET when provided;
+ * otherwise a random 384-bit secret is generated once and kept in the
+ * settings table. There is deliberately no hard-coded fallback: a secret
+ * that appears in the public source code would let anyone forge a login.
+ */
+export function initAuth(db) {
+  if (process.env.JWT_SECRET) {
+    if (process.env.JWT_SECRET.length < 32) console.warn('[warn] JWT_SECRET is shorter than 32 characters; use a long random value');
+    secret = process.env.JWT_SECRET;
+  } else {
+    const row = db.prepare("SELECT value FROM settings WHERE key = 'jwt_secret'").get();
+    secret = row?.value;
+    if (!secret) {
+      secret = crypto.randomBytes(48).toString('hex');
+      db.prepare("INSERT INTO settings (key, value) VALUES ('jwt_secret', ?)").run(secret);
+    }
+  }
+  const stmt = db.prepare('SELECT 1 FROM users WHERE id = ?');
+  userExists = (id) => Boolean(stmt.get(id));
+}
+
 export function jwtSecret() {
-  return process.env.JWT_SECRET || 'dev-only-secret-change-me';
+  if (!secret) throw new Error('initAuth(db) must be called before signing tokens');
+  return secret;
 }
 
 export function requireAuth(req, _res, next) {
   const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : null;
   if (!token) return next(new HttpError(401, 'Authentication required'));
+  let payload;
   try {
-    const payload = jwt.verify(token, jwtSecret());
-    req.userId = payload.sub;
-    next();
+    payload = jwt.verify(token, jwtSecret(), { algorithms: ['HS256'] });
   } catch {
-    next(new HttpError(401, 'Invalid or expired token'));
+    return next(new HttpError(401, 'Invalid or expired token'));
   }
+  // A validly signed token is not enough: the account must still exist.
+  if (!Number.isSafeInteger(payload.sub) || !userExists(payload.sub)) {
+    return next(new HttpError(401, 'Account no longer exists; please log in again'));
+  }
+  req.userId = payload.sub;
+  next();
+}
+
+/** Positive integer id from a JSON value or string, else null (never throws). */
+export function toId(v) {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && /^\s*\d+\s*$/.test(v) ? Number(v) : NaN;
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
 }
 
 /**

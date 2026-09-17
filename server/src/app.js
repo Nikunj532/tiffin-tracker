@@ -3,7 +3,7 @@ import cors from 'cors';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HttpError, requireAuth } from './http.js';
+import { HttpError, initAuth, requireAuth } from './http.js';
 import authRoutes from './routes/auth.js';
 import planRoutes from './routes/plans.js';
 import customerRoutes from './routes/customers.js';
@@ -20,6 +20,7 @@ export function createApp(db, { log = true } = {}) {
   app.use(express.json({ limit: '2mb' }));
   app.use(express.text({ type: ['text/csv', 'text/plain'], limit: '2mb' }));
   loadClock(db);
+  initAuth(db);
 
   if (log) {
     app.use((req, res, next) => {

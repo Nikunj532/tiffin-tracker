@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { badRequest, h, HttpError, notFound, pageParams, paged, str } from '../http.js';
 
+const MAX_PRICE_PAISE = 100_000_000; // ₹10,00,000
+
 export default function planRoutes(db) {
   const r = Router();
 
@@ -13,6 +15,7 @@ export default function planRoutes(db) {
     const errors = {};
     if (!name) errors.name = 'Name is required';
     if (!Number.isInteger(price_paise) || price_paise <= 0) errors.price_paise = 'Price must be a positive whole number of paise';
+    else if (price_paise > MAX_PRICE_PAISE) errors.price_paise = 'Price cannot exceed ₹10,00,000 per month';
     if (Object.keys(errors).length) throw badRequest('Validation failed', errors);
     return { name, description, price_paise, is_active: body.is_active === false ? 0 : 1 };
   };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str } from '../http.js';
+import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str, toId } from '../http.js';
 import { addDays, isValidDate, isValidMonth, todayLocal } from '../dates.js';
 import { computeBill, rangesOverlap } from '../billing.js';
 import { tx } from '../db.js';
@@ -31,7 +31,7 @@ export default function subscriptionRoutes(db) {
   r.post('/customers/:customerId/subscriptions', h((req, res) => {
     const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(req.params.customerId, req.userId);
     if (!customer) throw notFound('Customer');
-    const plan = db.prepare('SELECT * FROM plans WHERE id = ? AND owner_id = ?').get(req.body.plan_id, req.userId);
+    const plan = db.prepare('SELECT * FROM plans WHERE id = ? AND owner_id = ?').get(toId(req.body.plan_id), req.userId);
     if (!plan) throw badRequest('plan_id must reference one of your plans');
     if (!plan.is_active) throw badRequest('This plan is inactive');
     const start = dateOr(req.body.start_date, todayLocal(), 'start_date');
@@ -206,7 +206,8 @@ export function transferLinks(db, sub) {
 
 function resolveTargetCustomer(db, owner, body) {
   if (body.to_customer_id !== undefined && body.to_customer_id !== null && body.to_customer_id !== '') {
-    const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(body.to_customer_id, owner);
+    const id = toId(body.to_customer_id);
+    const customer = id && db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(id, owner);
     if (!customer) throw badRequest('to_customer_id must reference one of your customers');
     return { customer, id: customer.id, created: false };
   }
