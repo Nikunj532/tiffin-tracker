@@ -11,6 +11,8 @@ At month-end the owner generates a bill for every customer in one click, and eac
 | UI | React 18 + React Router + Vite (plain CSS, responsive) |
 | Tests | Node's built-in test runner (`node --test`): billing unit tests + end-to-end API test |
 
+📘 **Illustrated guide:** [docs/Tiffin-Tracker-Project-Guide.pdf](docs/Tiffin-Tracker-Project-Guide.pdf) explains the workflow, every screen and every term, with screenshots (44 pages).
+
 ---
 
 ## 1. Setup
