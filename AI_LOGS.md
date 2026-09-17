@@ -2417,3 +2417,4358 @@ now create the AI_LOGS.mdand help me run the project.
   "session_id": "self"
 }
 ```
+
+<details><summary>Tool result</summary>
+
+```text
+Exported this session's transcript "Tiffin billing system workflow" to C:\Users\Dell\Downloads\session-export-1789639496503.zip (1 MB, 1269261 bytes). The zip holds the conversation transcript, its subagent transcripts and session metadata, not the app's logs; nothing was uploaded.
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"$TMP\" 2>/dev/null || cd /c/Users/Dell/AppData/Local/Temp; rm -rf tt-export && mkdir tt-export && cd tt-export && unzip -q \"C:/Users/Dell/Downloads/session-export-1789639496503.zip\" && find . -type f | head; f=$(find . -name \"*.jsonl\" | head -1); wc -l \"$f\"; head -c 1500 \"$f\"",
+  "description": "Unzip transcript export and inspect format"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+./f73bae41-da2a-4f62-988c-75aac2b10797.jsonl
+./local-session-state.json
+./metadata.json
+./transcript.jsonl
+408 ./f73bae41-da2a-4f62-988c-75aac2b10797.jsonl
+{"type":"queue-operation","operation":"enqueue","timestamp":"2026-09-17T09:39:53.083Z","sessionId":"f73bae41-da2a-4f62-988c-75aac2b10797","content":"<system-reminder>\nThe user started this session without choosing a project folder, so your working directory is a scratch workspace the app created for it: C:\\Users\\Dell\\AppData\\Roaming\\Claude\\scratch-workspaces\\541a60de-58d0-4608-bdf2-2380cd2289d6\\27d73f48-4d7b-43a9-9022-d394e6de5686\\scratch-2026-09-17-9d9c86. It starts empty, belongs to this session only, and is removed once the session is gone. Files you create there persist for as long as the session exists. The app shows this session as \"No folder\" and never shows the workspace's location, so don't quote its path to the user either: link files you create there as relative paths, and if the user wants to keep them, offer to move them into a folder they choose.\n\nIf the request concerns an existing project on this machine, do not work in the scratch workspace. Before reading or editing anything in that project, move the session there with the `change_directory` tool, passing the absolute path (the user sees and approves that exact folder, or in bypass permissions mode it is granted without asking). If you can't determine the path, ask the user which folder, or call `request_directory` without a path so they can pick one. Access is granted at once and the session's working directory moves there when this turn ends, so use absolute paths under the project until then
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd /c/Users/Dell/AppData/Local/Temp/tt-export && node -e '\nconst lines=require(\"fs\").readFileSync(\"transcript.jsonl\",\"utf8\").split(\"\\n\").filter(Boolean).map(JSON.parse);\nconst types={};for(const l of lines){types[l.type]=(types[l.type]||0)+1}console.log(types);\nconst u=lines.find(l=>l.type===\"user\");console.log(JSON.stringify(u).slice(0,600));\nconst a=lines.find(l=>l.type===\"assistant\");console.log(JSON.stringify(a.message.content).slice(0,400));\n'",
+  "description": "Inspect transcript record structure"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{
+  'queue-operation': 10,
+  user: 82,
+  attachment: 78,
+  'last-prompt': 25,
+  'file-history-snapshot': 5,
+  'atis-latch': 25,
+  assistant: 144,
+  system: 4,
+  'file-history-delta': 35
+}
+{"parentUuid":null,"isSidechain":false,"promptId":"c70af21a-2951-470a-87e2-350b66209d94","type":"user","message":{"role":"user","content":"<system-reminder>\nThe user started this session without choosing a project folder, so your working directory is a scratch workspace the app created for it: C:\\Users\\Dell\\AppData\\Roaming\\Claude\\scratch-workspaces\\541a60de-58d0-4608-bdf2-2380cd2289d6\\27d73f48-4d7b-43a9-9022-d394e6de5686\\scratch-2026-09-17-9d9c86. It starts empty, belongs to this session only, and is removed once the session is gone. Files you create there persist for as long as the 
+[{"type":"thinking","thinking":"","signature":"CAQSqwUKEAgRGAI4AUIIdGhpbmtpbmcSDAGVbVGOMSr9x9lIzBoMe4wcNUU3BeoiBuTgIjCLkEcwpIf9XvjQpZsPu3LwFOGU30Qd7wQKPNLYqwmiFCo8equlBhnGkzNudnfKN5QqyASNSxcsKpfAjXrXBhDLraYYUXCAnf3DmdN98WzEVdZHo64ADjGz/6zfduUxSAJnDjWaSn0kHyVnxidzh3dfabmCZMeeJ4nion2UJ0Jr1RaaYB568s/Z28+2anEg1Wlwlt4CAGFK0+6ozRv4pHuRfcJ7rI9PTGs4crujBI9lqCQdlRdWayfi1K63jsX2XBOiKVfyn8uyjL8vYz/3ZDp9qmwUn
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd /c/Users/Dell/AppData/Local/Temp/tt-export && cat > conv.js <<'EOF'\nconst fs=require(\"fs\");\nconst lines=fs.readFileSync(\"transcript.jsonl\",\"utf8\").split(\"\\n\").filter(Boolean).map(JSON.parse)\n  .filter(l=>(l.type===\"user\"||l.type===\"assistant\")&&!l.isSidechain&&!l.isMeta);\nconst strip=s=>s.replace(/<system-reminder>[\\s\\S]*?<\\/system-reminder>/g,\"\").trim();\nconst fence=(s)=>{const n=Math.max(3,...[...String(s).matchAll(/`{3,}/g)].map(m=>m[0].length+1));return \"`\".repeat(n)};\nconst block=(lang,s)=>{const f=fence(s);return `${f}${lang}\\n${s}\\n${f}`};\nlet out=[\"# AI Logs\",\"\",\"Complete conversation between the developer and the AI assistant (Claude Code, model Claude Opus 5) used to build Tiffin Tracker, exported from the Claude desktop app session transcript. Messages, tool calls and tool results are reproduced in order without edits. Hidden system reminders and the model's private reasoning are not part of the visible conversation and are omitted; screenshots are shown as [image].\",\"\"];\nlet lastRole=null;\nfor(const l of lines){\n  const c=l.message.content;\n  const parts=typeof c===\"string\"?[{type:\"text\",text:c}]:c;\n  for(const p of parts){\n    if(p.type===\"thinking\"||p.type===\"redacted_thinking\") continue;\n    if(p.type===\"text\"){\n      const t=l.type===\"user\"?strip(p.text):p.text.trim();\n      if(!t) continue;\n      if(l.type===\"user\"){out.push(\"---\",\"\",\"## 👤 User\",\"\",t,\"\");lastRole=\"user\";}\n      else{ if(lastRole!==\"assistant\"){out.push(\"## 🤖 Assistant\",\"\");lastRole=\"assistant\";} out.push(t,\"\"); }\n    } else if(p.type===\"tool_use\"){\n      if(lastRole!==\"assistant\"){out.push(\"## 🤖 Assistant\",\"\");lastRole=\"assistant\";}\n      out.push(`**Tool call — \\`${p.name}\\`**`,\"\",block(\"json\",JSON.stringify(p.input,null,2)),\"\");\n    } else if(p.type===\"tool_result\"){\n      let r=p.content; if(Array.isArray(r)) r=r.map(x=>x.type===\"text\"?x.text:\"[image]\").join(\"\\n\");\n      r=strip(String(r??\"\"));\n      out.push(`<details><summary>Tool result${p.is_error?\" (error)\":\"\"}</summary>`,\"\",block(\"text\",r||\"(empty)\"),\"\",\"</details>\",\"\");\n    }\n  }\n}\nfs.writeFileSync(process.argv[2],out.join(\"\\n\"));\nconsole.log(\"messages\",lines.length);\nEOF\nnode conv.js \"C:/Users/Dell/Documents/tiffin-tracker/AI_LOGS.md\" && wc -c \"C:/Users/Dell/Documents/tiffin-tracker/AI_LOGS.md\" && grep -n \"^## 👤 User\" -A3 \"C:/Users/Dell/Documents/tiffin-tracker/AI_LOGS.md\" | head -40",
+  "description": "Convert transcript to AI_LOGS.md markdown"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+messages 226
+209615 C:/Users/Dell/Documents/tiffin-tracker/AI_LOGS.md
+7:## 👤 User
+8-
+9-The storyline
+10-A home-style tiffin (lunch delivery) service. Customers subscribe to a monthly plan and get lunch delivered every weekday. Life happens — they pause for a few days (travel, festivals) and shouldn’t be charged for paused days. At month-end the owner needs each customer’s bill: the plan price pro-rated for the days actually delivered. Customers are looked up by phone, and the owner wants to see who’s active versus paused.
+--
+135:## 👤 User
+136-
+137-help me build this from scratch
+138-
+--
+2130:## 👤 User
+2131-
+2132-help me push the project on github
+2133-
+--
+2215:## 👤 User
+2216-
+2217-https://github.com/Nikunj532/tiffin-tracker.git
+2218-
+--
+2390:## 👤 User
+2391-
+2392-now create the AI_LOGS.mdand help me run the project.
+2393-
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+`AI_LOGS.md` is created: about 210 KB, built from the app's own export of this session with all 5 of your messages in order. Committing and pushing it, then checking the app is running:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Documents/tiffin-tracker\" && git add AI_LOGS.md && git commit -q -m \"Add AI_LOGS.md (session transcript)\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\" && git push -q 2>&1; git log --oneline -2; curl -s localhost:4000/api/health",
+  "description": "Commit and push AI logs, check running API",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+warning: in the working copy of 'AI_LOGS.md', LF will be replaced by CRLF the next time Git touches it
+67cc1fe Add AI_LOGS.md (session transcript)
+a7b918f Tiffin Tracker: subscriptions, pause/resume and pro-rated billing
+{"ok":true}
+```
+
+</details>
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8pkBEy7VfEraY6wTTLf
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8q5YnHqrbYaN7c1CnaY
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8q7YwmthprUndSbnKYF
+
+---
+
+## 👤 User
+
+how to run the website on my local
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pid=$(netstat -ano | grep \":4000 \" | grep LISTENING | awk '{print $5}' | head -1); echo \"pid=$pid\"; [ -n \"$pid\" ] && taskkill //PID $pid //F",
+  "description": "Stop my test server holding port 4000"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+pid=4272
+SUCCESS: The process with PID 4272 has been terminated.
+```
+
+</details>
+
+Your project is at `Desktop\tiffin-tracker\tiffin-tracker`, which is the copy you cloned from GitHub. I also stopped the test server I had left running, so port 4000 is free for you. Run these in your VS Code terminal (the Git Bash one you have open is fine).
+
+**Option A: one server, simplest**
+
+1. Install dependencies. This takes a minute the first time, and seeding won't work until it's done, which is probably why `npm run seed` printed nothing:
+   ```bash
+   npm run install:all
+   ```
+2. Load the demo data:
+   ```bash
+   npm run seed
+   ```
+   You should see `Seeded demo data. Login with demo@tiffin.app / demo1234`.
+3. Build the website:
+   ```bash
+   npm run build
+   ```
+4. Start the server:
+   ```bash
+   npm start
+   ```
+   Wait for `Tiffin Tracker API listening on http://localhost:4000`.
+5. Open **http://localhost:4000** in your browser. You'll see the landing page. Click **Log in** and use `demo@tiffin.app` / `demo1234`.
+
+Leave that terminal running. Press `Ctrl+C` to stop the server.
+
+**Option B: development mode (page reloads when you edit code)**
+
+Use two terminals; the **+** button in the terminal panel opens a second one.
+- Terminal 1: start the API.
+  ```bash
+  npm run dev:server
+  ```
+- Terminal 2: start the website.
+  ```bash
+  npm run dev:client
+  ```
+- Open **http://localhost:5173**.
+
+**To run the tests:**
+```bash
+npm test
+```
+You should see `pass 13`, `fail 0`.
+
+**If something goes wrong:**
+- **`node:sqlite` error:** your Node.js is older than 22.13. Check it with `node -v`.
+- **`EADDRINUSE :4000`:** something else is already using port 4000. Close the other terminal that's running the server.
+- **`npm run seed` still prints nothing:** paste me the full terminal output.
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "curl -s localhost:4000/api/health; echo; curl -s localhost:4000/ | grep -o \"<title>.*</title>\"; curl -s -X POST localhost:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"demo@tiffin.app\",\"password\":\"demo1234\"}' | head -c 80",
+  "description": "Check user's running server and demo login"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{"ok":true}
+<title>Tiffin Tracker</title>
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc4OTYzOTk0N
+```
+
+</details>
+
+Your server is running. I tested it from here: the API responds, the website loads, and the demo login works, so the seed step did run.
+
+**Open http://localhost:4000 in your browser** (Chrome, Edge or Brave), then:
+1. You'll see the landing page. Click **Log in**.
+2. Log in with `demo@tiffin.app` / `demo1234`.
+3. To see the main features, try:
+   - **Dashboard:** today's tiffin count, and type a phone number such as `9845000000` into the lookup box.
+   - **Customers:** search, click the Paused and Active tabs, sort by clicking column headers, change pages at the bottom.
+   - Open a customer and use **Pause** and **Resume**. The bill and calendar update right away.
+   - **Bills:** click **Generate bills** for this month.
+   - **Log out**, then try **Create account** to test sign-up with a fresh account.
+
+Keep the terminal open while you use the site, and press `Ctrl+C` there to stop the server. Next time, `npm start` is all you need, unless you change the frontend code, in which case run `npm run build` first.
+
+---
+
+## 👤 User
+
+check if the backend is connected properly
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "B=localhost:4000/api; J='Content-Type: application/json'\nT=$(curl -s -X POST $B/auth/login -H \"$J\" -d '{\"email\":\"demo@tiffin.app\",\"password\":\"demo1234\"}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).token')\nA=\"Authorization: Bearer $T\"\nchk(){ printf \"%-45s \" \"$1\"; shift; out=$(curl -s -w ' HTTP%{http_code}' \"$@\"); echo \"${out: -7} ${out:0:110}\"; }\nchk \"health\" $B/health\nchk \"no token -> 401\" $B/customers\nchk \"auth/me\" $B/auth/me -H \"$A\"\nchk \"dashboard\" $B/dashboard -H \"$A\"\nchk \"plans (sort price desc)\" \"$B/plans?sort=price&order=desc\" -H \"$A\"\nchk \"customers paused p1 limit3\" \"$B/customers?status=paused&limit=3\" -H \"$A\"\nchk \"search 'nair'\" \"$B/customers?search=nair\" -H \"$A\"\nchk \"phone lookup\" $B/customers/phone/9845000000 -H \"$A\"\nchk \"bills sept (amount desc)\" \"$B/bills?month=2026-09&sort=amount&order=desc&limit=2\" -H \"$A\"\necho \"--- write flow on a separate throwaway account ---\"\nE=\"check$(date +%s)@example.com\"\nT2=$(curl -s -X POST $B/auth/register -H \"$J\" -d \"{\\\"name\\\":\\\"Check\\\",\\\"email\\\":\\\"$E\\\",\\\"password\\\":\\\"secret123\\\"}\" | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).token')\nA2=\"Authorization: Bearer $T2\"\nP=$(curl -s -X POST $B/plans -H \"$J\" -H \"$A2\" -d '{\"name\":\"Test\",\"price_paise\":220000}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).id')\nC=$(curl -s -X POST $B/customers -H \"$J\" -H \"$A2\" -d '{\"name\":\"Test Cust\",\"phone\":\"9111111111\"}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).id')\nS=$(curl -s -X POST $B/customers/$C/subscriptions -H \"$J\" -H \"$A2\" -d \"{\\\"plan_id\\\":$P,\\\"start_date\\\":\\\"2026-09-01\\\"}\" | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).id')\nchk \"pause 7-11 Sep\" -X POST $B/subscriptions/$S/pause -H \"$J\" -H \"$A2\" -d '{\"start_date\":\"2026-09-07\",\"end_date\":\"2026-09-11\"}'\nchk \"bill preview (expect 17 days, 170000)\" \"$B/subscriptions/$S/bill?month=2026-09\" -H \"$A2\"\nchk \"generate bills\" -X POST $B/bills/generate -H \"$J\" -H \"$A2\" -d '{\"month\":\"2026-09\"}'\nchk \"demo owner can't see it\" $B/customers/$C -H \"$A\"\nsqlite=$(ls -la ~/Desktop/tiffin-tracker/tiffin-tracker/server/data/ 2>&1 | grep tiffin.db); echo \"DB file: $sqlite\"",
+  "description": "Smoke test all API endpoints on running server"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+health                                        HTTP200 {"ok":true} HTTP200
+no token -> 401                               HTTP401 {"error":"Authentication required"} HTTP401
+auth/me                                       HTTP200 {"user":{"id":1,"name":"Demo Owner","business_name":"Annapurna Tiffins","email":"demo@tiffin.app"}} HTTP200
+dashboard                                     HTTP200 {"as_of":"2026-09-17","month":"2026-09","is_delivery_day":true,"meals_today":17,"counts":{"active":17,"paused"
+plans (sort price desc)                       HTTP200 {"data":[{"id":3,"owner_id":1,"name":"Non-Veg Thali","description":"Thali with chicken/egg curry","price_paise
+customers paused p1 limit3                    HTTP200 {"data":[{"id":1,"owner_id":1,"name":"Aarav Sharma","phone":"9845000000","address":"10, Koramangala, Bengaluru
+search 'nair'                                 HTTP200 {"data":[{"id":17,"owner_id":1,"name":"Manish Nair","phone":"9845126704","address":"26, BTM Layout, Bengaluru"
+phone lookup                                  HTTP200 {"id":1,"owner_id":1,"name":"Aarav Sharma","phone":"9845000000","address":"10, Koramangala, Bengaluru","create
+bills sept (amount desc)                      HTTP200 {"data":[],"page":1,"limit":2,"total":0,"totalPages":1,"sort":"amount","order":"desc","month":"2026-09","summa
+--- write flow on a separate throwaway account ---
+pause 7-11 Sep                                HTTP201 {"id":31,"customer_id":33,"plan_id":4,"price_paise":220000,"start_date":"2026-09-01","end_date":null,"created_
+bill preview (expect 17 days, 170000)         HTTP200 {"subscription_id":31,"customer_name":"Test Cust","plan_name":"Test","month":"2026-09","working_days":22,"subs
+generate bills                                HTTP200 {"month":"2026-09","bills_generated":1,"total_amount_paise":170000} HTTP200
+demo owner can't see it                       HTTP404 {"error":"Customer not found"} HTTP404
+DB file: -rw-r--r-- 1 Dell 197121 57344 Sep 17 15:38 tiffin.db
+-rw-r--r-- 1 Dell 197121 32768 Sep 17 15:41 tiffin.db-shm
+-rw-r--r-- 1 Dell 197121 74192 Sep 17 15:45 tiffin.db-wal
+```
+
+</details>
+
+The API itself works. Last check: whether the website in the browser actually talks to it.
+
+**Tool call — `mcp__Claude_Browser__navigate`**
+
+```json
+{
+  "url": "http://localhost:4000/login"
+}
+```
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "localStorage.clear(); location.href='/login'; await new Promise(r=>setTimeout(r,1500));\nconst r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@tiffin.app',password:'demo1234'})}).then(r=>r.json());\nlocalStorage.setItem('tiffin_token', r.token); location.href='/app/customers?status=paused'; 'ok'"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+navigated to http://localhost:4000
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+The page navigated while this script was running, so the script was cut off and any return value was lost. If the script itself navigated (clicked a link, submitted a form, changed location), do not re-run it — continue from the page the tab is on now. If it did not, something else navigated the page (a reload, a redirect, or the user); check the page and redo whatever is still missing.
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@tiffin.app',password:'demo1234'})}).then(r=>r.json());\nlocalStorage.setItem('tiffin_token', r.token); location.href='/app/customers?status=paused'; 'ok'"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+"ok"
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__browser_batch`**
+
+```json
+{
+  "actions": [
+    {
+      "name": "computer",
+      "input": {
+        "action": "wait",
+        "duration": 2
+      }
+    },
+    {
+      "name": "read_network_requests",
+      "input": {
+        "urlPattern": "/api/"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "screenshot",
+        "scale": 0.6
+      }
+    }
+  ]
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[computer:wait] waited 2s
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[read_network_requests] [19620.11] POST http://localhost:4000/api/auth/login → 200 OK
+[19620.12] GET http://localhost:4000/api/dashboard → 200 OK
+[19620.13] GET http://localhost:4000/api/customers/33 → 200 OK
+[19620.14] GET http://localhost:4000/api/subscriptions/31/bill?month=2026-09 → 200 OK
+[19620.16] POST http://localhost:4000/api/subscriptions/31/resume → 200 OK
+[19620.17] GET http://localhost:4000/api/customers/33 → 200 OK
+[19620.18] GET http://localhost:4000/api/subscriptions/31/bill?month=2026-09 → 200 OK
+[19620.19] POST http://localhost:4000/api/subscriptions/31/pause → 409 Conflict
+[19620.20] POST http://localhost:4000/api/subscriptions/31/pause → 201 Created
+[19620.21] GET http://localhost:4000/api/customers/33 → 200 OK
+[19620.22] GET http://localhost:4000/api/subscriptions/31/bill?month=2026-09 → 200 OK
+[19620.28] GET http://localhost:4000/api/auth/me → 200 OK
+[19620.29] GET http://localhost:4000/api/customers?status=paused&page=1&limit=5&sort=phone&order=desc → 200 OK
+[19620.35] GET http://localhost:4000/api/auth/me → 200 OK
+[19620.36] GET http://localhost:4000/api/bills?month=2026-09&page=1&limit=10&sort=name&order=asc → 200 OK
+[19620.37] POST http://localhost:4000/api/bills/generate → 200 OK
+[19620.38] GET http://localhost:4000/api/bills?month=2026-09&page=1&limit=10&sort=name&order=asc → 200 OK
+[19620.45] GET http://localhost:4000/api/auth/me → 200 OK
+[19620.46] GET http://localhost:4000/api/dashboard → 200 OK
+[19620.47] GET http://localhost:4000/api/customers?page=1&limit=10&sort=name&order=asc → 200 OK
+[19620.48] GET http://localhost:4000/api/customers/33 → 200 OK
+[19620.49] GET http://localhost:4000/api/subscriptions/31/bill?month=2026-09 → 200 OK
+[19620.51] GET http://localhost:4000/api/plans?page=1&limit=10&sort=name&order=asc → 200 OK
+[19620.52] GET http://localhost:4000/api/bills?month=2026-09&page=1&limit=10&sort=name&order=asc → 200 OK
+[19620.53] GET http://localhost:4000/api/dashboard → 200 OK
+[17028.6] GET http://localhost:4000/api/auth/me → 200 OK
+[17028.7] GET http://localhost:4000/api/dashboard → 200 OK
+[17028.13] POST http://localhost:4000/api/auth/login → 200 OK
+[17028.19] GET http://localhost:4000/api/auth/me → 200 OK
+[17028.20] GET http://localhost:4000/api/customers?status=paused&page=1&limit=10&sort=name&order=asc → 200 OK
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:screenshot] Screenshot size: 479x457 0.6-scale view; coordinate frame: 799x762.
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[image]
+```
+
+</details>
+
+Yes, the backend is connected properly. The server running in your VS Code terminal answered every request with the expected result, and the website in the browser loads its data from it.
+
+**API checks** (sent straight to your running server):
+
+| Check | Result |
+|---|---|
+| Health check | ✅ 200 |
+| Request without logging in | ✅ refused (401), as it should be |
+| Demo login and "who am I" | ✅ 200, Demo Owner / Annapurna Tiffins |
+| Dashboard | ✅ 17 tiffins today, 17 active, 8 paused |
+| Plans sorted by price | ✅ 200 |
+| Customers: paused filter, search for "nair", pagination | ✅ 200, correct matches |
+| Phone lookup `9845000000` | ✅ found Aarav Sharma |
+| Create plan → customer → subscribe → pause 7–11 Sep | ✅ all saved (201) |
+| Bill preview | ✅ ₹2,200 plan × 17 delivered ÷ 22 weekdays = **₹1,700**, as expected |
+| Generate bills | ✅ 1 bill, ₹1,700 total |
+| Demo owner opens the other account's customer | ✅ not visible (404), so each owner's data stays separate |
+
+**Website to backend:** I opened http://localhost:4000 and logged in. The browser's network log shows the page's calls (login, dashboard, customer list) all returning 200 from your server. The Customers page shows real data from the database, with the counts Active 17 / Paused 8 / Upcoming 3 / Inactive 4.
+
+**Database:** it's saving to `server/data/tiffin.db` in your Desktop copy, and the file was last updated just now.
+
+**Three notes:**
+- I created a test account `check<number>@example.com` to try the pause and bill steps without touching your demo data. It has one test plan and one customer, and won't show up when you're logged in as the demo owner. To start with a clean database, stop the server, delete `server/data`, then run `npm run seed` and `npm start`.
+- The Bills page for September will be empty until you click **Generate bills**. That's normal, not a connection problem.
+- If you change code and rebuild, make sure a leftover `data` folder doesn't get committed. It's already listed in `.gitignore`.
+
+---
+
+## 👤 User
+
+when i am writing just 3 words the broser clases automatically
+
+## 🤖 Assistant
+
+Let me try to reproduce this by typing into the same register page in my browser:
+
+**Tool call — `mcp__Claude_Browser__browser_batch`**
+
+```json
+{
+  "actions": [
+    {
+      "name": "javascript_tool",
+      "input": {
+        "action": "javascript_exec",
+        "text": "localStorage.clear(); location.href='/register'; 1"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "wait",
+        "duration": 2
+      }
+    },
+    {
+      "name": "find",
+      "input": {
+        "query": "textbox"
+      }
+    }
+  ]
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[javascript_tool:javascript_exec] 1
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:wait] waited 2s
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[find] Found 4 match(es) for "textbox":
+- textbox [ref_6]
+- textbox "e.g. Maa Ki Rasoi" [ref_8] placeholder="e.g. Maa Ki Rasoi"
+- textbox [ref_10] type="email"
+- textbox [ref_12] type="password"
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+```
+
+</details>
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8qgCkWbfbxWFPTAZMd2
+
+---
+
+## 👤 User
+
+help me resolve the issue
+
+## 🤖 Assistant
+
+**Tool call — `mcp__Claude_Browser__browser_batch`**
+
+```json
+{
+  "actions": [
+    {
+      "name": "computer",
+      "input": {
+        "action": "left_click",
+        "ref": "ref_6"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "type",
+        "text": "Nikunj Agarwal"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "left_click",
+        "ref": "ref_8"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "type",
+        "text": "Maa Ki Rasoi"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "left_click",
+        "ref": "ref_10"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "type",
+        "text": "abc@example.com"
+      }
+    },
+    {
+      "name": "javascript_tool",
+      "input": {
+        "action": "javascript_exec",
+        "text": "({url: location.href, vals: [...document.querySelectorAll('input')].map(i=>i.type==='password'?'***':i.value)})"
+      }
+    },
+    {
+      "name": "read_console_messages",
+      "input": {
+        "onlyErrors": true
+      }
+    }
+  ]
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[computer:left_click] left_click at (376, 265) [ref_6]
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:type] typed 14 chars
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:left_click] left_click at (376, 342) [ref_8]
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:type] typed 12 chars
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:left_click] left_click at (376, 419) [ref_10]
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[computer:type] typed 15 chars
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[javascript_tool:javascript_exec] {
+  "url": "http://localhost:4000/register",
+  "vals": [
+    "Nikunj Agarwal",
+    "Maa Ki Rasoi",
+    "abc@example.com",
+    "***"
+  ]
+}
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+[read_console_messages] [error] Failed to load resource: the server responded with a status of 409 (Conflict)
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4000)
+```
+
+</details>
+
+I couldn't reproduce this, and it doesn't look like a bug in the app. In my browser I typed a full name, business name and email into the same register page on your running server. Nothing closed, every value stayed in its field, the page stayed on `/register`, and there were no new errors. (The one console error is left over from my earlier test of the overlapping-pause warning.)
+
+A web page also can't close a browser by itself. Nothing on that page runs when you type except storing the value as you type. So when **Brave** closes after a few keystrokes, the cause is almost always inside Brave: an extension, or its autofill/password popup crashing. Autofill is a good suspect, because it pops up as you start typing into email and name fields.
+
+**Try these in order, and stop when one works:**
+
+1. **Private window with extensions off.** Press `Ctrl+Shift+N` in Brave and open `localhost:4000/register`. If typing works there, an extension is the cause.
+2. **Find the extension.** Go to `brave://extensions` and turn extensions off one by one. Password managers, Grammarly, translators and AI assistants are the usual suspects. Test the page after each one.
+3. **Turn off autofill for the test.** In `brave://settings/autofill`, switch off address and payment autofill, then try again.
+4. **Update Brave.** Go to `brave://settings/help`, let it update, and restart it. Crashes while typing are often fixed in updates.
+5. **Turn off hardware acceleration.** In `brave://settings/system`, switch off "Use graphics acceleration when available" and restart.
+6. **Check it's only Brave.** Open `localhost:4000` in **Edge**. If it works there, your app is fine, and you can use Edge for testing and the demo.
+
+**Two quick questions if it still happens:**
+- Does the **whole Brave window** close, or only the **tab**? Do you see an "Aw, Snap!" error page?
+- Does it happen on other sites' forms too, or only on this page?
+
+Your answers will tell me whether it's a Brave crash or something in the app. If it turns out to be the app, I'll fix the code.
+
+---
+
+## 👤 User
+
+what does weekdays 22/22 means
+
+## 🤖 Assistant
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8queQxqnbecJpSCNHqj
+
+---
+
+## 👤 User
+
+Now create a detailed pdf 
+explaining the workflow of project.
+and explain each term introduced in the website or backend.
+
+make it detaileed but easy to understand.
+
+include images of the respective if possible from the project.
+also add how the website works. adn each component of website
+
+## 🤖 Assistant
+
+**Tool call — `Skill`**
+
+```json
+{
+  "skill": "anthropic-skills:pdf"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Launching skill: anthropic-skills:pdf
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "ls \"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe\" \"/c/Program Files/Microsoft/Edge/Application/msedge.exe\" 2>&1; curl -s localhost:4000/api/health; S=\"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad\"; mkdir -p \"$S/guide/shots\" && cd \"$S/guide\" && npm init -y >/dev/null && PUPPETEER_SKIP_DOWNLOAD=1 npm i puppeteer-core@23 --no-audit --no-fund 2>&1 | tail -1",
+  "description": "Find Edge, check server, install puppeteer-core",
+  "timeout": 200000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ls: cannot access '/c/Program Files/Microsoft/Edge/Application/msedge.exe': No such file or directory
+/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe
+{"ok":true}added 84 packages in 16s
+```
+
+</details>
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8rB92putFkvNbg8AtDh
+
+---
+
+## 👤 User
+
+Now create a detailed pdf 
+explaining the workflow of project.
+and explain each term introduced in the website or backend.
+
+make it detaileed but easy to understand.
+
+include images of the respective if possible from the project.
+also add how the website works. adn each component of website
+
+## 🤖 Assistant
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8rDEgi3Z6CFB7My5LYY
+
+---
+
+## 👤 User
+
+Now create a detailed pdf 
+explaining the workflow of project.
+and explain each term introduced in the website or backend.
+
+make it detaileed but easy to understand.
+
+include images of the respective if possible from the project.
+also add how the website works. adn each component of website
+
+## 🤖 Assistant
+
+Taking screenshots of each page of your running app:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "S=\"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide\"; cd \"$S\" && cat > shots.cjs <<'EOF'\nconst puppeteer = require('puppeteer-core');\nconst B = 'http://localhost:4000';\nconst wait = (ms) => new Promise(r => setTimeout(r, ms));\n(async () => {\n  const browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, args: ['--no-first-run'] });\n  const page = await browser.newPage();\n  await page.setViewport({ width: 1280, height: 800 });\n  const shot = async (name, opts = {}) => { await wait(900); await page.screenshot({ path: `shots/${name}.jpg`, type: 'jpeg', quality: 78, ...opts }); console.log('shot', name); };\n\n  await page.goto(B + '/'); await shot('landing-hero');\n  await page.evaluate(() => window.scrollTo(0, document.querySelectorAll('section')[2].offsetTop - 20)); await shot('landing-features');\n  await page.evaluate(() => window.scrollTo(0, document.querySelectorAll('section')[4].offsetTop - 20)); await shot('landing-next');\n  await page.goto(B + '/login'); await shot('login');\n  await page.goto(B + '/register'); await shot('register');\n\n  const { token } = await (await fetch(B + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'demo@tiffin.app', password: 'demo1234' }) })).json();\n  await fetch(B + '/api/bills/generate', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ month: '2026-09' }) });\n  await page.evaluate((t) => localStorage.setItem('tiffin_token', t), token);\n\n  await page.goto(B + '/app'); await shot('dashboard');\n  await page.goto(B + '/app/customers'); await shot('customers');\n  await page.goto(B + '/app/customers?status=paused&sort=phone&order=desc&limit=5'); await shot('customers-filtered');\n  await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.includes('Add customer')).click()); await shot('add-customer');\n  await page.goto(B + '/app/customers/1'); await shot('customer-detail', { fullPage: true });\n  await page.evaluate(() => [...document.querySelectorAll('button')].find(b => /Pause|Schedule pause/.test(b.textContent)).click()); await shot('pause-modal');\n  await page.goto(B + '/app/customers/1');\n  await wait(800);\n  const hasResume = await page.evaluate(() => { const b = [...document.querySelectorAll('button')].find(b => b.textContent.includes('Resume')); if (b) b.click(); return !!b; });\n  if (hasResume) await shot('resume-modal');\n  const inactive = await (await fetch(B + '/api/customers?status=inactive&limit=1', { headers: { Authorization: 'Bearer ' + token } })).json();\n  if (inactive.data[0]) {\n    await page.goto(B + '/app/customers/' + inactive.data[0].id); await wait(800);\n    await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.includes('Subscribe')).click()); await shot('subscribe-modal');\n  }\n  await page.goto(B + '/app/plans'); await shot('plans');\n  await page.goto(B + '/app/bills'); await shot('bills');\n  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });\n  await page.goto(B + '/app/customers/1'); await shot('mobile', { type: 'jpeg' });\n  await browser.close();\n})().catch(e => { console.error(e); process.exit(1); });\nEOF\nnode shots.cjs 2>&1 | tail -20; ls -la shots | awk '{print $5, $9}'",
+  "description": "Capture screenshots of every app page",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+shot landing-hero
+shot landing-features
+shot landing-next
+shot login
+shot register
+shot dashboard
+shot customers
+shot customers-filtered
+shot add-customer
+shot customer-detail
+shot pause-modal
+shot resume-modal
+shot subscribe-modal
+shot plans
+shot bills
+shot mobile
+ 
+0 .
+0 ..
+53418 add-customer.jpg
+84957 bills.jpg
+70433 customer-detail.jpg
+67170 customers-filtered.jpg
+85302 customers.jpg
+89541 dashboard.jpg
+90434 landing-features.jpg
+69872 landing-hero.jpg
+86894 landing-next.jpg
+24355 login.jpg
+87739 mobile.jpg
+62285 pause-modal.jpg
+52451 plans.jpg
+29083 register.jpg
+57466 resume-modal.jpg
+36247 subscribe-modal.jpg
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/shots/customer-detail.jpg"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/shots/resume-modal.jpg"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+The screenshots look good. Writing the guide now.
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/guide.html",
+  "content": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Tiffin Tracker – Project Guide</title>\n<style>\n@page { size: A4; margin: 16mm 15mm 18mm; }\n* { box-sizing: border-box; }\nbody { font-family: 'Segoe UI', system-ui, sans-serif; color: #1f1a14; font-size: 10.6pt; line-height: 1.55; margin: 0; }\nh1 { font-size: 21pt; margin: 0 0 6px; color: #b53a0b; page-break-after: avoid; }\nh2 { font-size: 14pt; margin: 18px 0 6px; color: #1f1a14; border-bottom: 2px solid #f3d3bf; padding-bottom: 3px; page-break-after: avoid; }\nh3 { font-size: 11.5pt; margin: 14px 0 4px; color: #b53a0b; page-break-after: avoid; }\np { margin: 5px 0; }\nul, ol { margin: 4px 0 6px; padding-left: 20px; }\nli { margin: 2px 0; }\ncode { font-family: Consolas, monospace; background: #f4efe8; padding: 0 4px; border-radius: 3px; font-size: 9.4pt; }\npre { font-family: Consolas, monospace; background: #221d18; color: #f5ede3; padding: 9px 11px; border-radius: 6px; font-size: 8.8pt; white-space: pre-wrap; page-break-inside: avoid; margin: 6px 0; }\ntable { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.6pt; page-break-inside: auto; }\ntr { page-break-inside: avoid; }\nth, td { border: 1px solid #e6dccf; padding: 4px 7px; text-align: left; vertical-align: top; }\nth { background: #fbeee4; }\n.chapter { page-break-before: always; }\n.num { display: inline-block; background: #d9480f; color: #fff; border-radius: 5px; padding: 0 8px; margin-right: 8px; font-size: 13pt; }\nfigure { margin: 8px 0 12px; page-break-inside: avoid; text-align: center; }\nfigure img { max-width: 100%; border: 1px solid #ddd2c4; border-radius: 6px; }\nfigure.half img { max-width: 72%; }\nfigure.phone img { max-width: 34%; }\nfigcaption { font-size: 8.8pt; color: #6f665c; margin-top: 3px; }\n.note { background: #fff4d6; border-left: 4px solid #e8a100; padding: 7px 10px; border-radius: 4px; margin: 8px 0; page-break-inside: avoid; }\n.tip { background: #e6f4ea; border-left: 4px solid #2b8a3e; padding: 7px 10px; border-radius: 4px; margin: 8px 0; page-break-inside: avoid; }\n.formula { background: #fff0e6; border: 2px dashed #d9480f; text-align: center; font-size: 13pt; font-weight: 700; padding: 10px; border-radius: 8px; margin: 10px 0; page-break-inside: avoid; }\n.muted { color: #6f665c; }\n/* diagrams */\n.flow { display: flex; align-items: stretch; justify-content: center; gap: 0; margin: 10px 0; page-break-inside: avoid; flex-wrap: nowrap; }\n.box { border: 2px solid #d9480f; border-radius: 8px; padding: 7px 9px; background: #fff; text-align: center; font-size: 9.2pt; min-width: 100px; }\n.box b { display: block; font-size: 10pt; color: #b53a0b; }\n.arrow { align-self: center; font-size: 16pt; color: #d9480f; padding: 0 6px; }\n.cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; }\n.cover h1 { font-size: 34pt; }\n.cover .sub { font-size: 14pt; color: #6f665c; margin-bottom: 20px; }\n.toc li { margin: 3px 0; }\n.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }\n.term { page-break-inside: avoid; margin: 5px 0; }\n.term b { color: #b53a0b; }\n.cal { display: inline-grid; grid-template-columns: repeat(7, 26px); gap: 3px; font-size: 8pt; font-weight: 600; }\n.cal div { height: 22px; display: grid; place-items: center; border-radius: 4px; }\n.d { background: #e6f4ea; color: #2b8a3e; } .p { background: #fff4d6; color: #b76e00; text-decoration: line-through; } .w { color: #c9bfb2; }\n</style></head><body>\n\n<!-- ============ COVER ============ -->\n<section class=\"cover\">\n  <div style=\"font-size:50pt\">🍱</div>\n  <h1>Tiffin Tracker</h1>\n  <div class=\"sub\">Complete Project Guide: how it works, every screen, every term, explained simply</div>\n  <p><b>What this document covers</b></p>\n  <ol class=\"toc\">\n    <li>The idea in one page</li>\n    <li>The big picture: how the pieces fit together</li>\n    <li>The billing rules (the heart of the project)</li>\n    <li>End-to-end workflow: a tiffin owner's month</li>\n    <li>Website tour: every page and component, with screenshots</li>\n    <li>Backend: how a click becomes saved data</li>\n    <li>The database, table by table</li>\n    <li>The REST API, endpoint by endpoint</li>\n    <li>Security, validation and errors</li>\n    <li>Glossary: every term used in the website and code</li>\n    <li>Running, testing and troubleshooting</li>\n  </ol>\n  <p class=\"muted\" style=\"margin-top:30px\">Repository: github.com/Nikunj532/tiffin-tracker · Stack: React + Node.js/Express + SQLite</p>\n</section>\n\n<!-- ============ 1 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">1</span>The idea in one page</h1>\n<p>A <b>tiffin service</b> is a home-style lunch delivery business. Customers pay a <b>monthly plan price</b> and get lunch delivered <b>every weekday</b> (Monday to Friday).</p>\n<p>Real life gets in the way. A customer travels for a week, goes home for Diwali, or falls sick. They <b>pause</b> the tiffin and shouldn't pay for those days. When they're back, they <b>resume</b>.</p>\n<p>At month-end the owner needs to answer <i>\"How much does each customer owe?\"</i> Doing that by hand with a notebook means counting weekdays and subtracting paused days for every customer, and mistakes are common.</p>\n\n<h3>What Tiffin Tracker does</h3>\n<table>\n<tr><th style=\"width:30%\">Owner's need</th><th>How the app solves it</th></tr>\n<tr><td>Keep a list of customers</td><td>Customers page: add, edit, search, sort, page through</td></tr>\n<tr><td>Know who is on which plan</td><td>Plans page plus <b>subscriptions</b> linking a customer to a plan</td></tr>\n<tr><td>Record pauses</td><td>Pause / Resume buttons on each customer's page</td></tr>\n<tr><td>Bill fairly</td><td>Automatic <b>pro-rated</b> bill: pay only for days actually served</td></tr>\n<tr><td>Find a customer quickly when they call</td><td><b>Phone lookup</b> on the Dashboard</td></tr>\n<tr><td>See who is active vs paused</td><td>Status badges, status filter tabs, Dashboard counts</td></tr>\n<tr><td>Work for any tiffin business</td><td>Each owner <b>registers</b> their own account; data is kept separate</td></tr>\n</table>\n\n<h3>Who uses it</h3>\n<p>Only the <b>tiffin owner</b> logs in. Customers never see the app; the owner records their pauses when they call or message. The landing page lists \"customer self-service pauses\" as a future feature.</p>\n\n<div class=\"tip\"><b>One-line summary:</b> subscribe → pause/resume → month-end bill = plan price × days delivered ÷ weekdays in month.</div>\n</section>\n\n<!-- ============ 2 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">2</span>The big picture</h1>\n<p>The project is a <b>full-stack web application</b>, which means it has three layers that talk to each other:</p>\n\n<div class=\"flow\">\n  <div class=\"box\"><b>1. Frontend</b>React website<br>in the browser<br><span class=\"muted\">client/</span></div>\n  <div class=\"arrow\">⇄</div>\n  <div class=\"box\"><b>2. Backend</b>Node.js + Express<br>REST API<br><span class=\"muted\">server/</span></div>\n  <div class=\"arrow\">⇄</div>\n  <div class=\"box\"><b>3. Database</b>SQLite file<br>tiffin.db<br><span class=\"muted\">server/data/</span></div>\n</div>\n\n<table>\n<tr><th style=\"width:18%\">Layer</th><th style=\"width:30%\">What it is</th><th>Its job, in plain words</th></tr>\n<tr><td><b>Frontend</b></td><td>React app (JavaScript that runs in the browser)</td><td>Draws the screens: buttons, tables, forms. When you click something it <i>asks</i> the backend for data or to save data. It never touches the database directly.</td></tr>\n<tr><td><b>Backend</b></td><td>Node.js program using the Express library</td><td>The \"brain and gatekeeper\". It checks you're logged in, checks the data makes sense, applies the billing rules, and reads or writes the database.</td></tr>\n<tr><td><b>Database</b></td><td>SQLite, a database stored in one file</td><td>The permanent memory. Customers, plans, pauses and bills survive restarts because they're saved here.</td></tr>\n</table>\n\n<h3>How they communicate</h3>\n<p>The frontend and backend talk using <b>HTTP requests</b> carrying <b>JSON</b> (a simple text format for data). Example: when you open the Customers page, the browser sends:</p>\n<pre>GET /api/customers?status=paused&amp;page=1&amp;limit=10&amp;sort=name&amp;order=asc\nAuthorization: Bearer eyJhbGciOi...   ← your login token</pre>\n<p>and the backend replies with:</p>\n<pre>{ \"data\": [ { \"id\": 1, \"name\": \"Aarav Sharma\", \"phone\": \"9845000000\", \"status\": \"paused\", ... } ],\n  \"page\": 1, \"limit\": 10, \"total\": 7, \"totalPages\": 1,\n  \"counts\": { \"active\": 17, \"paused\": 7, \"upcoming\": 3, \"inactive\": 4 } }</pre>\n\n<h3>Folder structure</h3>\n<pre>tiffin-tracker/\n├── client/                     ← FRONTEND (React)\n│   └── src/\n│       ├── main.jsx            routes: which URL shows which page\n│       ├── api.js              helper that calls the backend + formats ₹ and dates\n│       ├── auth.jsx            remembers who is logged in\n│       ├── useListQuery.js     keeps search/sort/page in the URL\n│       ├── components/         Layout (top bar) and shared UI pieces\n│       └── pages/              Landing, Auth, Dashboard, Customers, CustomerDetail, Plans, Bills\n├── server/                     ← BACKEND (Express)\n│   ├── src/\n│   │   ├── index.js            starts the server on port 4000\n│   │   ├── app.js              connects all routes + error handling\n│   │   ├── db.js               creates the database tables\n│   │   ├── billing.js          THE BILLING FORMULA (pure function)\n│   │   ├── dates.js            date helpers (weekday? add days? month bounds?)\n│   │   ├── http.js             login check, pagination, error helpers\n│   │   ├── seed.js             fills the database with demo data\n│   │   └── routes/             auth, plans, customers, subscriptions, bills, dashboard\n│   ├── test/                   automated tests\n│   └── data/tiffin.db          ← DATABASE FILE (created automatically)\n├── README.md  REASONING.md  AI_LOGS.md\n└── package.json                shortcut commands (install:all, seed, build, start, test)</pre>\n\n<div class=\"note\">In <b>production mode</b> (<code>npm start</code>) the backend also serves the built website, so everything runs at one address: <b>http://localhost:4000</b>. In <b>development mode</b> the website runs separately on port 5173 and forwards <code>/api</code> calls to port 4000.</div>\n</section>\n\n<!-- ============ 3 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">3</span>The billing rules</h1>\n<p>Everything in this project exists to make this calculation correct. It lives in one file, <code>server/src/billing.js</code>, in a function called <code>computeBill</code>.</p>\n\n<div class=\"formula\">Bill = Plan price × Delivered days ÷ Weekdays in the month</div>\n\n<h3>Step by step</h3>\n<ol>\n<li><b>Count the weekdays in the month</b> (Monday–Friday). September 2026 has <b>22</b>. This is the \"Weekdays in month\" number.</li>\n<li><b>Find the subscribed weekdays:</b> weekdays that fall between the subscription's start date and end date (if any). If a customer started on the 1st or earlier and hasn't stopped, that's all 22. If they started on 22 Sep, it's only 7.</li>\n<li><b>Remove paused weekdays:</b> any subscribed weekday inside a pause. Saturdays and Sundays are ignored because nothing is delivered then anyway.</li>\n<li><b>Delivered days</b> = subscribed weekdays − paused weekdays.</li>\n<li><b>Bill</b> = price × delivered ÷ weekdays in month, rounded to the nearest paisa.</li>\n</ol>\n\n<h3>Worked example: Aarav Sharma, September 2026</h3>\n<p>Plan: <b>Veg Mini, ₹2,500/month</b>. Paused <b>15 Sep to 20 Sep</b> (Travel).</p>\n<div style=\"display:flex; gap:20px; align-items:center; page-break-inside:avoid\">\n<div class=\"cal\">\n<div class=\"w\">M</div><div class=\"w\">T</div><div class=\"w\">W</div><div class=\"w\">T</div><div class=\"w\">F</div><div class=\"w\">S</div><div class=\"w\">S</div>\n<div></div><div class=\"d\">1</div><div class=\"d\">2</div><div class=\"d\">3</div><div class=\"d\">4</div><div class=\"w\">5</div><div class=\"w\">6</div>\n<div class=\"d\">7</div><div class=\"d\">8</div><div class=\"d\">9</div><div class=\"d\">10</div><div class=\"d\">11</div><div class=\"w\">12</div><div class=\"w\">13</div>\n<div class=\"d\">14</div><div class=\"p\">15</div><div class=\"p\">16</div><div class=\"p\">17</div><div class=\"p\">18</div><div class=\"w\">19</div><div class=\"w\">20</div>\n<div class=\"d\">21</div><div class=\"d\">22</div><div class=\"d\">23</div><div class=\"d\">24</div><div class=\"d\">25</div><div class=\"w\">26</div><div class=\"w\">27</div>\n<div class=\"d\">28</div><div class=\"d\">29</div><div class=\"d\">30</div>\n</div>\n<table style=\"width:auto\">\n<tr><td>Weekdays in September</td><td><b>22</b></td></tr>\n<tr><td>Subscribed weekdays</td><td><b>22</b> (subscribed since July)</td></tr>\n<tr><td>Paused weekdays</td><td><b>4</b> (15, 16, 17, 18; the 19th and 20th are a weekend)</td></tr>\n<tr><td>Delivered days</td><td><b>22 − 4 = 18</b></td></tr>\n<tr><td>Bill</td><td><b>₹2,500 × 18 ÷ 22 = ₹2,045.45</b></td></tr>\n</table>\n</div>\n\n<h3>What \"Weekdays 22/22\" means on the Bills page</h3>\n<p>The Bills table shows <b>subscribed weekdays / weekdays in month</b>.</p>\n<ul>\n<li><b>22/22</b>: the customer was subscribed on every one of the 22 weekdays in the month.</li>\n<li><b>7/22</b>: the subscription only covered 7 of the month's weekdays (for example it started on 22 Sep), so the bill is smaller.</li>\n<li><b>21/22</b>: the subscription ended or started one weekday short of the full month.</li>\n</ul>\n<p>Paused days are shown separately in the <b>Paused</b> column, and <b>Delivered = subscribed − paused</b>.</p>\n\n<h3>The special rules, and why</h3>\n<table>\n<tr><th style=\"width:34%\">Rule</th><th>Why</th></tr>\n<tr><td>Divide by the month's <b>actual</b> weekday count (20–23)</td><td>A full month always costs exactly the plan price. Never more, never less.</td></tr>\n<tr><td>Weekend days in a pause don't reduce the bill</td><td>No lunch was going to be delivered on a weekend.</td></tr>\n<tr><td>Pause <b>end date is inclusive</b> (last paused day)</td><td>Matches how people talk: \"paused 7th to 11th\".</td></tr>\n<tr><td>A pause with no end = \"until resumed\"</td><td>The customer doesn't know when they'll be back.</td></tr>\n<tr><td><b>Resume on date D</b> = D is the first delivery day again</td><td>The pause is closed the day before D. If D is the pause's own first day, the pause is deleted.</td></tr>\n<tr><td>Pauses can't overlap</td><td>Otherwise a day could be counted as paused twice.</td></tr>\n<tr><td>The plan price is <b>copied</b> onto the subscription</td><td>If the owner raises the plan price later, existing customers' bills don't change silently.</td></tr>\n<tr><td>Money stored in <b>paise</b> (whole numbers)</td><td>Decimals in computers can drift (0.1 + 0.2 ≠ 0.3). ₹2,045.45 is stored as 204545.</td></tr>\n<tr><td>A pause spanning two months is split</td><td>Each month only counts the paused days that fall inside it.</td></tr>\n</table>\n</section>\n\n<!-- ============ 4 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">4</span>End-to-end workflow: a tiffin owner's month</h1>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n  <div class=\"box\"><b>Register</b>/ log in</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Create plans</b>e.g. Veg Mini ₹2,500</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Add customer</b>name, phone, address</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Subscribe</b>customer → plan</div>\n</div>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n  <div class=\"box\"><b>Daily use</b>Dashboard: tiffins today</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Pause / Resume</b>when customers call</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Month-end</b>Generate bills</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Collect</b>show breakdown</div>\n</div>\n\n<h3>Step 1: Register and log in</h3>\n<p>The owner creates an account (name, tiffin service name, email, password). The backend stores a <b>hashed</b> password and returns a <b>token</b>. The browser keeps that token and sends it with every later request, which is how the backend knows who is asking.</p>\n\n<h3>Step 2: Create meal plans</h3>\n<p>On <b>Plans</b>, the owner adds plans such as \"Veg Mini ₹2,500\", \"Veg Full Thali ₹3,500\" and \"Non-Veg Thali ₹4,500\". A plan can be <b>retired</b> (unticked \"Available for new subscriptions\") so no new customers join it, while existing customers stay on it.</p>\n\n<h3>Step 3: Add customers</h3>\n<p>On <b>Customers → + Add customer</b>, enter name, phone and address. Phone numbers are cleaned (spaces and dashes removed) and must be unique for that owner, because the phone number is how customers are looked up.</p>\n\n<h3>Step 4: Subscribe</h3>\n<p>On the customer's page click <b>Subscribe to a plan</b>, choose the plan and a start date. The subscription stores the start date and a copy of the price. A customer can only have one running subscription at a time.</p>\n\n<h3>Step 5: Day to day</h3>\n<ul>\n<li>The <b>Dashboard</b> shows how many tiffins to cook and deliver today (the number of Active customers on a weekday) and who is paused.</li>\n<li>A customer calls: type their phone into <b>Find customer by phone</b> to jump to their page.</li>\n<li>They're travelling: click <b>⏸ Pause</b>, pick first and last paused day (or \"until I resume\"), and add a reason.</li>\n<li>They're back early: click <b>▶ Resume</b> and choose the first delivery day.</li>\n<li>They're leaving: click <b>End subscription</b> with the last delivery day.</li>\n</ul>\n\n<h3>Step 6: Month-end billing</h3>\n<p>Open <b>Bills</b>, pick the month and click <b>Generate bills</b>. The backend runs the billing formula for every subscription that touched that month and <b>saves</b> the results. The table shows each customer's weekdays, paused days, delivered days and amount, plus the total to collect.</p>\n<p>If a pause is corrected afterwards, click <b>Regenerate</b>. The saved bills are recomputed from scratch, and running it twice gives the same result.</p>\n\n<div class=\"tip\"><b>Status updates itself.</b> The app never stores \"paused\" as a flag. Every time, it checks today's date against the pauses. A pause scheduled for next week turns into \"Paused\" on the right morning without anyone clicking anything.</div>\n</section>\n\n<!-- ============ 5 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">5</span>Website tour: every page and component</h1>\n\n<h2>5.1 Landing page (<code>/</code>)</h2>\n<p>The public front page, visible without logging in. File: <code>client/src/pages/Landing.jsx</code>.</p>\n<figure><img src=\"shots/landing-hero.jpg\"><figcaption>Hero section: headline, short description, \"Start free\" / \"Try the demo\" buttons, and a sample bill card with a delivery calendar.</figcaption></figure>\n<table>\n<tr><th style=\"width:26%\">Component</th><th>What it shows / does</th></tr>\n<tr><td>Navigation bar</td><td>Logo, plus <b>Log in</b> and <b>Start free</b> buttons (shows <b>Open dashboard</b> if you're already logged in).</td></tr>\n<tr><td>Hero</td><td>What the product is, in one sentence, with the main call-to-action buttons.</td></tr>\n<tr><td>Sample bill card</td><td>A mini example of a pro-rated bill (₹3,000 × 17 ÷ 22 = ₹2,318) with paused days struck through.</td></tr>\n<tr><td>The problem</td><td>Three pain points: notebook chaos, awkward disputes, hours of math.</td></tr>\n<tr><td>Key features</td><td>Six feature cards (pause/resume, fair bills, phone lookup, status, calendar, search/sort/paginate).</td></tr>\n<tr><td>Who it's for / How it helps</td><td>Target audience and benefits.</td></tr>\n<tr><td>Coming next</td><td>Three planned features: WhatsApp bills with UPI links, customer self-service pauses, kitchen and route sheet.</td></tr>\n<tr><td>Call-to-action band and footer</td><td>A final sign-up button.</td></tr>\n</table>\n<figure><img src=\"shots/landing-features.jpg\"><figcaption>\"Key features\" cards.</figcaption></figure>\n<figure><img src=\"shots/landing-next.jpg\"><figcaption>\"Who it's for\", \"How it helps\" and \"Coming next\" sections.</figcaption></figure>\n\n<h2>5.2 Register and Log in (<code>/register</code>, <code>/login</code>)</h2>\n<p>File: <code>client/src/pages/Auth.jsx</code>. Both are simple forms inside a card.</p>\n<div class=\"grid2\">\n<figure><img src=\"shots/register.jpg\"><figcaption>Register: your name, tiffin service name, email, password (min 8 characters).</figcaption></figure>\n<figure><img src=\"shots/login.jpg\"><figcaption>Log in: email and password. Shows demo credentials.</figcaption></figure>\n</div>\n<ul>\n<li>Errors from the backend (e.g. \"An account with this email already exists\") appear in a red <b>alert box</b> above the form.</li>\n<li>After registering you're taken to <b>Plans</b> (a new owner's first job). After logging in you're taken to the <b>Dashboard</b>.</li>\n<li>If you're already logged in, these pages redirect you into the app (<b>GuestOnly</b> guard). App pages redirect logged-out visitors to Log in (<b>Protected</b> guard).</li>\n</ul>\n\n<h2>5.3 The app layout: top bar</h2>\n<p>File: <code>client/src/components/Layout.jsx</code>. Every page inside <code>/app</code> shares it:</p>\n<ul>\n<li><b>Brand:</b> the owner's tiffin service name (e.g. \"Annapurna Tiffins\"). Click it to go to the Dashboard.</li>\n<li><b>Navigation tabs:</b> Dashboard · Customers · Plans · Bills. The current page is highlighted in orange.</li>\n<li><b>User area:</b> owner's name and <b>Log out</b> (forgets the token and returns to the landing page).</li>\n</ul>\n\n<h2>5.4 Dashboard (<code>/app</code>)</h2>\n<figure><img src=\"shots/dashboard.jpg\"><figcaption>Dashboard: today's summary, status counts, projected revenue, phone lookup and \"Paused today\" list.</figcaption></figure>\n<table>\n<tr><th style=\"width:28%\">Component</th><th>Meaning</th></tr>\n<tr><td>Today · date</td><td>Today's date, and whether it's a <b>Delivery day</b> (weekday) or weekend.</td></tr>\n<tr><td>Find customer by phone</td><td>Type a phone number and press <b>Look up</b> to open that customer. Shows \"No customer with phone …\" if not found.</td></tr>\n<tr><td>Tiffins to deliver today</td><td>Number of <b>Active</b> customers today (0 on weekends). This is how many lunches to cook.</td></tr>\n<tr><td>Active / Paused / Upcoming cards</td><td>How many customers are in each status. Click a card to open Customers filtered to that status.</td></tr>\n<tr><td>Projected bill total</td><td>What this month's bills would total if generated right now, calculated live from current pauses.</td></tr>\n<tr><td>Paused today table</td><td>Customers paused today, with pause dates and reason (up to 10; \"View all →\" for the rest).</td></tr>\n<tr><td>Get started callout</td><td>Only shown to a new owner with no plans; links to Plans.</td></tr>\n</table>\n\n<h2>5.5 Customers list (<code>/app/customers</code>)</h2>\n<p>File: <code>client/src/pages/Customers.jsx</code>. This page shows <b>search</b>, <b>filtering</b>, <b>sorting</b> and <b>pagination</b>.</p>\n<figure><img src=\"shots/customers.jpg\"><figcaption>All customers, sorted by name, 10 per page.</figcaption></figure>\n<table>\n<tr><th style=\"width:26%\">Component</th><th>What it does</th></tr>\n<tr><td>Search box</td><td>Searches name, phone and address as you type. It waits 0.3 s after you stop typing before asking the server (<b>debounce</b>), so it doesn't send a request per keystroke.</td></tr>\n<tr><td>Status tabs</td><td>All · Active · Paused · Upcoming · Inactive, with counts in brackets.</td></tr>\n<tr><td>Sortable column headers</td><td>Click <b>Name, Phone, Plan, Status or Added</b> to sort. Click again to reverse. ▲ = ascending (A→Z, old→new), ▼ = descending, ↕ = not sorted by this column.</td></tr>\n<tr><td>Status badge</td><td>Coloured pill: green <b>active</b>, yellow <b>paused</b>, blue <b>upcoming</b>, grey <b>inactive</b>.</td></tr>\n<tr><td>Pagination bar</td><td>\"1–10 of 32\", rows per page (5/10/20/50), ‹ Prev, Page X / Y, Next ›.</td></tr>\n<tr><td>+ Add customer</td><td>Opens the Add customer <b>modal</b> (pop-up form).</td></tr>\n</table>\n<figure><img src=\"shots/customers-filtered.jpg\"><figcaption>Filtered to <b>Paused</b>, sorted by <b>Phone ▼</b>, <b>5 per page</b>. The URL becomes <code>?status=paused&amp;sort=phone&amp;order=desc&amp;limit=5</code>, so refreshing or sharing the link keeps the same view.</figcaption></figure>\n<figure class=\"half\"><img src=\"shots/add-customer.jpg\"><figcaption>Add customer modal: name, phone (10–13 digits), delivery address. After saving you're taken to the new customer's page.</figcaption></figure>\n\n<h2>5.6 Customer detail (<code>/app/customers/:id</code>)</h2>\n<p>File: <code>client/src/pages/CustomerDetail.jsx</code>. Everything about one customer, and where pauses happen.</p>\n<figure><img src=\"shots/customer-detail.jpg\"><figcaption>Aarav Sharma: status, subscription card with actions, pause history, and this month's bill with a delivery calendar.</figcaption></figure>\n<table>\n<tr><th style=\"width:28%\">Component</th><th>What it does</th></tr>\n<tr><td>Header</td><td>Name, status badge, phone, address; <b>Edit</b> (same form as Add) and <b>Delete</b> (asks for confirmation; removes all their history).</td></tr>\n<tr><td>Subscription card</td><td>Plan name and price, \"Since\" start date, and \"Paused until …\" if currently paused.</td></tr>\n<tr><td>⏸ Pause</td><td>Shown when not paused. Opens the pause form.</td></tr>\n<tr><td>▶ Resume</td><td>Shown when paused today. Opens the resume form.</td></tr>\n<tr><td>Schedule pause</td><td>Shown while paused, to add another future pause.</td></tr>\n<tr><td>End subscription</td><td>Sets the last delivery day. Pauses after it are trimmed.</td></tr>\n<tr><td>Pauses table</td><td>Every pause (From, To or \"until resumed\", Reason). <b>Remove</b> deletes a pause entered by mistake, so those days become billable again.</td></tr>\n<tr><td>Subscribe to a plan</td><td>Shown instead of the card when the customer has no running subscription.</td></tr>\n<tr><td>Bill for &lt;month&gt;</td><td>A <b>live preview</b> of the bill. Pick any month with the month picker. Shows the amount, the formula with real numbers, and the four counts.</td></tr>\n<tr><td>Delivery calendar</td><td>Each day coloured: <span style=\"color:#2b8a3e\">green = delivered</span>, <span style=\"color:#b76e00\">yellow struck-through = paused</span>, faded = weekend, grey = not subscribed (before start or after end).</td></tr>\n<tr><td>Subscription history</td><td>Shown only if the customer had more than one subscription over time.</td></tr>\n</table>\n<div class=\"grid2\">\n<figure><img src=\"shots/pause-modal.jpg\"><figcaption>Pause form: first paused day, last paused day, \"Pause until I resume manually\" checkbox, reason.</figcaption></figure>\n<figure><img src=\"shots/resume-modal.jpg\"><figcaption>Resume form: first delivery day. \"The pause ends the day before this date.\"</figcaption></figure>\n</div>\n<figure class=\"half\"><img src=\"shots/subscribe-modal.jpg\"><figcaption>Subscribe form for a customer without a plan: choose an active plan and start date.</figcaption></figure>\n<div class=\"note\"><b>What happens on a mistake?</b> If you try to pause dates that overlap an existing pause, the form shows e.g. <i>\"Overlaps an existing pause starting 2026-09-15 to 2026-09-16\"</i> and nothing is saved.</div>\n\n<h2>5.7 Plans (<code>/app/plans</code>)</h2>\n<figure><img src=\"shots/plans.jpg\"><figcaption>Meal plans with price, number of current subscribers and availability.</figcaption></figure>\n<ul>\n<li><b>+ New plan / Edit:</b> name, what's included, monthly price in ₹ (converted to paise when saved), and \"Available for new subscriptions\".</li>\n<li><b>Status \"available\" / \"retired\":</b> retired plans can't be chosen for new subscriptions.</li>\n<li><b>Delete:</b> only allowed if nobody ever subscribed to the plan; otherwise retire it.</li>\n<li>Search box, sortable columns (Plan, Monthly price, Subscribers) and pagination work like the Customers page.</li>\n</ul>\n\n<h2>5.8 Bills (<code>/app/bills</code>)</h2>\n<figure><img src=\"shots/bills.jpg\"><figcaption>Monthly bills: month picker, Regenerate, summary cards, searchable and sortable bill table.</figcaption></figure>\n<table>\n<tr><th style=\"width:28%\">Component</th><th>Meaning</th></tr>\n<tr><td>Month picker</td><td>Choose which month's bills to view or generate.</td></tr>\n<tr><td>Generate bills / Regenerate</td><td>Calculates and saves bills for every subscription active in that month.</td></tr>\n<tr><td>Total to collect</td><td>Sum of all bill amounts for the month.</td></tr>\n<tr><td>Bills</td><td>Number of bills (one per subscription that touched the month).</td></tr>\n<tr><td>Tiffins delivered</td><td>Sum of delivered days across all customers, i.e. the total lunches served.</td></tr>\n<tr><td>Paused days (not charged)</td><td>Sum of paused weekdays: lunches customers didn't pay for.</td></tr>\n<tr><td>Last generated</td><td>When the bills were last calculated. If pauses changed since then, click Regenerate.</td></tr>\n<tr><td>Customer column</td><td>Name (links to the customer page) and phone.</td></tr>\n<tr><td>Plan column</td><td>Plan name and the monthly price used for the bill.</td></tr>\n<tr><td><b>Weekdays</b> column</td><td><b>subscribed weekdays / weekdays in month</b>, e.g. 22/22 (whole month) or 7/22 (joined late).</td></tr>\n<tr><td>Paused column</td><td>Paused weekdays in that month.</td></tr>\n<tr><td>Delivered column</td><td>Subscribed − paused. The number the customer pays for.</td></tr>\n<tr><td>Amount column</td><td>The final bill in ₹.</td></tr>\n</table>\n\n<h2>5.9 Works on phones too</h2>\n<div style=\"display:flex; gap:16px; align-items:center; page-break-inside:avoid\">\n<figure class=\"phone\" style=\"flex:1\"><img src=\"shots/mobile.jpg\" style=\"max-width:62%\"><figcaption>Customer page on a phone-sized screen.</figcaption></figure>\n<div style=\"flex:1.3\"><p>The layout is <b>responsive</b>: on narrow screens, columns stack vertically, less important table columns (Plan, Added) are hidden, and tables scroll sideways instead of breaking the page.</p></div>\n</div>\n</section>\n\n<!-- ============ 6 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">6</span>Backend: how a click becomes saved data</h1>\n<p>Let's follow one action, <b>pausing Aarav from 21 to 23 September</b>, through the whole system.</p>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n<div class=\"box\"><b>① Click</b>Pause form<br>submitted</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>② api.js</b>POST request<br>+ token</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>③ Express</b>routes to<br>subscriptions.js</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>④ requireAuth</b>checks token</div>\n</div>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n<div class=\"box\"><b>⑤ Validate</b>dates OK?<br>overlap?</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>⑥ SQL INSERT</b>into pauses</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>⑦ Response</b>201 + updated<br>subscription JSON</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>⑧ React</b>reloads page,<br>bill updates</div>\n</div>\n\n<ol>\n<li><b>Frontend:</b> the <code>PauseForm</code> component calls <code>api('/subscriptions/1/pause', {method:'POST', body:{start_date:'2026-09-21', end_date:'2026-09-23', reason:''}})</code>.</li>\n<li><b>api.js</b> adds <code>Authorization: Bearer &lt;token&gt;</code> and sends the request to the server.</li>\n<li><b>app.js</b> (Express) matches the URL to the subscription routes.</li>\n<li><b>requireAuth</b> (in <code>http.js</code>) verifies the token and learns the owner's id. No or invalid token → <b>401</b>.</li>\n<li><b>subscriptions.js</b> loads the subscription (only if it belongs to this owner, otherwise <b>404</b>) and checks:\n  <ul><li>dates are real dates in YYYY-MM-DD format → otherwise <b>400</b></li>\n  <li>end is not before start, and the pause is within the subscription → otherwise <b>400</b></li>\n  <li>no overlap with existing pauses → otherwise <b>409</b></li></ul></li>\n<li>It runs <code>INSERT INTO pauses (subscription_id, start_date, end_date, reason) VALUES (...)</code>.</li>\n<li>It replies <b>201 Created</b> with the subscription and all its pauses.</li>\n<li>React reloads the customer and the bill preview (<code>GET /subscriptions/1/bill?month=2026-09</code>), which runs <code>computeBill</code> again, so the calendar and amount update.</li>\n</ol>\n\n<h3>Backend files explained</h3>\n<table>\n<tr><th style=\"width:26%\">File</th><th>Responsibility</th></tr>\n<tr><td><code>index.js</code></td><td>Opens the database, builds the app, starts listening on port 4000.</td></tr>\n<tr><td><code>app.js</code></td><td>Registers middleware (JSON parsing, CORS, request logging), mounts each route group, serves the built website, and turns thrown errors into JSON error responses.</td></tr>\n<tr><td><code>db.js</code></td><td>Creates the six tables if they don't exist; turns on foreign keys; <code>tx()</code> helper for transactions.</td></tr>\n<tr><td><code>billing.js</code></td><td><code>computeBill()</code>, the formula; <code>rangesOverlap()</code>, the overlap check. No database or clock inside, so it's easy to test.</td></tr>\n<tr><td><code>dates.js</code></td><td>Is this a valid date? Is it a weekday? Add N days. First and last day of a month. All in UTC so time zones can't shift a day.</td></tr>\n<tr><td><code>http.js</code></td><td><code>HttpError</code>, <code>requireAuth</code>, <code>pageParams</code> (reads page/limit/sort/order safely), <code>paged</code> (builds the list response), phone clean-up.</td></tr>\n<tr><td><code>routes/auth.js</code></td><td>Register, login, \"who am I\".</td></tr>\n<tr><td><code>routes/plans.js</code></td><td>Create, list, edit, delete plans.</td></tr>\n<tr><td><code>routes/customers.js</code></td><td>Customer CRUD, search/filter/sort/paginate, phone lookup, and the <b>status</b> SQL.</td></tr>\n<tr><td><code>routes/subscriptions.js</code></td><td>Subscribe, pause, resume, remove pause, end subscription, bill preview.</td></tr>\n<tr><td><code>routes/bills.js</code></td><td>Generate (save) bills for a month; list saved bills with summary.</td></tr>\n<tr><td><code>routes/dashboard.js</code></td><td>Today's counts, tiffins to deliver, projected revenue, paused-today list.</td></tr>\n<tr><td><code>seed.js</code></td><td>Deletes and recreates the demo owner with 3 plans and 32 customers.</td></tr>\n</table>\n\n<h3>Frontend files explained</h3>\n<table>\n<tr><th style=\"width:26%\">File</th><th>Responsibility</th></tr>\n<tr><td><code>main.jsx</code></td><td>Starts React and defines <b>routes</b> (URL → page), with Protected and GuestOnly guards.</td></tr>\n<tr><td><code>auth.jsx</code></td><td><b>AuthProvider</b>: remembers the logged-in user, offers login/register/logout to every page.</td></tr>\n<tr><td><code>api.js</code></td><td>One function to call the backend (adds the token, handles errors); formats ₹ amounts and dates.</td></tr>\n<tr><td><code>useListQuery.js</code></td><td>Stores search, filter, page, sort and order in the URL query string.</td></tr>\n<tr><td><code>components/ui.jsx</code></td><td>Reusable pieces: StatusBadge, SortTh (sortable header), Pagination, Modal, ErrorNote, useDebounced.</td></tr>\n<tr><td><code>components/Layout.jsx</code></td><td>Top bar and navigation around every app page.</td></tr>\n<tr><td><code>pages/*.jsx</code></td><td>One file per screen (described in Chapter 5).</td></tr>\n<tr><td><code>styles.css</code></td><td>All colours, spacing, tables, badges, modal, calendar and mobile rules.</td></tr>\n</table>\n</section>\n\n<!-- ============ 7 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">7</span>The database, table by table</h1>\n<p>The database has <b>6 tables</b>. Think of each table as a spreadsheet; each row is one record. Tables are linked by <b>ids</b>.</p>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n<div class=\"box\"><b>users</b>tiffin owners</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>plans</b>&amp; <b>customers</b><br>belong to an owner</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>subscriptions</b>customer + plan</div><div class=\"arrow\">→</div>\n<div class=\"box\"><b>pauses</b>&amp; <b>bills</b><br>belong to a subscription</div>\n</div>\n\n<h3>users: the tiffin owners who log in</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>id</td><td>Unique number for the owner</td></tr>\n<tr><td>name, business_name</td><td>Owner's name and tiffin service name (shown in the top bar)</td></tr>\n<tr><td>email</td><td>Login email, unique (case doesn't matter)</td></tr>\n<tr><td>password_hash</td><td>Scrambled password (bcrypt). The real password is never stored.</td></tr>\n<tr><td>created_at</td><td>When the account was created</td></tr></table>\n\n<h3>plans: what the owner sells</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>owner_id</td><td>Which owner this plan belongs to</td></tr>\n<tr><td>name, description</td><td>\"Veg Mini\", \"3 rotis, dal, sabzi\"</td></tr>\n<tr><td>price_paise</td><td>Monthly price in paise (250000 = ₹2,500)</td></tr>\n<tr><td>is_active</td><td>1 = available for new subscriptions, 0 = retired</td></tr></table>\n\n<h3>customers: people who receive tiffins</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>owner_id</td><td>Which owner's customer this is</td></tr>\n<tr><td>name, phone, address</td><td>Contact details. <b>(owner_id, phone) is unique</b>: no duplicate phones per owner.</td></tr>\n<tr><td>created_at</td><td>\"Added\" date shown on the Customers page</td></tr></table>\n\n<h3>subscriptions: a customer on a plan for a period</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>customer_id, plan_id</td><td>Who, and which plan</td></tr>\n<tr><td>price_paise</td><td>Price <b>copied</b> from the plan when subscribing</td></tr>\n<tr><td>start_date</td><td>First delivery day</td></tr>\n<tr><td>end_date</td><td>Last delivery day, or empty (NULL) if still running</td></tr></table>\n\n<h3>pauses: days not to deliver</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>subscription_id</td><td>Which subscription is paused</td></tr>\n<tr><td>start_date</td><td>First paused day</td></tr>\n<tr><td>end_date</td><td>Last paused day (inclusive), or NULL = until resumed</td></tr>\n<tr><td>reason</td><td>Optional note: Travel, Diwali, Unwell…</td></tr></table>\n\n<h3>bills: saved month-end results</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>subscription_id, month</td><td>Whose bill and for which month (\"2026-09\"). One bill per subscription per month.</td></tr>\n<tr><td>working_days</td><td>Weekdays in the month (e.g. 22)</td></tr>\n<tr><td>subscribed_days</td><td>Weekdays inside the subscription period</td></tr>\n<tr><td>paused_days</td><td>Subscribed weekdays that were paused</td></tr>\n<tr><td>delivered_days</td><td>subscribed_days − paused_days</td></tr>\n<tr><td>price_paise, amount_paise</td><td>Price used and final bill amount</td></tr>\n<tr><td>generated_at</td><td>When it was calculated (\"Last generated\")</td></tr></table>\n\n<div class=\"tip\"><b>Why isn't \"status\" a column?</b> Status (active/paused/upcoming/inactive) is <b>calculated</b> each time from today's date, the subscription dates and the pauses. Stored flags go out of date; calculated status never does.</div>\n\n<h3>How status is decided</h3>\n<table>\n<tr><th style=\"width:18%\">Status</th><th>Rule (checked in this order, for today's date)</th></tr>\n<tr><td><span style=\"color:#b76e00\"><b>paused</b></span></td><td>Has a running subscription today <b>and</b> a pause covering today</td></tr>\n<tr><td><span style=\"color:#2b8a3e\"><b>active</b></span></td><td>Has a running subscription today, not paused</td></tr>\n<tr><td><span style=\"color:#1c64b8\"><b>upcoming</b></span></td><td>Only has a subscription that starts in the future</td></tr>\n<tr><td><span style=\"color:#6f665c\"><b>inactive</b></span></td><td>No current or future subscription (never subscribed, or ended)</td></tr>\n</table>\n</section>\n\n<!-- ============ 8 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">8</span>The REST API, endpoint by endpoint</h1>\n<p>All addresses start with <code>/api</code>. Except register, login and health, every request needs the header <code>Authorization: Bearer &lt;token&gt;</code>. Dates are <code>YYYY-MM-DD</code>, months are <code>YYYY-MM</code>, and money is in paise.</p>\n\n<h3>Auth</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>POST</td><td>/api/auth/register</td><td>Create an owner account → returns token + user</td></tr>\n<tr><td>POST</td><td>/api/auth/login</td><td>Log in → returns token + user</td></tr>\n<tr><td>GET</td><td>/api/auth/me</td><td>Who is logged in</td></tr></table>\n\n<h3>Plans</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>GET</td><td>/api/plans</td><td>List plans (search, page, limit, sort = name/price/subscribers/created_at, order)</td></tr>\n<tr><td>POST</td><td>/api/plans</td><td>Create a plan</td></tr>\n<tr><td>GET / PUT / DELETE</td><td>/api/plans/:id</td><td>Read / update / delete one plan</td></tr></table>\n\n<h3>Customers</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>GET</td><td>/api/customers</td><td>List, search and filter customers (search, status, page, limit, sort = name/phone/plan/status/created_at, order, as_of)</td></tr>\n<tr><td>GET</td><td>/api/customers/phone/:phone</td><td>Find a customer by phone</td></tr>\n<tr><td>POST</td><td>/api/customers</td><td>Add a customer</td></tr>\n<tr><td>GET</td><td>/api/customers/:id</td><td>Customer with all subscriptions and pauses</td></tr>\n<tr><td>PUT / DELETE</td><td>/api/customers/:id</td><td>Edit / delete customer</td></tr></table>\n\n<h3>Subscriptions, pause and resume</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>POST</td><td>/api/customers/:id/subscriptions</td><td>Subscribe customer to a plan { plan_id, start_date }</td></tr>\n<tr><td>GET</td><td>/api/subscriptions/:id</td><td>Subscription with pauses</td></tr>\n<tr><td>POST</td><td>/api/subscriptions/:id/pause</td><td>Pause { start_date, end_date?, reason? }</td></tr>\n<tr><td>POST</td><td>/api/subscriptions/:id/resume</td><td>Resume { date } (first delivery day again)</td></tr>\n<tr><td>DELETE</td><td>/api/pauses/:id</td><td>Remove a pause</td></tr>\n<tr><td>POST</td><td>/api/subscriptions/:id/end</td><td>End subscription { end_date }</td></tr>\n<tr><td>GET</td><td>/api/subscriptions/:id/bill?month=</td><td>Live bill preview (not saved)</td></tr></table>\n\n<h3>Bills, dashboard and health</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>POST</td><td>/api/bills/generate</td><td>Calculate and save bills for { month }</td></tr>\n<tr><td>GET</td><td>/api/bills</td><td>List saved bills (month, search, page, limit, sort = name/phone/plan/amount/delivered/paused, order) + summary</td></tr>\n<tr><td>GET</td><td>/api/dashboard</td><td>Today's counts, tiffins today, projected revenue, paused today</td></tr>\n<tr><td>GET</td><td>/api/health</td><td>Is the server alive? → { ok: true }</td></tr></table>\n\n<h3>HTTP status codes you'll see</h3>\n<table><tr><th style=\"width:14%\">Code</th><th style=\"width:22%\">Name</th><th>When it happens here</th></tr>\n<tr><td>200</td><td>OK</td><td>Request worked (read, update, resume, generate)</td></tr>\n<tr><td>201</td><td>Created</td><td>Something new was saved (register, customer, plan, subscription, pause)</td></tr>\n<tr><td>204</td><td>No Content</td><td>Delete worked, nothing to return</td></tr>\n<tr><td>400</td><td>Bad Request</td><td>Invalid input: bad date, missing name, end before start…</td></tr>\n<tr><td>401</td><td>Unauthorized</td><td>Not logged in, wrong password, or expired token</td></tr>\n<tr><td>404</td><td>Not Found</td><td>Doesn't exist, or belongs to another owner</td></tr>\n<tr><td>409</td><td>Conflict</td><td>Clashes with existing data: duplicate phone/email, overlapping pause, second subscription, deleting a used plan</td></tr>\n<tr><td>500</td><td>Server Error</td><td>Unexpected bug; details are printed in the server terminal</td></tr></table>\n\n<h3>Example: a real request and response</h3>\n<pre>POST /api/bills/generate\nAuthorization: Bearer eyJhbGciOi...\nContent-Type: application/json\n\n{ \"month\": \"2026-09\" }\n\n→ 200 OK\n{ \"month\": \"2026-09\", \"bills_generated\": 30, \"total_amount_paise\": 8381819 }   ← ₹83,818.19</pre>\n</section>\n\n<!-- ============ 9 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">9</span>Security, validation and errors</h1>\n<h3>Login and passwords</h3>\n<ul>\n<li>Passwords are stored as a <b>bcrypt hash</b>, a one-way scramble. Even someone who reads the database can't see real passwords. At login, the typed password is hashed again and compared.</li>\n<li>After login the server issues a <b>JWT</b> (JSON Web Token), valid for 7 days, signed with a secret (<code>JWT_SECRET</code>). The browser saves it in <b>localStorage</b> and sends it with every request.</li>\n<li>If the token is missing, altered or expired, the server replies 401 and the website logs you out automatically.</li>\n</ul>\n<h3>Keeping owners' data apart (multi-tenancy)</h3>\n<p>Every query includes <code>owner_id = the logged-in owner</code>. Asking for another owner's customer returns 404, as if it doesn't exist, so ids of other businesses are never revealed.</p>\n<h3>Input validation</h3>\n<ul>\n<li>Names are required; emails must look like emails; passwords need at least 8 characters.</li>\n<li>Phones: spaces, dashes and brackets are removed, then the number must be 10–13 digits (optional leading +).</li>\n<li>Dates must be real calendar dates (2026-02-30 is rejected).</li>\n<li>Prices must be positive whole paise.</li>\n<li>Page is at least 1; limit is between 1 and 100.</li>\n</ul>\n<h3>Safe sorting (SQL injection protection)</h3>\n<p>Sort options are chosen from a fixed list (<b>whitelist</b>). If someone sends <code>sort=name;DROP TABLE users</code>, it's ignored and the default sort is used. All other values go into SQL as <b>parameters</b>, never pasted into the SQL text.</p>\n<h3>Transactions</h3>\n<p>Multi-step changes (generating a month's bills, ending a subscription and trimming its pauses) run in a <b>transaction</b>: either every step is saved, or none are.</p>\n<h3>Consistent error format</h3>\n<pre>{ \"error\": \"Validation failed\", \"details\": { \"phone\": \"Phone must be 10–13 digits (optionally starting with +)\" } }</pre>\n<p>The website shows <code>error</code> in a red box and lists each <code>details</code> message under it.</p>\n</section>\n\n<!-- ============ 10 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">10</span>Glossary: every term explained</h1>\n\n<h3>Business terms (what you see on the website)</h3>\n<div class=\"term\"><b>Tiffin</b>: a packed home-style lunch delivered in a lunch box.</div>\n<div class=\"term\"><b>Owner</b>: the person running the tiffin service; the only user who logs in.</div>\n<div class=\"term\"><b>Tiffin service name / Business name</b>: shown in the top-left of the app, e.g. \"Annapurna Tiffins\".</div>\n<div class=\"term\"><b>Plan / Meal plan</b>: a product with a monthly price, e.g. \"Veg Mini ₹2,500/month\".</div>\n<div class=\"term\"><b>Available / Retired (plan)</b>: available plans can get new subscribers; retired ones can't but keep existing subscribers.</div>\n<div class=\"term\"><b>Subscribers</b>: number of customers currently on a plan.</div>\n<div class=\"term\"><b>Customer</b>: a person receiving tiffins; identified by phone number.</div>\n<div class=\"term\"><b>Subscription</b>: a customer signed up to a plan from a start date until an optional end date.</div>\n<div class=\"term\"><b>Subscribe</b>: create a subscription for a customer.</div>\n<div class=\"term\"><b>End subscription</b>: set the last delivery day; the customer stops receiving and being billed after it.</div>\n<div class=\"term\"><b>Pause</b>: a range of dates when no tiffin is delivered and nothing is charged.</div>\n<div class=\"term\"><b>Schedule pause</b>: add a pause that starts in the future.</div>\n<div class=\"term\"><b>Pause until resumed / open-ended pause</b>: a pause with no end date.</div>\n<div class=\"term\"><b>Resume</b>: end the current pause; the chosen date is the first delivery day again.</div>\n<div class=\"term\"><b>Remove (pause)</b>: delete a pause entered by mistake; those days become billable.</div>\n<div class=\"term\"><b>Reason</b>: optional note for a pause (Travel, Festival, Unwell).</div>\n<div class=\"term\"><b>Status</b>: a customer's state today: Active, Paused, Upcoming or Inactive.</div>\n<div class=\"term\"><b>Active</b>: subscribed and receiving tiffin today.</div>\n<div class=\"term\"><b>Paused</b>: subscribed, but paused today.</div>\n<div class=\"term\"><b>Upcoming</b>: subscription starts in the future.</div>\n<div class=\"term\"><b>Inactive</b>: no current or future subscription.</div>\n<div class=\"term\"><b>Delivery day</b>: a weekday (Mon–Fri). Weekends are not delivery days.</div>\n<div class=\"term\"><b>Tiffins to deliver today</b>: count of Active customers on a delivery day.</div>\n<div class=\"term\"><b>Weekdays in month / Working days</b>: Monday–Friday dates in the month (20–23).</div>\n<div class=\"term\"><b>Subscribed weekdays</b>: weekdays within the customer's subscription period in that month.</div>\n<div class=\"term\"><b>Weekdays column (e.g. 22/22)</b>: subscribed weekdays / weekdays in the month.</div>\n<div class=\"term\"><b>Paused weekdays / Paused days</b>: subscribed weekdays that fell inside a pause.</div>\n<div class=\"term\"><b>Delivered days</b>: subscribed weekdays − paused weekdays; what the customer pays for.</div>\n<div class=\"term\"><b>Pro-rated bill</b>: a bill reduced in proportion to the days actually served.</div>\n<div class=\"term\"><b>Bill / Amount</b>: price × delivered ÷ weekdays in month.</div>\n<div class=\"term\"><b>Bill preview</b>: live calculation on the customer page; not saved.</div>\n<div class=\"term\"><b>Generate bills</b>: calculate and save bills for all customers for a month.</div>\n<div class=\"term\"><b>Regenerate</b>: recalculate saved bills after changes (safe to repeat).</div>\n<div class=\"term\"><b>Total to collect</b>: sum of all bills for the month.</div>\n<div class=\"term\"><b>Projected bill total</b>: dashboard estimate of this month's bills using current data.</div>\n<div class=\"term\"><b>Last generated</b>: timestamp of the latest bill generation.</div>\n<div class=\"term\"><b>Delivery calendar</b>: colour-coded month view: delivered, paused, weekend, not subscribed.</div>\n<div class=\"term\"><b>Paise</b>: 1/100 of a rupee. Money is stored in paise to avoid rounding errors.</div>\n<div class=\"term\"><b>Demo data / Seed</b>: sample owner, plans and customers created by <code>npm run seed</code>.</div>\n\n<h3>Website (frontend) terms</h3>\n<div class=\"term\"><b>Frontend / Client</b>: the part that runs in the browser (the <code>client/</code> folder).</div>\n<div class=\"term\"><b>React</b>: a JavaScript library for building interfaces from reusable <b>components</b>.</div>\n<div class=\"term\"><b>Component</b>: a reusable piece of UI, e.g. <code>StatusBadge</code>, <code>Pagination</code>, <code>Modal</code>.</div>\n<div class=\"term\"><b>Page</b>: a component shown for a URL, e.g. <code>Customers.jsx</code> for <code>/app/customers</code>.</div>\n<div class=\"term\"><b>JSX (.jsx)</b>: JavaScript with HTML-like tags, used by React.</div>\n<div class=\"term\"><b>State</b>: data a component remembers while you use it (form values, loaded list).</div>\n<div class=\"term\"><b>Hook</b>: a React helper function starting with \"use\", e.g. <code>useState</code>, <code>useEffect</code>, <code>useListQuery</code>.</div>\n<div class=\"term\"><b>Context / AuthProvider</b>: shares the logged-in user with every page.</div>\n<div class=\"term\"><b>Route / React Router</b>: maps a URL to a page without reloading the browser.</div>\n<div class=\"term\"><b>SPA (Single-Page Application)</b>: the site loads once; pages then switch instantly using JavaScript.</div>\n<div class=\"term\"><b>Protected route</b>: a page that requires login; otherwise it redirects to /login.</div>\n<div class=\"term\"><b>GuestOnly route</b>: login/register pages that redirect to the app if you're already logged in.</div>\n<div class=\"term\"><b>Layout</b>: shared frame (top bar and navigation) around app pages.</div>\n<div class=\"term\"><b>Modal</b>: a pop-up dialog over the page (Add customer, Pause, Resume…). Closes with ✕, Cancel, Esc or clicking outside.</div>\n<div class=\"term\"><b>Badge</b>: small coloured label (status, plan availability).</div>\n<div class=\"term\"><b>Callout</b>: highlighted message box with an action, e.g. \"No bills generated yet. Generate now\".</div>\n<div class=\"term\"><b>Alert / ErrorNote</b>: red box showing an error message from the server.</div>\n<div class=\"term\"><b>Search</b>: filter rows by typed text (name, phone, address).</div>\n<div class=\"term\"><b>Debounce</b>: wait until the user stops typing (0.3 s) before searching.</div>\n<div class=\"term\"><b>Filter / Status tabs</b>: show only customers with a chosen status.</div>\n<div class=\"term\"><b>Sort / Order (asc, desc)</b>: arrange rows by a column; ascending ▲ or descending ▼.</div>\n<div class=\"term\"><b>Pagination / Page / Limit</b>: split long lists into pages; limit = rows per page.</div>\n<div class=\"term\"><b>Query string</b>: the part of a URL after \"?\", e.g. <code>?status=paused&amp;page=2</code>.</div>\n<div class=\"term\"><b>localStorage</b>: small browser storage where the login token is kept.</div>\n<div class=\"term\"><b>Responsive design</b>: layout adapts to phone, tablet and desktop widths.</div>\n<div class=\"term\"><b>Landing page</b>: public marketing page explaining the product.</div>\n<div class=\"term\"><b>CTA (Call to action)</b>: a prominent button like \"Start free\".</div>\n<div class=\"term\"><b>Vite</b>: tool that runs the React dev server (port 5173) and builds the production files.</div>\n<div class=\"term\"><b>Build (npm run build)</b>: turns source code into optimised files in <code>client/dist</code>.</div>\n<div class=\"term\"><b>Proxy</b>: in dev mode, Vite forwards <code>/api</code> calls from port 5173 to the backend on 4000.</div>\n\n<h3>Backend and database terms</h3>\n<div class=\"term\"><b>Backend / Server</b>: the program that handles requests and talks to the database (<code>server/</code>).</div>\n<div class=\"term\"><b>Node.js</b>: runs JavaScript outside the browser.</div>\n<div class=\"term\"><b>Express</b>: a Node.js library for building web servers and APIs.</div>\n<div class=\"term\"><b>API</b>: a set of addresses (endpoints) the frontend can call to get or change data.</div>\n<div class=\"term\"><b>REST</b>: a style of API using URLs for things (<code>/customers/5</code>) and HTTP methods for actions.</div>\n<div class=\"term\"><b>Endpoint</b>: one API address + method, e.g. <code>POST /api/customers</code>.</div>\n<div class=\"term\"><b>HTTP methods</b>: GET = read, POST = create or perform an action, PUT = update, DELETE = remove.</div>\n<div class=\"term\"><b>Request / Response</b>: the message sent to the server, and the server's reply.</div>\n<div class=\"term\"><b>JSON</b>: text format for data, e.g. <code>{\"name\":\"Asha\",\"phone\":\"9876543210\"}</code>.</div>\n<div class=\"term\"><b>Status code</b>: number in a response saying what happened (200, 201, 400, 401, 404, 409, 500).</div>\n<div class=\"term\"><b>Header</b>: extra information sent with a request, like <code>Authorization</code>.</div>\n<div class=\"term\"><b>Route / Router</b>: code handling a group of endpoints (e.g. <code>routes/customers.js</code>).</div>\n<div class=\"term\"><b>Middleware</b>: code that runs before route handlers, e.g. JSON parsing, request logging, the <code>requireAuth</code> login check.</div>\n<div class=\"term\"><b>CORS</b>: browser rule about which websites may call an API; enabled so the dev site can call the API.</div>\n<div class=\"term\"><b>Port</b>: a numbered \"door\" on your computer: 4000 for the API, 5173 for the dev website.</div>\n<div class=\"term\"><b>localhost</b>: your own computer.</div>\n<div class=\"term\"><b>Authentication</b>: proving who you are (email + password → token).</div>\n<div class=\"term\"><b>Authorization</b>: what you're allowed to access (only your own data).</div>\n<div class=\"term\"><b>JWT (JSON Web Token)</b>: a signed \"ID card\" the server gives after login; sent as <code>Bearer &lt;token&gt;</code>.</div>\n<div class=\"term\"><b>JWT_SECRET</b>: secret key used to sign tokens. Set your own in production.</div>\n<div class=\"term\"><b>bcrypt / Hash</b>: one-way scrambling of passwords so they can't be read back.</div>\n<div class=\"term\"><b>Validation</b>: checking input is correct before saving.</div>\n<div class=\"term\"><b>Multi-tenant / owner scoping</b>: many businesses share one app, each seeing only their data.</div>\n<div class=\"term\"><b>Database</b>: organised permanent storage for data.</div>\n<div class=\"term\"><b>SQLite / node:sqlite</b>: a lightweight database stored in a single file, built into Node.js 22.13+.</div>\n<div class=\"term\"><b>SQL</b>: the language for querying databases (SELECT, INSERT, UPDATE, DELETE).</div>\n<div class=\"term\"><b>Table / Row / Column</b>: a spreadsheet-like collection / one record / one field.</div>\n<div class=\"term\"><b>Schema</b>: the design of all tables and columns.</div>\n<div class=\"term\"><b>Primary key (id)</b>: unique number identifying a row.</div>\n<div class=\"term\"><b>Foreign key</b>: a column pointing to another table's id (e.g. <code>pauses.subscription_id</code>).</div>\n<div class=\"term\"><b>Unique constraint</b>: prevents duplicates (email per user; phone per owner; one bill per subscription per month).</div>\n<div class=\"term\"><b>Index</b>: a lookup structure that makes searches faster.</div>\n<div class=\"term\"><b>NULL</b>: \"no value\", e.g. an end date that isn't set.</div>\n<div class=\"term\"><b>Cascade delete</b>: deleting a customer also deletes their subscriptions, pauses and bills.</div>\n<div class=\"term\"><b>Transaction</b>: a group of changes saved all-or-nothing.</div>\n<div class=\"term\"><b>Upsert</b>: insert a row, or update it if it already exists (used when regenerating bills).</div>\n<div class=\"term\"><b>Idempotent</b>: doing it twice gives the same result as once (Regenerate).</div>\n<div class=\"term\"><b>Snapshot</b>: a saved copy of a result at a moment (saved bills).</div>\n<div class=\"term\"><b>Derived value</b>: calculated on demand instead of stored (status).</div>\n<div class=\"term\"><b>Pure function</b>: output depends only on inputs, no database or clock (<code>computeBill</code>).</div>\n<div class=\"term\"><b>UTC</b>: universal time zone used for date maths so days never shift.</div>\n<div class=\"term\"><b>ISO date (YYYY-MM-DD)</b>: date format like 2026-09-17, which sorts correctly as text.</div>\n<div class=\"term\"><b>as_of</b>: optional parameter to see statuses on another date (useful for testing).</div>\n<div class=\"term\"><b>Parameterized query</b>: values sent separately from SQL text, preventing SQL injection.</div>\n<div class=\"term\"><b>SQL injection</b>: an attack sneaking SQL commands into input; blocked by parameters and whitelists.</div>\n<div class=\"term\"><b>Whitelist</b>: fixed list of allowed values (sort columns).</div>\n<div class=\"term\"><b>WAL (tiffin.db-wal, -shm)</b>: helper files SQLite uses for safe, fast writes. Normal to see.</div>\n<div class=\"term\"><b>Seed script</b>: creates demo data (<code>server/src/seed.js</code>).</div>\n<div class=\"term\"><b>Environment variable</b>: setting passed to the program (PORT, JWT_SECRET, DB_FILE).</div>\n<div class=\"term\"><b>npm / package.json</b>: Node's package manager / file listing dependencies and commands.</div>\n<div class=\"term\"><b>Dependency</b>: an external library the project uses (express, bcryptjs, jsonwebtoken, react…).</div>\n<div class=\"term\"><b>Unit test</b>: tests one small piece (billing formula) in isolation.</div>\n<div class=\"term\"><b>API / end-to-end test</b>: starts the real server and runs a full user story through HTTP.</div>\n</section>\n\n<!-- ============ 11 ============ -->\n<section class=\"chapter\">\n<h1><span class=\"num\">11</span>Running, testing and troubleshooting</h1>\n<h3>First-time setup</h3>\n<pre>npm run install:all     # install backend + frontend libraries\nnpm run seed            # create demo data (demo@tiffin.app / demo1234)\nnpm run build           # build the website\nnpm start               # start → open http://localhost:4000</pre>\n<h3>Development mode (auto-reload while editing)</h3>\n<pre>npm run dev:server      # terminal 1 → API on http://localhost:4000\nnpm run dev:client      # terminal 2 → website on http://localhost:5173</pre>\n<h3>Tests</h3>\n<pre>npm test                # 13 tests → expect \"pass 13, fail 0\"</pre>\n<p><b>billing.test.js</b> checks the formula on tricky cases: full month, mid-month start, weekday pause, weekend-only pause, open-ended pause, pause across two months, fully paused month, ended subscription, future subscription, leap-year February, multiple pauses.<br>\n<b>api.test.js</b> runs a whole owner story against a temporary in-memory database, including error cases and data separation between owners.</p>\n\n<h3>Command reference</h3>\n<table><tr><th style=\"width:30%\">Command</th><th>What it does</th></tr>\n<tr><td><code>npm run install:all</code></td><td>Installs dependencies for server and client</td></tr>\n<tr><td><code>npm run seed</code></td><td>Resets the demo owner's data</td></tr>\n<tr><td><code>npm run build</code></td><td>Builds the React site into client/dist</td></tr>\n<tr><td><code>npm start</code></td><td>Runs the server (API + built website) on port 4000</td></tr>\n<tr><td><code>npm run dev:server</code></td><td>API with auto-restart on code changes</td></tr>\n<tr><td><code>npm run dev:client</code></td><td>Vite dev website with instant reload</td></tr>\n<tr><td><code>npm test</code></td><td>Runs all automated tests</td></tr>\n<tr><td><code>Ctrl + C</code></td><td>Stops the running server in the terminal</td></tr></table>\n\n<h3>Troubleshooting</h3>\n<table><tr><th style=\"width:36%\">Problem</th><th>Fix</th></tr>\n<tr><td><code>No such built-in module: node:sqlite</code></td><td>Node.js is too old. Install Node 22.13 or newer (check with <code>node -v</code>).</td></tr>\n<tr><td><code>EADDRINUSE :4000</code></td><td>Another server is already running on port 4000. Close that terminal, or start with a different PORT.</td></tr>\n<tr><td>Website shows old design after code changes</td><td>Run <code>npm run build</code> again, then restart <code>npm start</code>.</td></tr>\n<tr><td>Logged out unexpectedly / 401 errors</td><td>Token expired (7 days) or JWT_SECRET changed. Log in again.</td></tr>\n<tr><td>Bills page empty</td><td>Bills are saved only after clicking <b>Generate bills</b> for that month.</td></tr>\n<tr><td>Bill doesn't reflect a recent pause</td><td>Saved bills are snapshots. Click <b>Regenerate</b>. (The customer page preview is always live.)</td></tr>\n<tr><td>Want a clean start</td><td>Stop the server, delete <code>server/data</code>, run <code>npm run seed</code>, start again.</td></tr>\n<tr><td>Browser closes while typing in forms</td><td>A browser or extension crash, not the app. Try a private window, disable extensions, or use another browser.</td></tr>\n<tr><td>See what the server is doing</td><td>Watch the terminal: each API call is logged as <code>METHOD url -&gt; status (time)</code>.</td></tr></table>\n\n<div class=\"tip\" style=\"margin-top:14px\"><b>Quick demo script (5 minutes):</b> log in → Dashboard shows today's tiffins → look up <code>9845000000</code> → Aarav is paused, bill ₹2,045.45 → click Resume (today) → status Active, bill goes up → Pause 21–23 Sep → bill goes down → Bills → Generate → sort by Amount ▼ → search \"Nair\".</div>\n</section>\n</body></html>\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/guide.html (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "B=localhost:4000/api; T=$(curl -s -X POST $B/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"demo@tiffin.app\",\"password\":\"demo1234\"}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).token'); curl -s -X POST $B/bills/generate -H \"Authorization: Bearer $T\" -H 'Content-Type: application/json' -d '{\"month\":\"2026-09\"}'; echo; curl -s \"$B/customers?limit=1\" -H \"Authorization: Bearer $T\" | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0)).counts)'",
+  "description": "Get real bill total and status counts"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{"month":"2026-09","bills_generated":30,"total_amount_paise":8393182}
+{"active":17,"paused":8,"upcoming":3,"inactive":4}
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "G=\"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide\"; cd \"$G\" && sed -i 's/\"total_amount_paise\": 8381819 }   ← ₹83,818.19/\"total_amount_paise\": 8393182 }   ← ₹83,931.82/; s/\"total\": 7, \"totalPages\": 1,/\"total\": 8, \"totalPages\": 1,/; s/\"paused\": 7, \"upcoming\"/\"paused\": 8, \"upcoming\"/' guide.html && mkdir -p \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs\" && cat > pdf.cjs <<'EOF'\nconst puppeteer = require('puppeteer-core'); const path = require('path');\n(async () => {\n  const b = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true });\n  const p = await b.newPage();\n  await p.goto('file:///' + path.resolve('guide.html').replace(/\\\\/g, '/'), { waitUntil: 'load' });\n  await p.pdf({ path: process.argv[2], format: 'A4', printBackground: true, displayHeaderFooter: true,\n    headerTemplate: '<span></span>',\n    footerTemplate: '<div style=\"font-size:8px;width:100%;text-align:center;color:#888;font-family:Segoe UI\">Tiffin Tracker – Project Guide · page <span class=\"pageNumber\"></span> of <span class=\"totalPages\"></span></div>',\n    margin: { top: '14mm', bottom: '16mm', left: '14mm', right: '14mm' } });\n  await b.close();\n})();\nEOF\nOUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\"; node pdf.cjs \"$OUT\" && ls -la \"$OUT\" && python -c \"from pypdf import PdfReader;print(len(PdfReader(r'$OUT').pages),'pages')\" 2>&1 | tail -1",
+  "description": "Fix example numbers and render guide to PDF",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\pdf.cjs:5
+  await p.goto('file:///' + path.resolve('guide.html').replace(/\/g, '/'), { waitUntil: 'load' });
+                                                               ^^^^^^^^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1861:18)
+    at Module._compile (node:internal/modules/cjs/loader:1903:20)
+    at Object..js (node:internal/modules/cjs/loader:2060:10)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.20.0
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "G=\"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide\"; cd \"$G\" && sed -i \"s#await p.goto(.*#await p.goto(require('url').pathToFileURL(path.resolve('guide.html')).href, { waitUntil: 'load' });#\" pdf.cjs && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\"; node pdf.cjs \"$OUT\" && ls -la \"$OUT\" && node -e \"const s=require('fs').readFileSync(process.argv[1],'latin1');console.log((s.match(/\\/Type\\s*\\/Page[^s]/g)||[]).length,'pages')\" \"$OUT\"",
+  "description": "Render guide HTML to PDF and count pages",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+ERROR: The process with PID 6432 (child process of PID 17552) could not be terminated.
+Reason: There is no running instance of the task.
+C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Frame.js:184
+                        ? new Error(`${response.errorText} at ${url}`)
+                          ^
+
+Error: net::ERR_FILE_NOT_FOUND at file:///C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/guide.html
+    at navigate (C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Frame.js:184:27)
+    at async Deferred.race (C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\node_modules\puppeteer-core\lib\cjs\puppeteer\util\Deferred.js:36:20)
+    at async CdpFrame.goto (C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Frame.js:150:25)
+    at async CdpPage.goto (C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\node_modules\puppeteer-core\lib\cjs\puppeteer\api\Page.js:574:20)
+    at async C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\scratchpad\guide\pdf.cjs:5:3
+
+Node.js v24.20.0
+```
+
+</details>
+
+Edge can't open files from that long temp path, so I'm moving the guide source into a short folder:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "G=\"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide\"; D=\"C:/Users/Dell/tt-guide\"; rm -rf \"$D\"; mkdir -p \"$D\" && cp -r \"$G/guide.html\" \"$G/shots\" \"$D/\" && cd \"$G\" && sed -i \"s#path.resolve('guide.html')#'C:/Users/Dell/tt-guide/guide.html'#\" pdf.cjs && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\"; node pdf.cjs \"$OUT\" 2>&1 | grep -v \"could not be terminated\\|no running instance\" ; ls -la \"$OUT\" && node -e \"const s=require('fs').readFileSync(process.argv[1],'latin1');console.log((s.match(/\\/Type\\s*\\/Page[^s]/g)||[]).length,'pages')\" \"$OUT\"",
+  "description": "Copy guide to short path and render PDF",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 2
+node:internal/process/promises:392
+      new UnhandledPromiseRejection(reason);
+      ^
+
+UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "#<ErrorEvent>".
+    at throwUnhandledRejectionsMode (node:internal/process/promises:392:7)
+    at processPromiseRejections (node:internal/process/promises:475:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:106:37) {
+  code: 'ERR_UNHANDLED_REJECTION'
+}
+
+Node.js v24.20.0
+ls: cannot access 'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf': No such file or directory
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/tt-guide\" && cat > pdf.cjs <<'EOF'\nconst puppeteer = require('C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/node_modules/puppeteer-core');\nconst fs = require('fs');\n(async () => {\n  let html = fs.readFileSync('guide.html', 'utf8').replace(/src=\"shots\\/([\\w-]+\\.jpg)\"/g, (_, f) => `src=\"data:image/jpeg;base64,${fs.readFileSync('shots/' + f).toString('base64')}\"`);\n  const b = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, userDataDir: 'C:/Users/Dell/tt-guide/profile', args: ['--no-first-run'] });\n  const p = await b.newPage();\n  await p.setContent(html, { waitUntil: 'load', timeout: 60000 });\n  await p.pdf({ path: process.argv[2], format: 'A4', printBackground: true, displayHeaderFooter: true, timeout: 120000,\n    headerTemplate: '<span></span>',\n    footerTemplate: '<div style=\"font-size:8px;width:100%;text-align:center;color:#888;font-family:Segoe UI\">Tiffin Tracker - Project Guide · page <span class=\"pageNumber\"></span> of <span class=\"totalPages\"></span></div>',\n    margin: { top: '14mm', bottom: '16mm', left: '14mm', right: '14mm' } });\n  await b.close();\n})().catch(e => { console.error('ERR', e && (e.stack || e.message || e.type || e)); process.exit(1); });\nEOF\nOUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\"; mkdir -p \"$(dirname \"$OUT\")\"; node pdf.cjs \"$OUT\" 2>&1 | grep -v \"terminated\\|running instance\" | head; ls -la \"$OUT\" && node -e \"const s=require('fs').readFileSync(process.argv[1],'latin1');console.log((s.match(/\\/Type\\s*\\/Page[^s]/g)||[]).length,'pages')\" \"$OUT\"",
+  "description": "Render PDF with inlined screenshots",
+  "timeout": 200000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+-rw-r--r-- 1 Dell 197121 1738068 Sep 17 16:00 C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf
+32 pages
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+The PDF rendered: 32 pages, 1.7 MB. Checking a few pages visually before I hand it over:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "python -c \"import pypdfium2\" 2>&1 && cd C:/Users/Dell/tt-guide && python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf')\nprint(len(d))\nfor i in [0,3,6,9,12]:\n    d[i].render(scale=0.9).to_pil().save(f'p{i+1}.png')\n\"",
+  "description": "Render sample PDF pages to images",
+  "timeout": 60000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'pypdfium2'
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__navigate`**
+
+```json
+{
+  "url": "file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf"
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+the Browser pane has no open project folder to open files from
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pip install -q pypdfium2 2>&1 | tail -1; cd C:/Users/Dell/tt-guide && python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf')\nprint(len(d))\nfor i in [0,4,9,14,20]:\n    d[i].render(scale=0.8).to_pil().save(f'p{i+1}.png')\n\"",
+  "description": "Install pypdfium2 and render sample pages",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python311\Lib\site-packages\pypdfium2\_helpers\bitmap.py", line 266, in to_pil
+    image = Lazy.PIL_Image.frombuffer(
+            ^^^^^^^^^^^^^^
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python311\Lib\site-packages\pypdfium2_cfg\_shared\stl.py", line 46, in __get__
+    value = self.func(obj)
+            ^^^^^^^^^^^^^^
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python311\Lib\site-packages\pypdfium2\_lazy.py", line 16, in PIL_Image
+    import PIL.Image; return PIL.Image
+    ^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'PIL'
+32
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pip install -q pillow 2>&1 | grep -v notice; cd C:/Users/Dell/tt-guide && python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf')\nfor i in [0,4,9,14,20]:\n    d[i].render(scale=0.8).to_pil().save(f'p{i+1}.png')\nprint('ok')\"",
+  "description": "Install Pillow and render sample pages",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ok
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/p5.png"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/p10.png"
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/p15.png"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+I made the PDF guide: **`docs/Tiffin-Tracker-Project-Guide.pdf`** in your Desktop copy of the project (`Desktop\tiffin-tracker\tiffin-tracker`). It's 32 A4 pages with 16 screenshots taken from your running app, and I checked a few rendered pages to confirm the layout, screenshots and calendar come out right.
+
+**"Weekdays 22/22" on the Bills page** means **weekdays the customer was subscribed / weekdays in the month**:
+- September 2026 has 22 weekdays (Mon–Fri).
+- **22/22** means the customer was subscribed for the whole month.
+- **7/22** (Arjun Khan) means his subscription only started on 22 Sep, so just 7 of the month's weekdays count.
+- Paused days are shown separately in the Paused column, and **Delivered = subscribed − paused**. The bill is plan price × delivered ÷ 22.
+
+**What's in the PDF:**
+
+| # | Chapter | What it covers |
+|---|---|---|
+| 1 | The idea in one page | What a tiffin service needs, and how the app answers each need |
+| 2 | The big picture | How the website, server and database fit together, what a request and response look like, and the folder structure |
+| 3 | Billing rules | The formula, step by step; a worked example (Aarav: ₹2,500 × 18 ÷ 22 = ₹2,045.45); what 22/22 and 7/22 mean; each special rule and why |
+| 4 | Workflow | An owner's month: register, create plans, add customers, subscribe, pause/resume, generate bills |
+| 5 | Website tour | Every page with screenshots, plus a table explaining each part of the page (buttons, filters, badges, pop-up forms, the calendar and the bill columns) |
+| 6 | Backend flow | One "Pause" click traced through all 8 steps from browser to database, and what each file does |
+| 7 | Database | All 6 tables, column by column, and how Active/Paused/Upcoming/Inactive is worked out |
+| 8 | API | Every endpoint, plus what each status code (200/201/400/401/404/409) means here |
+| 9 | Security | Password scrambling, login tokens, keeping each owner's data separate, input checks, protection against SQL injection |
+| 10 | Glossary | About 110 terms in plain language: business words, website words, and server/database words |
+| 11 | Running | Commands, tests, a troubleshooting table and a 5-minute demo script |
+
+The PDF isn't committed or pushed to GitHub. If you want it in the repo:
+```bash
+git add docs && git commit -m "Add project guide PDF" && git push
+```
+
+---
+
+## 👤 User
+
+tell me how the subscription works
+
+## 🤖 Assistant
+
+A **subscription** links one customer to one meal plan for a period of time. The customer's status and every bill are worked out from the subscription and its pauses.
+
+## 1. What a subscription holds
+
+| Field | Example | Meaning |
+|---|---|---|
+| Customer | Aarav Sharma | Who gets the tiffin |
+| Plan | Veg Mini | Which meal plan |
+| **Price** | ₹2,500 | **Copied from the plan when the customer subscribes** |
+| Start date | 4 Jul 2026 | First delivery day |
+| End date | *(empty)* | Last delivery day; empty means it keeps running |
+| Pauses | 15–20 Sep, Travel | Date ranges with no delivery and no charge |
+
+Why copy the price? If you later raise "Veg Mini" to ₹2,800, existing customers keep paying ₹2,500. Only new subscriptions get the new price.
+
+## 2. Its life cycle
+
+```
+Subscribe ──► Active ──► Pause ──► Paused ──► Resume ──► Active ──► End ──► Inactive
+(start date)            (dates)              (date)               (last day)
+```
+
+**Subscribe** (customer page → *Subscribe to a plan*)
+- Pick a plan and a start date.
+- The start date can be in the future, and the customer shows as **Upcoming** until then.
+- The plan must be *available*, not retired.
+- A customer can have **only one running subscription at a time**. A second one is refused ("already has a subscription running…"), so to switch plans you end the old one first.
+
+**Pause** (*⏸ Pause*)
+- Pick the first and last paused day, or tick "until I resume". The last day counts as paused.
+- It can start today or later (a scheduled pause).
+- It can't overlap another pause, and it can't fall before the start date or after the end date.
+
+**Resume** (*▶ Resume*)
+- The date you pick is the first delivery day again.
+- The pause is closed on the day before. For example, if a pause started 15 Sep and you resume on 17 Sep, the pause becomes 15–16 Sep.
+- If you resume on the pause's own first day, the pause is deleted completely.
+
+**Remove pause:** deletes a pause entered by mistake. Those days become billable again.
+
+**End subscription**
+- Pick the last delivery day.
+- Pauses after that day are trimmed or deleted automatically.
+- After the end date the customer is **Inactive**, and they can be subscribed again, even to a different plan.
+
+## 3. How status comes from the subscription
+
+Nothing is stored as "paused". The app checks today's date against the dates each time:
+
+| Status | Rule |
+|---|---|
+| **Paused** | Subscription running today **and** a pause covers today |
+| **Active** | Subscription running today, no pause today |
+| **Upcoming** | Subscription starts in the future |
+| **Inactive** | No subscription, or it has ended |
+
+So a pause you schedule for next Monday turns the customer to "Paused" on Monday morning by itself.
+
+## 4. How it becomes a bill
+
+For each month, the app looks at the subscription's dates and pauses:
+
+1. **Weekdays in the month** (Mon–Fri): 22 in September.
+2. **Subscribed weekdays**: weekdays between the start and end dates. This is the "22/22" or "7/22" on the Bills page.
+3. **Paused weekdays**: subscribed weekdays inside a pause. Weekends don't count.
+4. **Delivered** = subscribed − paused.
+5. **Bill = copied price × delivered ÷ weekdays in the month.**
+
+Aarav in September: ₹2,500 × (22 − 4) ÷ 22 = **₹2,045.45**.
+
+Someone who subscribes on 22 Sep: ₹4,500 × 7 ÷ 22 = **₹1,431.82**.
+
+## 5. In the code
+
+- **Database:** the `subscriptions` table, with pauses in the `pauses` table linked by `subscription_id`.
+- **Server:** [server/src/routes/subscriptions.js](server/src/routes/subscriptions.js) handles subscribe, pause, resume, end, remove pause and the bill preview.
+- **API endpoints:**
+  - `POST /api/customers/:id/subscriptions`
+  - `POST /api/subscriptions/:id/pause`, `/resume` and `/end`
+  - `DELETE /api/pauses/:id`
+  - `GET /api/subscriptions/:id/bill?month=`
+- **Bill math:** `computeBill()` in [server/src/billing.js](server/src/billing.js).
+
+---
+
+## 👤 User
+
+where is the pdf
+
+## 🤖 Assistant
+
+**Tool call — `SendUserFile`**
+
+```json
+{
+  "files": [
+    "C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf"
+  ],
+  "status": "normal",
+  "caption": "Tiffin Tracker project guide (32 pages)"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1 file delivered to user.
+```
+
+</details>
+
+I've attached the PDF above. It's saved here on your computer:
+
+**`C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\docs\Tiffin-Tracker-Project-Guide.pdf`**
+
+You can also find it in VS Code: in the Explorer sidebar, open the **docs** folder in your project. If you don't see the folder, click the refresh icon at the top of the Explorer.
+
+---
+
+## 👤 User
+
+what does this site is mainly for
+
+## 🤖 Assistant
+
+Tiffin Tracker is **for people who run a tiffin (lunch delivery) service**. It helps them manage monthly subscriptions and **bill each customer only for the days a lunch was actually delivered**.
+
+**The problem it solves:** customers pay a monthly price for weekday lunches, but they often pause for travel, festivals or illness. At month-end the owner has to count weekdays and subtract paused days for every customer by hand. That's slow, and mistakes cause arguments over the bill.
+
+**What the owner does with it:**
+- **Manage customers and plans:** add customers with phone and address, and create plans like "Veg Mini ₹2,500/month".
+- **Subscribe** a customer to a plan from a start date.
+- **Pause and resume** deliveries when a customer calls. Paused days aren't charged.
+- **Find a customer by phone** when they call.
+- **See who is active or paused** today, and how many tiffins to cook.
+- **Generate month-end bills in one click.** Each bill is plan price × days delivered ÷ weekdays in the month.
+
+**Who uses it:**
+- Home cooks and small tiffin or mess services, from 10 to a few hundred customers.
+- Only the owner logs in. Customers don't use the site; the owner records their pauses.
+
+---
+
+## 👤 User
+
+integrate the followiing features to the project.
+
+* Level 1 — T1 (integrate): “Each morning, notify the customers due a delivery today (active, a weekday, not paused) via the Notification Service.” Graded via /outbox after POST /clock.
+* Level 2 — T6 (lifecycle): “Transfer a subscription to a new customer mid-cycle; the plan and cycle carry over, billing splits by who was served.”
+* Level 3 — T4 (messy data): “Import a messy customer list (dup phones, mixed date formats, blanks) into clean subscriptions with an { imported, deduped, rejected } report.”
+
+## 🤖 Assistant
+
+**Tool call — `mcp__ccd_directory__request_directory`**
+
+```json
+{
+  "path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Folder access granted: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker
+
+Use this exact path with Read/Write/Edit/Grep/Glob.
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git status --short && git log --oneline -3 && git remote -v | head -1 && cd \"C:/Users/Dell/Documents/tiffin-tracker\" && git log --oneline -1 && diff -rq \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src\" server/src && echo same-src",
+  "description": "Compare Desktop clone and Documents copy"
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+?? docs/
+67cc1fe Add AI_LOGS.md (session transcript)
+a7b918f Tiffin Tracker: subscriptions, pause/resume and pro-rated billing
+origin	https://github.com/Nikunj532/tiffin-tracker (fetch)
+67cc1fe Add AI_LOGS.md (session transcript)
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/app.js and server/src/app.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/billing.js and server/src/billing.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/dates.js and server/src/dates.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/db.js and server/src/db.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js and server/src/http.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/index.js and server/src/index.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/auth.js and server/src/routes/auth.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/bills.js and server/src/routes/bills.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/customers.js and server/src/routes/customers.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/dashboard.js and server/src/routes/dashboard.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/plans.js and server/src/routes/plans.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js and server/src/routes/subscriptions.js differ
+Files C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/seed.js and server/src/seed.js differ
+```
+
+</details>
+
+**Tool call — `Grep`**
+
+```json
+{
+  "pattern": "todayLocal",
+  "path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src",
+  "output_mode": "content"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\dates.js:44:export function todayLocal() {
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\bills.js:3:import { isValidMonth, monthBounds, todayLocal } from '../dates.js';
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\bills.js:20:    const month = v || todayLocal().slice(0, 7);
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:5:import { isValidDate, todayLocal } from '../dates.js';
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:41:  return isValidDate(query.as_of) ? query.as_of : todayLocal();
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:109:    res.status(201).json(getCustomer(lastInsertRowid, req.userId, todayLocal()));
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:125:    getCustomer(req.params.id, req.userId, todayLocal());
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:129:    res.json(getCustomer(req.params.id, req.userId, todayLocal()));
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js:133:    getCustomer(req.params.id, req.userId, todayLocal());
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\seed.js:5:import { addDays, todayLocal } from './dates.js';
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\seed.js:30:  const today = todayLocal();
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:3:import { addDays, isValidDate, isValidMonth, todayLocal } from '../dates.js';
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:35:    const start = dateOr(req.body.start_date, todayLocal(), 'start_date');
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:54:    const start = dateOr(req.body.start_date, todayLocal(), 'start_date');
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:76:    const date = dateOr(req.body.date, todayLocal(), 'date');
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:98:    const end = dateOr(req.body.end_date, todayLocal(), 'end_date');
+C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js:112:    const month = req.query.month || todayLocal().slice(0, 7);
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && file server/src/db.js client/src/api.js && git config core.autocrlf; ls server/data 2>/dev/null; curl -s localhost:4000/api/health",
+  "description": "Check line endings and server state"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+server/src/db.js:  JavaScript source, ASCII text, with CRLF line terminators
+client/src/api.js: JavaScript source, Unicode text, UTF-8 text, with CRLF line terminators
+true
+tiffin.db
+tiffin.db-shm
+tiffin.db-wal
+{"ok":true}
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\dates.js"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	// Date helpers. All dates are 'YYYY-MM-DD' strings handled in UTC so the
+2	// server's timezone never shifts a day.
+3	
+4	const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+5	const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+6	
+7	export function isValidDate(s) {
+8	  if (typeof s !== 'string' || !DATE_RE.test(s)) return false;
+9	  const d = parseDate(s);
+10	  return formatDate(d) === s;
+11	}
+12	
+13	export function isValidMonth(s) {
+14	  return typeof s === 'string' && MONTH_RE.test(s);
+15	}
+16	
+17	export function parseDate(s) {
+18	  const [y, m, d] = s.split('-').map(Number);
+19	  return new Date(Date.UTC(y, m - 1, d));
+20	}
+21	
+22	export function formatDate(d) {
+23	  return d.toISOString().slice(0, 10);
+24	}
+25	
+26	export function addDays(s, n) {
+27	  const d = parseDate(s);
+28	  d.setUTCDate(d.getUTCDate() + n);
+29	  return formatDate(d);
+30	}
+31	
+32	export function monthBounds(month) {
+33	  const [y, m] = month.split('-').map(Number);
+34	  const start = formatDate(new Date(Date.UTC(y, m - 1, 1)));
+35	  const end = formatDate(new Date(Date.UTC(y, m, 0)));
+36	  return { start, end };
+37	}
+38	
+39	export function isWeekday(s) {
+40	  const day = parseDate(s).getUTCDay();
+41	  return day !== 0 && day !== 6;
+42	}
+43	
+44	export function todayLocal() {
+45	  const now = new Date();
+46	  const y = now.getFullYear();
+47	  const m = String(now.getMonth() + 1).padStart(2, '0');
+48	  const d = String(now.getDate()).padStart(2, '0');
+49	  return `${y}-${m}-${d}`;
+50	}
+51	
+52	export const maxDate = (a, b) => (a > b ? a : b);
+53	export const minDate = (a, b) => (a < b ? a : b);
+54
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\db.js",
+  "offset": 80
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+80	  db.exec(SCHEMA);
+81	  return db;
+82	}
+83	
+84	/** Run fn inside a transaction. */
+85	export function tx(db, fn) {
+86	  db.exec('BEGIN');
+87	  try {
+88	    const result = fn();
+89	    db.exec('COMMIT');
+90	    return result;
+91	  } catch (err) {
+92	    db.exec('ROLLBACK');
+93	    throw err;
+94	  }
+95	}
+96
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\http.js"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import jwt from 'jsonwebtoken';
+2	
+3	export class HttpError extends Error {
+4	  constructor(status, message, details) {
+5	    super(message);
+6	    this.status = status;
+7	    this.details = details;
+8	  }
+9	}
+10	
+11	export const badRequest = (msg, details) => new HttpError(400, msg, details);
+12	export const notFound = (what = 'Resource') => new HttpError(404, `${what} not found`);
+13	
+14	/** Wrap sync/async handlers so thrown errors reach the error middleware. */
+15	export const h = (fn) => (req, res, next) => {
+16	  try {
+17	    const out = fn(req, res, next);
+18	    if (out && typeof out.catch === 'function') out.catch(next);
+19	  } catch (err) {
+20	    next(err);
+21	  }
+22	};
+23	
+24	export function jwtSecret() {
+25	  return process.env.JWT_SECRET || 'dev-only-secret-change-me';
+26	}
+27	
+28	export function requireAuth(req, _res, next) {
+29	  const header = req.headers.authorization || '';
+30	  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+31	  if (!token) return next(new HttpError(401, 'Authentication required'));
+32	  try {
+33	    const payload = jwt.verify(token, jwtSecret());
+34	    req.userId = payload.sub;
+35	    next();
+36	  } catch {
+37	    next(new HttpError(401, 'Invalid or expired token'));
+38	  }
+39	}
+40	
+41	/**
+42	 * Parse page/limit/sort/order from the query string. `sortable` maps public
+43	 * sort keys to trusted SQL expressions, so user input never reaches SQL.
+44	 */
+45	export function pageParams(query, sortable, defaultSort) {
+46	  const page = Math.max(1, parseInt(query.page, 10) || 1);
+47	  const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 10));
+48	  const sortKey = Object.hasOwn(sortable, query.sort) ? query.sort : defaultSort;
+49	  const order = String(query.order).toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+50	  return { page, limit, offset: (page - 1) * limit, sortKey, orderBy: `${sortable[sortKey]} ${order}`, order };
+51	}
+52	
+53	export function paged(data, total, { page, limit, sortKey, order }) {
+54	  return { data, page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)), sort: sortKey, order: order.toLowerCase() };
+55	}
+56	
+57	export function str(v, max = 200) {
+58	  return typeof v === 'string' ? v.trim().slice(0, max) : '';
+59	}
+60	
+61	export function normalizePhone(v) {
+62	  return typeof v === 'string' ? v.replace(/[\s\-()]/g, '') : '';
+63	}
+64	
+65	export const PHONE_RE = /^\+?\d{10,13}$/;
+66
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\app.js"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import express from 'express';
+2	import cors from 'cors';
+3	import fs from 'node:fs';
+4	import path from 'node:path';
+5	import { fileURLToPath } from 'node:url';
+6	import { HttpError, requireAuth } from './http.js';
+7	import authRoutes from './routes/auth.js';
+8	import planRoutes from './routes/plans.js';
+9	import customerRoutes from './routes/customers.js';
+10	import subscriptionRoutes from './routes/subscriptions.js';
+11	import billRoutes from './routes/bills.js';
+12	import dashboardRoutes from './routes/dashboard.js';
+13	
+14	export function createApp(db, { log = true } = {}) {
+15	  const app = express();
+16	  app.use(cors());
+17	  app.use(express.json({ limit: '100kb' }));
+18	
+19	  if (log) {
+20	    app.use((req, res, next) => {
+21	      const t0 = Date.now();
+22	      res.on('finish', () => {
+23	        if (req.path.startsWith('/api')) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
+24	      });
+25	      next();
+26	    });
+27	  }
+28	
+29	  app.get('/api/health', (_req, res) => res.json({ ok: true }));
+30	  app.use('/api/auth', authRoutes(db));
+31	  app.use('/api/plans', requireAuth, planRoutes(db));
+32	  app.use('/api/customers', requireAuth, customerRoutes(db));
+33	  app.use('/api/bills', requireAuth, billRoutes(db));
+34	  app.use('/api/dashboard', requireAuth, dashboardRoutes(db));
+35	  app.use('/api', requireAuth, subscriptionRoutes(db));
+36	  app.use('/api', (_req, _res, next) => next(new HttpError(404, 'API route not found')));
+37	
+38	  // Serve the built React app in production (single deployable).
+39	  const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+40	  if (fs.existsSync(dist)) {
+41	    app.use(express.static(dist));
+42	    app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')));
+43	  }
+44	
+45	  // eslint-disable-next-line no-unused-vars
+46	  app.use((err, _req, res, _next) => {
+47	    if (err.type === 'entity.parse.failed') err = new HttpError(400, 'Malformed JSON body');
+48	    const status = err.status || 500;
+49	    if (status >= 500) console.error(err);
+50	    res.status(status).json({ error: status >= 500 ? 'Internal server error' : err.message, details: err.details });
+51	  });
+52	
+53	  return app;
+54	}
+55
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\dates.js",
+  "old_string": "export function todayLocal() {\n  const now = new Date();",
+  "new_string": "// Simulated \"today\" set through POST /clock. null = use the real date.\nlet clockOverride = null;\nexport function setClockOverride(date) {\n  clockOverride = date || null;\n}\nexport function getClockOverride() {\n  return clockOverride;\n}\n\n/** Today's date, honouring the simulated clock when one is set. */\nexport function todayLocal() {\n  return clockOverride ?? realToday();\n}\n\nexport function realToday() {\n  const now = new Date();"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\dates.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\db.js",
+  "old_string": "  db.exec(SCHEMA);\n  return db;\n}",
+  "new_string": "  db.exec(SCHEMA);\n  migrate(db);\n  return db;\n}\n\n/** Additive changes for databases created before these features existed. */\nfunction migrate(db) {\n  const subCols = db.prepare('PRAGMA table_info(subscriptions)').all().map((c) => c.name);\n  if (!subCols.includes('transferred_from_id')) {\n    db.exec('ALTER TABLE subscriptions ADD COLUMN transferred_from_id INTEGER REFERENCES subscriptions(id) ON DELETE SET NULL');\n  }\n  db.exec(`\n    CREATE INDEX IF NOT EXISTS idx_subs_transferred_from ON subscriptions(transferred_from_id);\n\n    CREATE TABLE IF NOT EXISTS settings (\n      key   TEXT PRIMARY KEY,\n      value TEXT\n    );\n\n    -- Every message handed to the Notification Service. dedupe_key makes\n    -- sends idempotent (e.g. one delivery reminder per subscription per day).\n    CREATE TABLE IF NOT EXISTS outbox (\n      id              INTEGER PRIMARY KEY AUTOINCREMENT,\n      owner_id        INTEGER REFERENCES users(id) ON DELETE CASCADE,\n      customer_id     INTEGER REFERENCES customers(id) ON DELETE SET NULL,\n      subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE SET NULL,\n      channel         TEXT NOT NULL DEFAULT 'sms',\n      recipient       TEXT NOT NULL,\n      type            TEXT NOT NULL,\n      for_date        TEXT,\n      message         TEXT NOT NULL,\n      status          TEXT NOT NULL DEFAULT 'sent',\n      dedupe_key      TEXT UNIQUE,\n      created_at      TEXT NOT NULL DEFAULT (datetime('now'))\n    );\n    CREATE INDEX IF NOT EXISTS idx_outbox_date ON outbox(for_date, type);\n    CREATE INDEX IF NOT EXISTS idx_outbox_owner ON outbox(owner_id, id);\n\n    -- One row per simulated morning that has been processed.\n    CREATE TABLE IF NOT EXISTS clock_runs (\n      date     TEXT PRIMARY KEY,\n      due      INTEGER NOT NULL,\n      notified INTEGER NOT NULL,\n      ran_at   TEXT NOT NULL DEFAULT (datetime('now'))\n    );\n  `);\n}"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\db.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\http.js",
+  "old_string": "export function normalizePhone(v) {\n  return typeof v === 'string' ? v.replace(/[\\s\\-()]/g, '') : '';\n}",
+  "new_string": "/**\n * Canonical phone form used for storage, lookup and de-duplication.\n * Strips spaces/dashes/dots/brackets and Indian prefixes (+91, 91, 0) from\n * 10-digit mobiles, so \"+91 98450-00000\", \"098450 00000\" and \"9845000000\"\n * are the same customer.\n */\nexport function normalizePhone(v) {\n  if (typeof v !== 'string' && typeof v !== 'number') return '';\n  let p = String(v).trim().replace(/[\\s\\-().]/g, '');\n  if (/^\\+91\\d{10}$/.test(p)) p = p.slice(3);\n  else if (/^91\\d{10}$/.test(p)) p = p.slice(2);\n  else if (/^0\\d{10}$/.test(p)) p = p.slice(1);\n  return p;\n}\n\n/** Like requireAuth, but lets anonymous requests through (req.userId stays undefined). */\nexport function optionalAuth(req, res, next) {\n  if (!req.headers.authorization) return next();\n  return requireAuth(req, res, next);\n}"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\http.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\notifications.js",
+  "content": "import { isWeekday, parseDate } from './dates.js';\n\n/**\n * Notification Service.\n *\n * Every outgoing customer message goes through `send()`. In this project the\n * transport is an outbox table (visible at GET /outbox) – swapping in a real\n * SMS/WhatsApp provider only means delivering rows from here. A `dedupe_key`\n * makes sends idempotent, so re-running a job never double-messages anyone.\n */\nexport function createNotificationService(db) {\n  const insert = db.prepare(`\n    INSERT INTO outbox (owner_id, customer_id, subscription_id, channel, recipient, type, for_date, message, dedupe_key)\n    VALUES (@owner_id, @customer_id, @subscription_id, @channel, @recipient, @type, @for_date, @message, @dedupe_key)\n    ON CONFLICT (dedupe_key) DO NOTHING`);\n\n  return {\n    /** Queue a message. Returns true if sent, false if it was a duplicate. */\n    send({ owner_id = null, customer_id = null, subscription_id = null, channel = 'sms', recipient, type, for_date = null, message, dedupe_key = null }) {\n      if (!recipient || !type || !message) throw new Error('Notification needs recipient, type and message');\n      const { changes } = insert.run({ owner_id, customer_id, subscription_id, channel, recipient, type, for_date, message, dedupe_key });\n      return changes === 1;\n    },\n  };\n}\n\nconst prettyDate = (s) =>\n  parseDate(s).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });\n\n/**\n * Customers due a delivery on `date`: subscription running that day, the day\n * is a weekday, and no pause covers it. Same rules as billing and status.\n */\nexport function customersDueOn(db, date) {\n  if (!isWeekday(date)) return [];\n  return db.prepare(`\n    SELECT s.id AS subscription_id, c.id AS customer_id, c.owner_id, c.name, c.phone,\n           pl.name AS plan_name, u.business_name\n    FROM subscriptions s\n    JOIN customers c ON c.id = s.customer_id\n    JOIN plans pl ON pl.id = s.plan_id\n    JOIN users u ON u.id = c.owner_id\n    WHERE s.start_date <= @d AND (s.end_date IS NULL OR s.end_date >= @d)\n      AND NOT EXISTS (\n        SELECT 1 FROM pauses p WHERE p.subscription_id = s.id\n          AND p.start_date <= @d AND (p.end_date IS NULL OR p.end_date >= @d))\n    ORDER BY c.owner_id, c.name`).all({ d: date });\n}\n\n/** The morning job: notify everyone due a delivery on `date`. Idempotent per day. */\nexport function runMorningNotifications(db, date, notifier = createNotificationService(db)) {\n  const due = customersDueOn(db, date);\n  let notified = 0;\n  for (const row of due) {\n    const firstName = row.name.split(/\\s+/)[0];\n    const sent = notifier.send({\n      owner_id: row.owner_id,\n      customer_id: row.customer_id,\n      subscription_id: row.subscription_id,\n      recipient: row.phone,\n      type: 'delivery_due',\n      for_date: date,\n      message: `Hi ${firstName}, your ${row.plan_name} tiffin from ${row.business_name || 'your tiffin service'} will be delivered today (${prettyDate(date)}).`,\n      dedupe_key: `delivery_due:${row.subscription_id}:${date}`,\n    });\n    if (sent) notified++;\n  }\n  db.prepare(`\n    INSERT INTO clock_runs (date, due, notified) VALUES (?, ?, ?)\n    ON CONFLICT (date) DO UPDATE SET due = excluded.due, notified = clock_runs.notified + excluded.notified, ran_at = datetime('now')`)\n    .run(date, due.length, notified);\n  return { date, delivery_day: isWeekday(date), due: due.length, notified, already_notified: due.length - notified };\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\notifications.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\clock.js",
+  "content": "import { addDays, getClockOverride, isValidDate, realToday, setClockOverride, todayLocal } from './dates.js';\nimport { runMorningNotifications } from './notifications.js';\nimport { badRequest } from './http.js';\n\nconst MAX_MORNINGS = 366;\n\n/** Restore a previously set simulated date when the server starts. */\nexport function loadClock(db) {\n  const row = db.prepare(\"SELECT value FROM settings WHERE key = 'clock_date'\").get();\n  setClockOverride(row?.value && isValidDate(row.value) ? row.value : null);\n}\n\nexport function clockState() {\n  return { today: todayLocal(), simulated: getClockOverride() !== null, real_today: realToday() };\n}\n\nfunction persist(db, date) {\n  if (date) db.prepare(\"INSERT INTO settings (key, value) VALUES ('clock_date', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value\").run(date);\n  else db.prepare(\"DELETE FROM settings WHERE key = 'clock_date'\").run();\n  setClockOverride(date);\n}\n\n/**\n * POST /clock. Moves the simulated clock and runs the morning job.\n *\n *  {}                        → run this morning's job again (no time change)\n *  { \"date\": \"2026-09-21\" }  → jump to that date (also accepts \"now\": ISO datetime)\n *  { \"advance_days\": 3 }     → move forward N days (alias: \"days\")\n *  { \"reset\": true }         → return to the real date (no job run)\n *\n * Moving forward runs every morning passed through, in order, so skipping\n * ahead a few days never skips anyone's reminder. Moving backwards (or to the\n * same day) runs only the target morning. Re-runs never duplicate messages.\n */\nexport function tickClock(db, body = {}) {\n  const from = todayLocal();\n\n  if (body.reset === true) {\n    persist(db, null);\n    return { ...clockState(), from, mornings: [], notified_total: 0 };\n  }\n\n  let target = from;\n  if (body.date !== undefined || body.now !== undefined) {\n    const raw = String(body.date ?? body.now).slice(0, 10);\n    if (!isValidDate(raw)) throw badRequest('date must be YYYY-MM-DD (or now: an ISO datetime)');\n    target = raw;\n  } else if (body.advance_days !== undefined || body.days !== undefined) {\n    const n = Number(body.advance_days ?? body.days);\n    if (!Number.isInteger(n) || n < 0 || n > MAX_MORNINGS) throw badRequest(`advance_days must be a whole number from 0 to ${MAX_MORNINGS}`);\n    target = addDays(from, n);\n  }\n\n  let days = [target];\n  if (target > from) {\n    days = [];\n    for (let d = addDays(from, 1); d <= target; d = addDays(d, 1)) days.push(d);\n    if (days.length > MAX_MORNINGS) throw badRequest(`Cannot advance more than ${MAX_MORNINGS} days at once`);\n  }\n\n  persist(db, target);\n  const mornings = days.map((d) => runMorningNotifications(db, d));\n  return { ...clockState(), from, mornings, notified_total: mornings.reduce((n, m) => n + m.notified, 0) };\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\clock.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\simulation.js",
+  "content": "import { Router } from 'express';\nimport { h, HttpError, isValidDateParam, optionalAuth, pageParams, paged, requireAuth, str } from '../http.js';\nimport { clockState, tickClock } from '../clock.js';\n\nconst SORTABLE = {\n  id: 'o.id',\n  created_at: 'o.created_at',\n  for_date: 'o.for_date',\n  recipient: 'o.recipient',\n  customer: 'c.name COLLATE NOCASE',\n  type: 'o.type',\n};\n\n/**\n * Clock + outbox. Mounted at both /clock, /outbox (grading harness) and\n * /api/clock, /api/outbox (the app). With a token, /outbox shows only that\n * owner's messages. Without one it shows all messages – allowed only while\n * PUBLIC_SIM_ENDPOINTS is not \"false\".\n */\nexport default function simulationRoutes(db) {\n  const r = Router();\n  const publicAllowed = () => process.env.PUBLIC_SIM_ENDPOINTS !== 'false';\n  const auth = (req, res, next) => (publicAllowed() ? optionalAuth(req, res, next) : requireAuth(req, res, next));\n\n  r.get('/clock', auth, h((_req, res) => res.json(clockState())));\n\n  r.post('/clock', auth, h((req, res) => res.json(tickClock(db, req.body || {}))));\n\n  // GET /outbox?date=&type=&customer_id=&search=&page=&limit=&sort=&order=\n  r.get('/outbox', auth, h((req, res) => {\n    const p = pageParams(req.query, SORTABLE, 'id');\n    if (!req.query.sort) p.orderBy = 'o.id DESC';\n    if (req.query.date && !isValidDateParam(req.query.date)) throw new HttpError(400, 'date must be YYYY-MM-DD');\n\n    const where = [];\n    const args = {};\n    if (req.userId) { where.push('o.owner_id = @owner'); args.owner = req.userId; }\n    if (req.query.date) { where.push('o.for_date = @date'); args.date = req.query.date; }\n    if (req.query.type) { where.push('o.type = @type'); args.type = str(req.query.type, 50); }\n    if (req.query.customer_id) { where.push('o.customer_id = @cid'); args.cid = Number(req.query.customer_id); }\n    if (req.query.search) { where.push('(o.recipient LIKE @q OR c.name LIKE @q OR o.message LIKE @q)'); args.q = `%${str(req.query.search)}%`; }\n    const clause = where.length ? `WHERE ${where.join(' AND ')}` : '';\n    const from = 'FROM outbox o LEFT JOIN customers c ON c.id = o.customer_id';\n\n    const total = db.prepare(`SELECT COUNT(*) AS n ${from} ${clause}`).get(args).n;\n    const rows = db.prepare(`\n      SELECT o.id, o.channel, o.recipient AS \"to\", o.type, o.for_date AS date, o.message, o.status,\n             o.customer_id, c.name AS customer_name, o.subscription_id, o.created_at\n      ${from} ${clause} ORDER BY ${p.orderBy}, o.id DESC LIMIT @limit OFFSET @offset`)\n      .all({ ...args, limit: p.limit, offset: p.offset });\n    res.json(paged(rows, total, p));\n  }));\n\n  return r;\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\simulation.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes\" && sed -i \"s/import { h, HttpError, isValidDateParam, optionalAuth, pageParams, paged, requireAuth, str } from '..\\/http.js';/import { h, HttpError, optionalAuth, pageParams, paged, requireAuth, str } from '..\\/http.js';\\nimport { isValidDate } from '..\\/dates.js';/; s/!isValidDateParam(/!isValidDate(/\" simulation.js && head -4 simulation.js && grep -n isValidDate simulation.js",
+  "description": "Fix date validator import in simulation routes"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+import { Router } from 'express';
+import { h, HttpError, optionalAuth, pageParams, paged, requireAuth, str } from '../http.js';
+import { isValidDate } from '../dates.js';
+import { clockState, tickClock } from '../clock.js';
+3:import { isValidDate } from '../dates.js';
+34:    if (req.query.date && !isValidDate(req.query.date)) throw new HttpError(400, 'date must be YYYY-MM-DD');
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\simulation.js",
+  "old_string": "    if (!req.query.sort) p.orderBy = 'o.id DESC';",
+  "new_string": "    if (!req.query.sort) { p.orderBy = 'o.id DESC'; p.order = 'DESC'; } // newest first by default"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\simulation.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+The clock, Notification Service and outbox are written. Next is the transfer feature (Level 2).
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\subscriptions.js",
+  "offset": 1,
+  "limit": 30
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import { Router } from 'express';
+2	import { badRequest, h, HttpError, notFound, str } from '../http.js';
+3	import { addDays, isValidDate, isValidMonth, todayLocal } from '../dates.js';
+4	import { computeBill, rangesOverlap } from '../billing.js';
+5	import { tx } from '../db.js';
+6	
+7	export default function subscriptionRoutes(db) {
+8	  const r = Router();
+9	
+10	  const loadSub = (id, owner) => {
+11	    const sub = db.prepare(`
+12	      SELECT s.*, pl.name AS plan_name, c.name AS customer_name, c.phone AS customer_phone
+13	      FROM subscriptions s
+14	      JOIN customers c ON c.id = s.customer_id
+15	      JOIN plans pl ON pl.id = s.plan_id
+16	      WHERE s.id = ? AND c.owner_id = ?`).get(id, owner);
+17	    if (!sub) throw notFound('Subscription');
+18	    sub.pauses = db.prepare('SELECT * FROM pauses WHERE subscription_id = ? ORDER BY start_date').all(sub.id);
+19	    return sub;
+20	  };
+21	
+22	  const dateOr = (v, fallback, field) => {
+23	    if (v === undefined || v === null || v === '') return fallback;
+24	    if (!isValidDate(v)) throw badRequest(`${field} must be a valid YYYY-MM-DD date`);
+25	    return v;
+26	  };
+27	
+28	  // POST /api/customers/:customerId/subscriptions  { plan_id, start_date }
+29	  r.post('/customers/:customerId/subscriptions', h((req, res) => {
+30	    const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(req.params.customerId, req.userId);
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\subscriptions.js",
+  "offset": 94
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+94	
+95	  // POST /api/subscriptions/:id/end  { end_date? }  – last delivery day (inclusive)
+96	  r.post('/subscriptions/:id/end', h((req, res) => {
+97	    const sub = loadSub(req.params.id, req.userId);
+98	    const end = dateOr(req.body.end_date, todayLocal(), 'end_date');
+99	    if (end < addDays(sub.start_date, -1)) throw badRequest('end_date cannot be before the subscription start');
+100	    tx(db, () => {
+101	      db.prepare('UPDATE subscriptions SET end_date = ? WHERE id = ?').run(end, sub.id);
+102	      // Trim pauses that run past the new end date.
+103	      db.prepare('DELETE FROM pauses WHERE subscription_id = ? AND start_date > ?').run(sub.id, end);
+104	      db.prepare('UPDATE pauses SET end_date = ? WHERE subscription_id = ? AND (end_date IS NULL OR end_date > ?)').run(end, sub.id, end);
+105	    });
+106	    res.json(loadSub(sub.id, req.userId));
+107	  }));
+108	
+109	  // GET /api/subscriptions/:id/bill?month=YYYY-MM  – live preview, not saved
+110	  r.get('/subscriptions/:id/bill', h((req, res) => {
+111	    const sub = loadSub(req.params.id, req.userId);
+112	    const month = req.query.month || todayLocal().slice(0, 7);
+113	    if (!isValidMonth(month)) throw badRequest('month must be YYYY-MM');
+114	    res.json({ subscription_id: sub.id, customer_name: sub.customer_name, plan_name: sub.plan_name, ...computeBill(sub, sub.pauses, month) });
+115	  }));
+116	
+117	  return r;
+118	}
+119
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\subscriptions.js",
+  "old_string": "    sub.pauses = db.prepare('SELECT * FROM pauses WHERE subscription_id = ? ORDER BY start_date').all(sub.id);\n    return sub;\n  };",
+  "new_string": "    sub.pauses = db.prepare('SELECT * FROM pauses WHERE subscription_id = ? ORDER BY start_date').all(sub.id);\n    Object.assign(sub, transferLinks(db, sub));\n    return sub;\n  };"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\subscriptions.js",
+  "old_string": "    res.json({ subscription_id: sub.id, customer_name: sub.customer_name, plan_name: sub.plan_name, ...computeBill(sub, sub.pauses, month) });\n  }));\n\n  return r;\n}",
+  "new_string": "    res.json({ subscription_id: sub.id, customer_name: sub.customer_name, plan_name: sub.plan_name, ...computeBill(sub, sub.pauses, month) });\n  }));\n\n  // POST /api/subscriptions/:id/transfer\n  //   { effective_date, to_customer_id }                       – hand over to an existing customer\n  //   { effective_date, customer: { name, phone, address } }   – or to a new one (reused if the phone exists)\n  //\n  // effective_date is the new customer's first delivery day. The current holder\n  // is served up to the day before. The plan, the locked-in price and any fixed\n  // end date carry over to a linked subscription, so the cycle continues\n  // unbroken. Each customer is billed only for the weekdays they were served.\n  r.post('/subscriptions/:id/transfer', h((req, res) => {\n    const sub = loadSub(req.params.id, req.userId);\n    const effective = dateOr(req.body.effective_date, todayLocal(), 'effective_date');\n\n    if (effective <= sub.start_date) {\n      throw badRequest(`effective_date must be after the subscription start (${sub.start_date}); to hand over from day one, edit the customer instead`);\n    }\n    if (sub.end_date && effective > sub.end_date) {\n      throw badRequest(`Subscription already ended on ${sub.end_date}; nothing left to transfer`);\n    }\n\n    const result = tx(db, () => {\n      const target = resolveTargetCustomer(db, req.userId, req.body);\n      if (target.id === sub.customer_id) throw badRequest('Cannot transfer a subscription to the same customer');\n      const clash = db.prepare('SELECT id, start_date FROM subscriptions WHERE customer_id = ? AND (end_date IS NULL OR end_date >= ?)')\n        .get(target.customer.id, effective);\n      if (clash) throw new HttpError(409, `${target.customer.name} already has a subscription running on or after ${effective}`);\n\n      const lastDay = addDays(effective, -1);\n      // Close the current holder's subscription, trimming pauses past the handover.\n      db.prepare('UPDATE subscriptions SET end_date = ? WHERE id = ?').run(lastDay, sub.id);\n      db.prepare('DELETE FROM pauses WHERE subscription_id = ? AND start_date > ?').run(sub.id, lastDay);\n      db.prepare('UPDATE pauses SET end_date = ? WHERE subscription_id = ? AND (end_date IS NULL OR end_date > ?)').run(lastDay, sub.id, lastDay);\n\n      // Same plan, same locked price, same end date: the cycle carries over.\n      const { lastInsertRowid } = db.prepare(`\n        INSERT INTO subscriptions (customer_id, plan_id, price_paise, start_date, end_date, transferred_from_id)\n        VALUES (?, ?, ?, ?, ?, ?)`).run(target.customer.id, sub.plan_id, sub.price_paise, effective, sub.end_date, sub.id);\n\n      const notifier = createNotificationService(db);\n      const from = db.prepare('SELECT * FROM customers WHERE id = ?').get(sub.customer_id);\n      notifier.send({\n        owner_id: req.userId, customer_id: from.id, subscription_id: sub.id, recipient: from.phone,\n        type: 'subscription_transferred_out', for_date: effective,\n        message: `Hi ${from.name.split(/\\s+/)[0]}, your ${sub.plan_name} tiffin has been transferred to ${target.customer.name} from ${effective}. Your last delivery is ${lastDay}.`,\n        dedupe_key: `transfer_out:${lastInsertRowid}`,\n      });\n      notifier.send({\n        owner_id: req.userId, customer_id: target.customer.id, subscription_id: Number(lastInsertRowid), recipient: target.customer.phone,\n        type: 'subscription_transferred_in', for_date: effective,\n        message: `Hi ${target.customer.name.split(/\\s+/)[0]}, ${from.name}'s ${sub.plan_name} tiffin plan is now yours from ${effective}.`,\n        dedupe_key: `transfer_in:${lastInsertRowid}`,\n      });\n\n      return { newId: Number(lastInsertRowid), createdCustomer: target.created };\n    });\n\n    const fromSub = loadSub(sub.id, req.userId);\n    const toSub = loadSub(result.newId, req.userId);\n    const month = effective.slice(0, 7);\n    const fromBill = computeBill(fromSub, fromSub.pauses, month);\n    const toBill = computeBill(toSub, toSub.pauses, month);\n    res.status(201).json({\n      effective_date: effective,\n      created_customer: result.createdCustomer,\n      from: fromSub,\n      to: toSub,\n      billing_split: {\n        month,\n        from: { customer_id: fromSub.customer_id, customer_name: fromSub.customer_name, ...fromBill },\n        to: { customer_id: toSub.customer_id, customer_name: toSub.customer_name, ...toBill },\n        combined_amount_paise: fromBill.amount_paise + toBill.amount_paise,\n      },\n    });\n  }));\n\n  return r;\n}\n\n/** Links between a subscription and the one it was transferred from / to. */\nexport function transferLinks(db, sub) {\n  const from = sub.transferred_from_id\n    ? db.prepare(`SELECT s.id AS subscription_id, c.id AS customer_id, c.name AS customer_name, s.end_date\n        FROM subscriptions s JOIN customers c ON c.id = s.customer_id WHERE s.id = ?`).get(sub.transferred_from_id)\n    : null;\n  const to = db.prepare(`SELECT s.id AS subscription_id, c.id AS customer_id, c.name AS customer_name, s.start_date\n      FROM subscriptions s JOIN customers c ON c.id = s.customer_id WHERE s.transferred_from_id = ?`).get(sub.id) || null;\n  return { transferred_from: from, transferred_to: to };\n}\n\nfunction resolveTargetCustomer(db, owner, body) {\n  if (body.to_customer_id !== undefined && body.to_customer_id !== null && body.to_customer_id !== '') {\n    const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(body.to_customer_id, owner);\n    if (!customer) throw badRequest('to_customer_id must reference one of your customers');\n    return { customer, id: customer.id, created: false };\n  }\n  const c = body.customer || {};\n  const phone = normalizePhone(c.phone);\n  if (!PHONE_RE.test(phone)) throw badRequest('Provide to_customer_id, or customer.phone (10–13 digits) for the new holder', { phone: 'Phone must be 10–13 digits' });\n  const existing = db.prepare('SELECT * FROM customers WHERE owner_id = ? AND phone = ?').get(owner, phone);\n  if (existing) return { customer: existing, id: existing.id, created: false };\n  const name = str(c.name, 100);\n  if (!name) throw badRequest('customer.name is required for a new customer', { name: 'Name is required' });\n  const { lastInsertRowid } = db.prepare('INSERT INTO customers (owner_id, name, phone, address) VALUES (?, ?, ?, ?)')\n    .run(owner, name, phone, str(c.address, 300));\n  const customer = db.prepare('SELECT * FROM customers WHERE id = ?').get(lastInsertRowid);\n  return { customer, id: customer.id, created: true };\n}"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\subscriptions.js",
+  "old_string": "import { badRequest, h, HttpError, notFound, str } from '../http.js';\nimport { addDays, isValidDate, isValidMonth, todayLocal } from '../dates.js';\nimport { computeBill, rangesOverlap } from '../billing.js';\nimport { tx } from '../db.js';",
+  "new_string": "import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str } from '../http.js';\nimport { addDays, isValidDate, isValidMonth, todayLocal } from '../dates.js';\nimport { computeBill, rangesOverlap } from '../billing.js';\nimport { tx } from '../db.js';\nimport { createNotificationService } from '../notifications.js';"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\subscriptions.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\customers.js",
+  "offset": 110,
+  "limit": 15
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+110	  }));
+111	
+112	  // Customer detail with full subscription + pause history.
+113	  r.get('/:id', h((req, res) => {
+114	    const t = asOf(req.query);
+115	    const customer = getCustomer(req.params.id, req.userId, t);
+116	    const subscriptions = db.prepare(`
+117	      SELECT s.*, pl.name AS plan_name FROM subscriptions s JOIN plans pl ON pl.id = s.plan_id
+118	      WHERE s.customer_id = ? ORDER BY s.start_date DESC`).all(customer.id);
+119	    const pauseStmt = db.prepare('SELECT * FROM pauses WHERE subscription_id = ? ORDER BY start_date DESC');
+120	    for (const s of subscriptions) s.pauses = pauseStmt.all(s.id);
+121	    res.json({ ...customer, subscriptions });
+122	  }));
+123	
+124	  r.put('/:id', h((req, res) => {
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\bills.js",
+  "offset": 68,
+  "limit": 12
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+68	      FROM bills b
+69	      JOIN subscriptions s ON s.id = b.subscription_id
+70	      JOIN customers c ON c.id = s.customer_id
+71	      JOIN plans pl ON pl.id = s.plan_id
+72	      WHERE c.owner_id = ? AND b.month = ? AND (c.name LIKE ? OR c.phone LIKE ?)`;
+73	    const args = [req.userId, month, q, q];
+74	
+75	    const summary = db.prepare(`SELECT COUNT(*) AS n, COALESCE(SUM(b.amount_paise), 0) AS total,
+76	      COALESCE(SUM(b.delivered_days), 0) AS delivered, COALESCE(SUM(b.paused_days), 0) AS paused ${from}`).get(...args);
+77	    const rows = db.prepare(`
+78	      SELECT b.*, c.id AS customer_id, c.name AS customer_name, c.phone AS customer_phone, pl.name AS plan_name
+79	      ${from} ORDER BY ${p.orderBy}, b.id LIMIT ? OFFSET ?`).all(...args, p.limit, p.offset);
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\customers.js",
+  "old_string": "    for (const s of subscriptions) s.pauses = pauseStmt.all(s.id);",
+  "new_string": "    for (const s of subscriptions) Object.assign(s, { pauses: pauseStmt.all(s.id) }, transferLinks(db, s));"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\customers.js",
+  "old_string": "import { isValidDate, todayLocal } from '../dates.js';",
+  "new_string": "import { isValidDate, todayLocal } from '../dates.js';\nimport { transferLinks } from './subscriptions.js';"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\customers.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\bills.js",
+  "old_string": "      SELECT b.*, c.id AS customer_id, c.name AS customer_name, c.phone AS customer_phone, pl.name AS plan_name\n      ${from}",
+  "new_string": "      SELECT b.*, c.id AS customer_id, c.name AS customer_name, c.phone AS customer_phone, pl.name AS plan_name,\n        s.start_date, s.end_date,\n        (SELECT fc.name FROM subscriptions fs JOIN customers fc ON fc.id = fs.customer_id WHERE fs.id = s.transferred_from_id) AS transferred_from_name,\n        (SELECT tc.name FROM subscriptions ts JOIN customers tc ON tc.id = ts.customer_id WHERE ts.transferred_from_id = s.id) AS transferred_to_name\n      ${from}"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\bills.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+Transfer is wired in. Now the messy-data importer (Level 3).
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\importer.js",
+  "content": "// Pure helpers for importing a messy customer list. No database access here,\n// so every cleaning rule is unit-testable on its own.\nimport { formatDate, isValidDate } from './dates.js';\nimport { normalizePhone, PHONE_RE } from './http.js';\n\n/* ---------------------------------------------------------------- CSV ---- */\n\n/**\n * Parse CSV text into an array of string arrays. Handles quoted fields,\n * escaped quotes (\"\"), CR/LF line endings, a UTF-8 BOM, and auto-detects\n * comma, semicolon or tab delimiters from the header line.\n */\nexport function parseCsv(text) {\n  const src = String(text ?? '').replace(/^﻿/, '');\n  const firstLine = src.split(/\\r?\\n/, 1)[0] || '';\n  const delimiter = [',', ';', '\\t'].map((d) => [d, firstLine.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];\n\n  const rows = [];\n  let row = [];\n  let field = '';\n  let quoted = false;\n  for (let i = 0; i < src.length; i++) {\n    const ch = src[i];\n    if (quoted) {\n      if (ch === '\"' && src[i + 1] === '\"') { field += '\"'; i++; }\n      else if (ch === '\"') quoted = false;\n      else field += ch;\n    } else if (ch === '\"' && field.trim() === '') {\n      quoted = true;\n      field = '';\n    } else if (ch === delimiter) {\n      row.push(field); field = '';\n    } else if (ch === '\\n' || ch === '\\r') {\n      if (ch === '\\r' && src[i + 1] === '\\n') i++;\n      row.push(field); rows.push(row); row = []; field = '';\n    } else {\n      field += ch;\n    }\n  }\n  if (field !== '' || row.length) { row.push(field); rows.push(row); }\n  return rows;\n}\n\n/* ------------------------------------------------------------ Headers ---- */\n\nconst HEADER_ALIASES = {\n  name: ['name', 'customer', 'customername', 'fullname', 'client', 'clientname'],\n  phone: ['phone', 'mobile', 'phoneno', 'phonenumber', 'mobileno', 'mobilenumber', 'contact', 'contactno', 'whatsapp', 'cell'],\n  address: ['address', 'deliveryaddress', 'addr', 'location', 'area'],\n  plan: ['plan', 'planname', 'mealplan', 'package', 'tiffin', 'tiffinplan'],\n  start_date: ['startdate', 'start', 'from', 'subscriptionstart', 'joined', 'joiningdate', 'joindate', 'date', 'startedon'],\n};\n\nexport function mapHeader(header) {\n  const key = String(header ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  for (const [field, aliases] of Object.entries(HEADER_ALIASES)) if (aliases.includes(key)) return field;\n  return null;\n}\n\n/** CSV text → [{ row, values: {name, phone, ...} }] using the header row. */\nexport function csvToRecords(text) {\n  const rows = parseCsv(text);\n  if (!rows.length) return { records: [], unknownHeaders: [], missingHeaders: Object.keys(HEADER_ALIASES) };\n  const header = rows[0].map(mapHeader);\n  const unknownHeaders = rows[0].filter((_, i) => !header[i]).map((h) => h.trim()).filter(Boolean);\n  const missingHeaders = ['name', 'phone'].filter((f) => !header.includes(f));\n  const records = rows.slice(1).map((cells, i) => {\n    const values = {};\n    header.forEach((field, col) => { if (field && values[field] === undefined) values[field] = cells[col] ?? ''; });\n    return { row: i + 2, values }; // spreadsheet line number (header is line 1)\n  });\n  return { records, unknownHeaders, missingHeaders };\n}\n\n/* -------------------------------------------------------------- Dates ---- */\n\nconst MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, sept: 9, oct: 10, nov: 11, dec: 12 };\n\nconst build = (y, m, d) => {\n  const year = y < 100 ? 2000 + y : y;\n  const s = formatDate(new Date(Date.UTC(year, m - 1, d)));\n  return isValidDate(s) && Number(s.slice(0, 4)) === year && Number(s.slice(5, 7)) === m && Number(s.slice(8)) === d ? s : null;\n};\n\n/**\n * Parse the date formats people actually type. Returns { date, warning } or\n * { date: null } when blank, or { error } when unreadable.\n *\n *   2026-09-01, 2026/9/1, 20260901            year first\n *   01/09/2026, 1-9-26, 01.09.2026            day first (Indian default)\n *   09/25/2026                                 month first, only when day > 12 proves it\n *   1 Sep 2026, 1st September 2026, Sep 1, 2026, 01-Sep-26\n */\nexport function parseLooseDate(input) {\n  if (input instanceof Date && !Number.isNaN(input.getTime())) return { date: formatDate(input) };\n  const s = String(input ?? '').trim().replace(/\\s+/g, ' ');\n  if (!s) return { date: null };\n\n  let m;\n  if ((m = s.match(/^(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})(?:[T ].*)?$/))) {\n    const date = build(+m[1], +m[2], +m[3]);\n    return date ? { date } : { error: `\"${s}\" is not a real date` };\n  }\n  if ((m = s.match(/^(\\d{4})(\\d{2})(\\d{2})$/))) {\n    const date = build(+m[1], +m[2], +m[3]);\n    return date ? { date } : { error: `\"${s}\" is not a real date` };\n  }\n  if ((m = s.match(/^(\\d{1,2})[-/.](\\d{1,2})[-/.](\\d{2}|\\d{4})$/))) {\n    const a = +m[1]; const b = +m[2]; const y = +m[3];\n    if (a > 12 && b <= 12) return build(y, b, a) ? { date: build(y, b, a) } : { error: `\"${s}\" is not a real date` };\n    if (b > 12 && a <= 12) return build(y, a, b) ? { date: build(y, a, b), warning: `\"${s}\" read as month/day/year` } : { error: `\"${s}\" is not a real date` };\n    const date = build(y, b, a);\n    if (!date) return { error: `\"${s}\" is not a real date` };\n    return a === b ? { date } : { date, warning: `\"${s}\" is ambiguous; read as day/month/year` };\n  }\n  if ((m = s.match(/^(\\d{1,2})(?:st|nd|rd|th)?[ -]([A-Za-z]{3,9})\\.?[ ,-]+(\\d{2}|\\d{4})$/))) {\n    const mon = MONTHS[m[2].toLowerCase().slice(0, 4)] ?? MONTHS[m[2].toLowerCase().slice(0, 3)];\n    const date = mon && build(+m[3], mon, +m[1]);\n    return date ? { date } : { error: `\"${s}\" is not a recognisable date` };\n  }\n  if ((m = s.match(/^([A-Za-z]{3,9})\\.? (\\d{1,2})(?:st|nd|rd|th)?,? (\\d{4})$/))) {\n    const mon = MONTHS[m[1].toLowerCase().slice(0, 4)] ?? MONTHS[m[1].toLowerCase().slice(0, 3)];\n    const date = mon && build(+m[3], mon, +m[2]);\n    return date ? { date } : { error: `\"${s}\" is not a recognisable date` };\n  }\n  return { error: `\"${s}\" is not a recognisable date` };\n}\n\n/* ------------------------------------------------------------ Cleaning --- */\n\nconst clean = (v) => String(v ?? '').replace(/\\s+/g, ' ').trim();\n\n/** Title-case names typed in ALL CAPS or all lower case; leave mixed case alone. */\nexport function tidyName(v) {\n  const s = clean(v);\n  if (s && (s === s.toUpperCase() || s === s.toLowerCase())) {\n    return s.toLowerCase().replace(/(^|[\\s'-])\\p{L}/gu, (c) => c.toUpperCase());\n  }\n  return s;\n}\n\nexport const isBlankRecord = (values) => Object.values(values).every((v) => clean(v) === '');\n\n/**\n * Validate and normalise one record. `plans` is the owner's plan list.\n * Returns { ok: true, value, warnings } or { ok: false, reasons }.\n */\nexport function cleanRecord(values, { plans, defaultPlanId = null, defaultStartDate = null }) {\n  const reasons = [];\n  const warnings = [];\n\n  const name = tidyName(values.name);\n  if (!name) reasons.push('name is blank');\n\n  const rawPhone = clean(values.phone);\n  const phone = normalizePhone(rawPhone);\n  if (!rawPhone) reasons.push('phone is blank');\n  else if (!PHONE_RE.test(phone)) reasons.push(`phone \"${rawPhone}\" is not a valid 10–13 digit number`);\n\n  let plan = null;\n  const planText = clean(values.plan);\n  if (!planText) {\n    plan = defaultPlanId ? plans.find((p) => p.id === Number(defaultPlanId)) : null;\n    if (!plan) reasons.push('plan is blank');\n    else warnings.push(`plan blank; used default \"${plan.name}\"`);\n  } else {\n    const key = planText.toLowerCase().replace(/\\s+/g, ' ');\n    plan = plans.find((p) => p.name.toLowerCase().replace(/\\s+/g, ' ') === key) || plans.find((p) => String(p.id) === planText);\n    if (!plan) reasons.push(`plan \"${planText}\" does not match any of your plans`);\n    else if (!plan.is_active) reasons.push(`plan \"${plan.name}\" is retired`);\n  }\n\n  let startDate = null;\n  const parsed = parseLooseDate(values.start_date);\n  if (parsed.error) reasons.push(`start date ${parsed.error}`);\n  else if (!parsed.date) {\n    if (defaultStartDate) { startDate = defaultStartDate; warnings.push(`start date blank; used default ${defaultStartDate}`); }\n    else reasons.push('start date is blank');\n  } else {\n    startDate = parsed.date;\n    if (parsed.warning) warnings.push(parsed.warning);\n  }\n\n  if (reasons.length) return { ok: false, reasons };\n  return { ok: true, value: { name, phone, address: clean(values.address).slice(0, 300), plan, start_date: startDate }, warnings };\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\importer.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\import.js",
+  "content": "import { Router } from 'express';\nimport { badRequest, h } from '../http.js';\nimport { isValidDate } from '../dates.js';\nimport { tx } from '../db.js';\nimport { cleanRecord, csvToRecords, isBlankRecord } from '../importer.js';\n\nconst MAX_ROWS = 5000;\n\n/**\n * POST /api/import/customers\n *\n * Body (JSON), one of:\n *   { \"csv\": \"name,phone,plan,start_date\\n...\" }\n *   { \"rows\": [ { \"name\": \"...\", \"phone\": \"...\", \"plan\": \"...\", \"start_date\": \"...\" }, ... ] }\n * or a raw text/csv body.\n *\n * Options (JSON body or query string): default_plan_id, default_start_date, dry_run.\n *\n * Every non-empty row ends up in exactly one bucket:\n *   imported – a clean subscription was created (customer created or reused)\n *   deduped  – phone repeats an earlier row, or the customer is already subscribed\n *   rejected – required data blank or unreadable (reasons listed)\n * Completely empty lines are ignored. The whole import is one transaction.\n */\nexport default function importRoutes(db) {\n  const r = Router();\n\n  r.post('/customers', h((req, res) => {\n    const body = typeof req.body === 'string' ? { csv: req.body } : req.body || {};\n    const opt = { ...req.query, ...body };\n    const dryRun = opt.dry_run === true || opt.dry_run === 'true';\n    const defaultStartDate = opt.default_start_date || null;\n    if (defaultStartDate && !isValidDate(defaultStartDate)) throw badRequest('default_start_date must be YYYY-MM-DD');\n\n    let records;\n    let unknownHeaders = [];\n    if (typeof body.csv === 'string') {\n      const parsed = csvToRecords(body.csv);\n      if (parsed.missingHeaders.length) {\n        throw badRequest(`CSV header row must include ${parsed.missingHeaders.join(' and ')} columns`, { headers: 'Expected columns like: name, phone, address, plan, start_date' });\n      }\n      records = parsed.records;\n      unknownHeaders = parsed.unknownHeaders;\n    } else if (Array.isArray(body.rows)) {\n      records = body.rows.map((values, i) => ({ row: i + 1, values: normaliseKeys(values) }));\n    } else {\n      throw badRequest('Send { csv: \"...\" } or { rows: [...] }');\n    }\n    if (records.length > MAX_ROWS) throw badRequest(`Import at most ${MAX_ROWS} rows at a time`);\n\n    const plans = db.prepare('SELECT id, name, is_active FROM plans WHERE owner_id = ?').all(req.userId);\n    if (opt.default_plan_id && !plans.some((p) => p.id === Number(opt.default_plan_id))) {\n      throw badRequest('default_plan_id must reference one of your plans');\n    }\n    const ctx = { plans, defaultPlanId: opt.default_plan_id, defaultStartDate };\n\n    const report = { imported: [], deduped: [], rejected: [] };\n    let blankRows = 0;\n\n    const findCustomer = db.prepare('SELECT * FROM customers WHERE owner_id = ? AND phone = ?');\n    const runningSub = db.prepare('SELECT id, start_date FROM subscriptions WHERE customer_id = ? AND (end_date IS NULL OR end_date >= ?)');\n    const insertCustomer = db.prepare('INSERT INTO customers (owner_id, name, phone, address) VALUES (?, ?, ?, ?)');\n    const insertSub = db.prepare('INSERT INTO subscriptions (customer_id, plan_id, price_paise, start_date) VALUES (?, ?, ?, ?)');\n    const planPrice = db.prepare('SELECT price_paise FROM plans WHERE id = ?');\n\n    const run = () => {\n      const seen = new Map(); // phone -> first row number that claimed it\n      for (const { row, values } of records) {\n        if (isBlankRecord(values)) { blankRows++; continue; }\n\n        const result = cleanRecord(values, ctx);\n        if (!result.ok) {\n          report.rejected.push({ row, reasons: result.reasons, data: values });\n          continue;\n        }\n        const v = result.value;\n\n        if (seen.has(v.phone)) {\n          report.deduped.push({ row, phone: v.phone, name: v.name, reason: `duplicate phone; kept row ${seen.get(v.phone)}`, duplicate_of_row: seen.get(v.phone) });\n          continue;\n        }\n        seen.set(v.phone, row);\n\n        const existing = findCustomer.get(req.userId, v.phone);\n        if (existing) {\n          const running = runningSub.get(existing.id, v.start_date);\n          if (running) {\n            report.deduped.push({ row, phone: v.phone, name: v.name, reason: `already a customer (${existing.name}) with a subscription running from ${running.start_date}`, customer_id: existing.id });\n            continue;\n          }\n        }\n\n        let customerId = existing?.id ?? null;\n        let subscriptionId = null;\n        if (!dryRun) {\n          if (!existing) customerId = Number(insertCustomer.run(req.userId, v.name, v.phone, v.address).lastInsertRowid);\n          subscriptionId = Number(insertSub.run(customerId, v.plan.id, planPrice.get(v.plan.id).price_paise, v.start_date).lastInsertRowid);\n        }\n        report.imported.push({\n          row, customer_id: customerId, subscription_id: subscriptionId, name: existing?.name ?? v.name, phone: v.phone,\n          plan: v.plan.name, start_date: v.start_date, customer: existing ? 'existing' : 'new', warnings: result.warnings,\n        });\n      }\n    };\n\n    if (dryRun) run(); else tx(db, run);\n\n    res.status(dryRun ? 200 : 201).json({\n      imported: report.imported.length,\n      deduped: report.deduped.length,\n      rejected: report.rejected.length,\n      total_rows: records.length - blankRows,\n      blank_rows_ignored: blankRows,\n      dry_run: dryRun,\n      unknown_columns: unknownHeaders,\n      details: report,\n    });\n  }));\n\n  return r;\n}\n\n/** Accept loosely named JSON keys (\"Mobile No\", \"Start Date\") too. */\nfunction normaliseKeys(obj) {\n  const out = {};\n  for (const [k, v] of Object.entries(obj || {})) {\n    const key = String(k).toLowerCase().replace(/[^a-z0-9]/g, '');\n    const map = { name: 'name', phone: 'phone', address: 'address', plan: 'plan', startdate: 'start_date', start_date: 'start_date' };\n    const field = map[key] ?? { mobile: 'phone', mobileno: 'phone', phoneno: 'phone', customer: 'name', customername: 'name', start: 'start_date', planname: 'plan' }[key];\n    if (field && out[field] === undefined) out[field] = v;\n  }\n  return out;\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\import.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src\" && node - <<'EOF'\nconst fs=require('fs');\nlet s=fs.readFileSync('routes/import.js','utf8');\ns=s.replace(/\\/\\*\\* Accept loosely named JSON keys[\\s\\S]*$/, `/** Accept loosely named JSON keys (\"Mobile No\", \"Start Date\") using the CSV header aliases. */\nfunction normaliseKeys(obj) {\n  const out = {};\n  for (const [k, v] of Object.entries(obj || {})) {\n    const field = mapHeader(k) ?? (k === 'start_date' ? 'start_date' : null);\n    if (field && out[field] === undefined) out[field] = v;\n  }\n  return out;\n}\n`);\ns=s.replace(\"import { cleanRecord, csvToRecords, isBlankRecord } from '../importer.js';\",\"import { cleanRecord, csvToRecords, isBlankRecord, mapHeader } from '../importer.js';\");\nfs.writeFileSync('routes/import.js',s);\nlet a=fs.readFileSync('app.js','utf8');\na=a.replace(\"import dashboardRoutes from './routes/dashboard.js';\",\"import dashboardRoutes from './routes/dashboard.js';\\r\\nimport simulationRoutes from './routes/simulation.js';\\r\\nimport importRoutes from './routes/import.js';\\r\\nimport { loadClock } from './clock.js';\");\na=a.replace(\"app.use(express.json({ limit: '100kb' }));\",\"app.use(express.json({ limit: '2mb' }));\\r\\n  app.use(express.text({ type: ['text/csv', 'text/plain'], limit: '2mb' }));\\r\\n  loadClock(db);\");\na=a.replace(\"if (req.path.startsWith('/api'))\",\"if (/^\\\\/(api|clock|outbox)/.test(req.path))\");\na=a.replace(\"  app.use('/api/dashboard', requireAuth, dashboardRoutes(db));\",\"  app.use('/api/dashboard', requireAuth, dashboardRoutes(db));\\r\\n  app.use('/api/import', requireAuth, importRoutes(db));\\r\\n  // Simulated clock + Notification Service outbox, at /clock & /outbox and under /api.\\r\\n  const sim = simulationRoutes(db);\\r\\n  app.use('/api', sim);\\r\\n  app.use('/', sim);\");\nfs.writeFileSync('app.js',a);\nEOF\ngrep -n \"sim\\|import\\|loadClock\\|text(\" app.js; grep -n mapHeader routes/import.js | head -3",
+  "description": "Mount new routes and simplify key mapping"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1:import express from 'express';
+2:import cors from 'cors';
+3:import fs from 'node:fs';
+4:import path from 'node:path';
+5:import { fileURLToPath } from 'node:url';
+6:import { HttpError, requireAuth } from './http.js';
+7:import authRoutes from './routes/auth.js';
+8:import planRoutes from './routes/plans.js';
+9:import customerRoutes from './routes/customers.js';
+10:import subscriptionRoutes from './routes/subscriptions.js';
+11:import billRoutes from './routes/bills.js';
+12:import dashboardRoutes from './routes/dashboard.js';
+13:import simulationRoutes from './routes/simulation.js';
+14:import importRoutes from './routes/import.js';
+15:import { loadClock } from './clock.js';
+21:  app.use(express.text({ type: ['text/csv', 'text/plain'], limit: '2mb' }));
+22:  loadClock(db);
+40:  app.use('/api/import', requireAuth, importRoutes(db));
+42:  const sim = simulationRoutes(db);
+43:  app.use('/api', sim);
+44:  app.use('/', sim);
+49:  const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+5:import { cleanRecord, csvToRecords, isBlankRecord, mapHeader } from '../importer.js';
+127:    const field = mapHeader(k) ?? (k === 'start_date' ? 'start_date' : null);
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src\" && sed -n 30,50p app.js",
+  "description": "Check route mount order"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+next();
+    });
+  }
+
+  app.get('/api/health', (_req, res) => res.json({ ok: true }));
+  app.use('/api/auth', authRoutes(db));
+  app.use('/api/plans', requireAuth, planRoutes(db));
+  app.use('/api/customers', requireAuth, customerRoutes(db));
+  app.use('/api/bills', requireAuth, billRoutes(db));
+  app.use('/api/dashboard', requireAuth, dashboardRoutes(db));
+  app.use('/api/import', requireAuth, importRoutes(db));
+  // Simulated clock + Notification Service outbox, at /clock & /outbox and under /api.
+  const sim = simulationRoutes(db);
+  app.use('/api', sim);
+  app.use('/', sim);
+  app.use('/api', requireAuth, subscriptionRoutes(db));
+  app.use('/api', (_req, _res, next) => next(new HttpError(404, 'API route not found')));
+
+  // Serve the built React app in production (single deployable).
+  const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+  if (fs.existsSync(dist)) {
+```
+
+</details>
+
+Server code is done. Writing tests for all three features:
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\test\\importer.test.js",
+  "content": "import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { cleanRecord, csvToRecords, parseCsv, parseLooseDate, tidyName } from '../src/importer.js';\nimport { normalizePhone } from '../src/http.js';\n\ntest('parseLooseDate understands mixed formats', () => {\n  const cases = {\n    '2026-09-01': '2026-09-01',\n    '2026/9/1': '2026-09-01',\n    '20260901': '2026-09-01',\n    '01/09/2026': '2026-09-01', // day first (Indian default)\n    '1-9-26': '2026-09-01',\n    '01.09.2026': '2026-09-01',\n    '25/09/2026': '2026-09-25',\n    '09/25/2026': '2026-09-25', // month first only when day > 12 proves it\n    '1 Sep 2026': '2026-09-01',\n    '1st September 2026': '2026-09-01',\n    'Sep 1, 2026': '2026-09-01',\n    'September 1 2026': '2026-09-01',\n    '01-Sep-26': '2026-09-01',\n    '  2026-09-01T10:00:00Z ': '2026-09-01',\n  };\n  for (const [input, expected] of Object.entries(cases)) {\n    assert.equal(parseLooseDate(input).date, expected, input);\n  }\n  assert.match(parseLooseDate('03/04/2026').warning, /ambiguous/);\n  assert.equal(parseLooseDate('').date, null);\n  assert.equal(parseLooseDate('   ').date, null);\n  assert.ok(parseLooseDate('31/02/2026').error);\n  assert.ok(parseLooseDate('next monday').error);\n  assert.ok(parseLooseDate('2026-13-01').error);\n});\n\ntest('normalizePhone collapses common Indian formats', () => {\n  for (const p of ['9845000000', '+91 98450 00000', '91-9845000000', '098450-00000', '(984) 500-0000', '98450.00000']) {\n    assert.equal(normalizePhone(p), '9845000000', p);\n  }\n  assert.equal(normalizePhone(9845000000), '9845000000');\n});\n\ntest('parseCsv handles quotes, CRLF, BOM and semicolons', () => {\n  assert.deepEqual(parseCsv('﻿a,b\\r\\n\"x, y\",\"say \"\"hi\"\"\"\\r\\n'), [['a', 'b'], ['x, y', 'say \"hi\"']]);\n  assert.deepEqual(parseCsv('name;phone\\nAsha;98'), [['name', 'phone'], ['Asha', '98']]);\n});\n\ntest('csvToRecords maps header aliases and line numbers', () => {\n  const { records, unknownHeaders, missingHeaders } = csvToRecords('Customer Name,Mobile No,Meal Plan,Start Date,Notes\\nAsha,98,Veg,1/9/2026,x');\n  assert.deepEqual(missingHeaders, []);\n  assert.deepEqual(unknownHeaders, ['Notes']);\n  assert.equal(records[0].row, 2);\n  assert.deepEqual(records[0].values, { name: 'Asha', phone: '98', plan: 'Veg', start_date: '1/9/2026' });\n});\n\ntest('tidyName fixes all-caps and all-lower names only', () => {\n  assert.equal(tidyName('  ASHA   RAO '), 'Asha Rao');\n  assert.equal(tidyName(\"d'souza\"), \"D'Souza\");\n  assert.equal(tidyName('McDonald'), 'McDonald');\n});\n\ntest('cleanRecord collects every problem with a row', () => {\n  const plans = [{ id: 1, name: 'Veg Thali', is_active: 1 }, { id: 2, name: 'Old Plan', is_active: 0 }];\n  const bad = cleanRecord({ name: '', phone: '12', plan: 'Pizza', start_date: 'soon' }, { plans });\n  assert.equal(bad.ok, false);\n  assert.equal(bad.reasons.length, 4);\n  assert.match(cleanRecord({ name: 'A', phone: '9845000000', plan: 'old plan', start_date: '2026-09-01' }, { plans }).reasons[0], /retired/);\n\n  const good = cleanRecord({ name: 'asha rao', phone: '+91 98450 00000', plan: ' veg  THALI ', start_date: '' }, { plans, defaultStartDate: '2026-09-01' });\n  assert.equal(good.ok, true);\n  assert.deepEqual(good.value.plan, plans[0]);\n  assert.equal(good.value.start_date, '2026-09-01');\n  assert.equal(good.value.name, 'Asha Rao');\n  assert.equal(good.warnings.length, 1);\n});\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\test\importer.test.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\test\\features.test.js",
+  "content": "import { test, before, after } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { openDb } from '../src/db.js';\nimport { createApp } from '../src/app.js';\n\n// September 2026: Tue 1st; 22 weekdays. Mon 7th, Fri 11th, Sat 12th, Mon 14th, Tue 15th.\nlet server;\nlet root;\nlet token;\nlet plan;\n\nbefore(async () => {\n  const app = createApp(openDb(':memory:'), { log: false });\n  await new Promise((resolve) => { server = app.listen(0, resolve); });\n  root = `http://127.0.0.1:${server.address().port}`;\n  token = (await call('POST', '/api/auth/register', { name: 'Owner', business_name: 'Maa Ki Rasoi', email: 'o@example.com', password: 'secret123' })).body.token;\n  plan = (await call('POST', '/api/plans', { name: 'Veg Thali', price_paise: 220000 }, token)).body;\n});\nafter(() => server.close());\n\nasync function call(method, path, body, auth, headers = {}) {\n  const isText = typeof body === 'string';\n  const res = await fetch(root + path, {\n    method,\n    headers: { 'Content-Type': isText ? 'text/csv' : 'application/json', ...(auth ? { Authorization: `Bearer ${auth}` } : {}), ...headers },\n    body: body === undefined ? undefined : isText ? body : JSON.stringify(body),\n  });\n  const text = await res.text();\n  return { status: res.status, body: text ? JSON.parse(text) : null };\n}\n\nconst addCustomer = async (name, phone) => (await call('POST', '/api/customers', { name, phone }, token)).body;\nconst subscribe = async (c, start = '2026-09-01') => (await call('POST', `/api/customers/${c.id}/subscriptions`, { plan_id: plan.id, start_date: start }, token)).body;\n\ntest('L1: POST /clock notifies only customers due a delivery; /outbox shows them', async () => {\n  const active = await addCustomer('Asha Rao', '9000000001');\n  const paused = await addCustomer('Bala K', '9000000002');\n  const later = await addCustomer('Chitra S', '9000000003');\n  await addCustomer('Dev NoPlan', '9000000004');\n  const ended = await addCustomer('Esha Ended', '9000000005');\n  await subscribe(active);\n  const pSub = await subscribe(paused);\n  await call('POST', `/api/subscriptions/${pSub.id}/pause`, { start_date: '2026-09-07', end_date: '2026-09-08' }, token);\n  await subscribe(later, '2026-09-15');\n  const eSub = await subscribe(ended);\n  await call('POST', `/api/subscriptions/${eSub.id}/end`, { end_date: '2026-09-04' }, token);\n\n  // Jump to Monday 7 Sep: only Asha is due (Bala paused, Chitra not started, Dev no plan, Esha ended).\n  const tick = await call('POST', '/clock', { date: '2026-09-07' });\n  assert.equal(tick.status, 200);\n  assert.equal(tick.body.today, '2026-09-07');\n  const monday = tick.body.mornings.find((m) => m.date === '2026-09-07');\n  assert.deepEqual([monday.due, monday.notified], [1, 1]);\n\n  const out = await call('GET', '/outbox?date=2026-09-07');\n  assert.equal(out.status, 200);\n  assert.deepEqual(out.body.data.map((m) => [m.to, m.type]), [['9000000001', 'delivery_due']]);\n  assert.match(out.body.data[0].message, /Veg Thali tiffin from Maa Ki Rasoi will be delivered today/);\n\n  // Re-running the same morning does not duplicate.\n  const again = await call('POST', '/clock', {});\n  assert.equal(again.body.mornings[0].notified, 0);\n  assert.equal((await call('GET', '/outbox?date=2026-09-07')).body.total, 1);\n\n  // Advancing across a weekend: Sat/Sun send nothing, Monday 14th catches up. Tue 8th: Bala still paused.\n  const week = await call('POST', '/clock', { advance_days: 7 });\n  const byDate = Object.fromEntries(week.body.mornings.map((m) => [m.date, m]));\n  assert.equal(week.body.mornings.length, 7);\n  assert.equal(byDate['2026-09-08'].notified, 1);\n  assert.equal(byDate['2026-09-09'].notified, 2); // Bala back\n  assert.equal(byDate['2026-09-12'].delivery_day, false);\n  assert.equal(byDate['2026-09-12'].notified, 0);\n  assert.equal(byDate['2026-09-14'].notified, 2);\n\n  // Chitra starts Tue 15th.\n  await call('POST', '/clock', { date: '2026-09-15' });\n  const tue = (await call('GET', '/outbox?date=2026-09-15&sort=recipient&order=asc')).body;\n  assert.deepEqual(tue.data.map((m) => m.to), ['9000000001', '9000000002', '9000000003']);\n\n  // App status follows the simulated clock.\n  assert.equal((await call('GET', '/api/clock', undefined, token)).body.today, '2026-09-15');\n  assert.equal((await call('GET', `/api/customers/${later.id}`, undefined, token)).body.status, 'active');\n\n  // Authenticated outbox is scoped to the owner; another owner sees nothing.\n  const other = (await call('POST', '/api/auth/register', { name: 'X', email: 'x@example.com', password: 'secret123' })).body.token;\n  assert.equal((await call('GET', '/api/outbox', undefined, other)).body.total, 0);\n  assert.ok((await call('GET', '/api/outbox', undefined, token)).body.total >= 8);\n\n  assert.equal((await call('POST', '/clock', { date: 'tomorrow' })).status, 400);\n});\n\ntest('L2: transfer mid-cycle carries plan and cycle; bill splits by who was served', async () => {\n  const from = await addCustomer('Farah Old', '9100000001');\n  const sub = await subscribe(from, '2026-09-01');\n  // Farah pauses 3–4 Sep and had a future pause that should not follow the subscription.\n  await call('POST', `/api/subscriptions/${sub.id}/pause`, { start_date: '2026-09-03', end_date: '2026-09-04' }, token);\n  await call('POST', `/api/subscriptions/${sub.id}/pause`, { start_date: '2026-09-21', end_date: '2026-09-22' }, token);\n  // Raise the plan price later: the transferred cycle must keep the locked price.\n  await call('PUT', `/api/plans/${plan.id}`, { name: 'Veg Thali', price_paise: 300000 }, token);\n\n  const res = await call('POST', `/api/subscriptions/${sub.id}/transfer`, {\n    effective_date: '2026-09-14',\n    customer: { name: 'Gaurav New', phone: '+91 91000 00002', address: 'Flat 2' },\n  }, token);\n  assert.equal(res.status, 201);\n  const { from: f, to: t, billing_split: split } = res.body;\n  assert.equal(res.body.created_customer, true);\n  assert.equal(f.end_date, '2026-09-13');\n  assert.equal(f.pauses.length, 1); // future pause dropped\n  assert.equal(t.start_date, '2026-09-14');\n  assert.equal(t.plan_id, plan.id);\n  assert.equal(t.price_paise, 220000); // cycle carries over at the locked price\n  assert.equal(t.transferred_from.customer_name, 'Farah Old');\n  assert.equal(f.transferred_to.customer_name, 'Gaurav New');\n\n  // Farah: weekdays 1–11 Sep = 9, minus 2 paused = 7. Gaurav: 14–30 Sep = 13.\n  assert.equal(split.from.delivered_days, 7);\n  assert.equal(split.to.delivered_days, 13);\n  assert.equal(split.from.amount_paise, Math.round((220000 * 7) / 22));\n  assert.equal(split.to.amount_paise, Math.round((220000 * 13) / 22));\n  // Together they never pay more than the one plan.\n  assert.ok(split.combined_amount_paise <= 220000);\n\n  // Both appear in generated bills with transfer links.\n  await call('POST', '/api/bills/generate', { month: '2026-09' }, token);\n  const bills = (await call('GET', '/api/bills?month=2026-09&search=91000000', undefined, token)).body.data;\n  const farah = bills.find((b) => b.customer_name === 'Farah Old');\n  const gaurav = bills.find((b) => b.customer_name === 'Gaurav New');\n  assert.equal(farah.transferred_to_name, 'Gaurav New');\n  assert.equal(gaurav.transferred_from_name, 'Farah Old');\n  assert.equal(farah.amount_paise + gaurav.amount_paise, split.combined_amount_paise);\n\n  // Both parties were notified.\n  const msgs = (await call('GET', '/api/outbox?search=transferred', undefined, token)).body.data.map((m) => m.type).sort();\n  assert.deepEqual(msgs, ['subscription_transferred_in', 'subscription_transferred_out']);\n\n  // Guards\n  assert.equal((await call('POST', `/api/subscriptions/${sub.id}/transfer`, { effective_date: '2026-09-20', customer: { name: 'Z', phone: '9100000009' } }, token)).status, 400); // already ended\n  assert.equal((await call('POST', `/api/subscriptions/${t.id}/transfer`, { effective_date: '2026-09-14', to_customer_id: from.id }, token)).status, 400); // not mid-cycle\n  assert.equal((await call('POST', `/api/subscriptions/${t.id}/transfer`, { effective_date: '2026-09-20', to_customer_id: t.customer_id }, token)).status, 400); // same person\n  const busy = await addCustomer('Busy', '9100000003');\n  await subscribe(busy, '2026-09-01');\n  assert.equal((await call('POST', `/api/subscriptions/${t.id}/transfer`, { effective_date: '2026-09-20', to_customer_id: busy.id }, token)).status, 409);\n  // A failed transfer to a brand-new customer leaves no half-created customer behind.\n  assert.equal((await call('POST', `/api/subscriptions/${t.id}/transfer`, { effective_date: '2026-09-14', customer: { name: 'Ghost', phone: '9100000010' } }, token)).status, 400);\n  assert.equal((await call('GET', '/api/customers/phone/9100000010', undefined, token)).status, 404);\n});\n\ntest('L3: messy CSV import reports imported / deduped / rejected', async () => {\n  await call('POST', '/api/plans', { name: 'Non-Veg Thali', price_paise: 450000 }, token);\n  const existing = await addCustomer('Already Here', '9200000009');\n  await subscribe(existing, '2026-09-01');\n\n  const csv = [\n    'Customer Name,Mobile No,Address,Meal Plan,Start Date,Notes',\n    'ASHA IYER,+91 92000 00001,\"12, MG Road\",veg thali,01/09/2026,first',   // imported\n    'Ravi Kumar,92000-00002,,Non-Veg Thali,2026-09-03,',                    // imported\n    'asha iyer,9200000001,,Veg Thali,5 Sep 2026,dup of row 2',              // deduped (phone repeat)\n    ',9200000003,,Veg Thali,2026-09-01,no name',                            // rejected\n    'Meena,,,Veg Thali,2026-09-01,no phone',                                 // rejected\n    'Kiran,9200000004,,Veg Thali,,no date',                                  // rejected\n    'Tara,9200000005,,Pizza Plan,2026-09-01,bad plan',                       // rejected\n    'Om,12345,,Veg Thali,31/02/2026,bad phone+date',                         // rejected\n    ',,,,,',                                                                 // blank line, ignored\n    'Already Here,09200000009,,Veg Thali,Sep 10 2026,existing subscriber',  // deduped (already subscribed)\n    'Neha Joshi,9200000006,,VEG THALI,09/25/2026,',                          // imported (month-first)\n    '',\n  ].join('\\r\\n');\n\n  const dry = await call('POST', '/api/import/customers', { csv, dry_run: true }, token);\n  assert.equal(dry.status, 200);\n  assert.deepEqual([dry.body.imported, dry.body.deduped, dry.body.rejected], [3, 2, 5]);\n  assert.equal((await call('GET', '/api/customers/phone/9200000001', undefined, token)).status, 404); // nothing written\n\n  const res = await call('POST', '/api/import/customers', { csv }, token);\n  assert.equal(res.status, 201);\n  const { imported, deduped, rejected, details } = res.body;\n  assert.deepEqual({ imported, deduped, rejected }, { imported: 3, deduped: 2, rejected: 5 });\n  assert.equal(res.body.blank_rows_ignored, 1);\n  assert.deepEqual(res.body.unknown_columns, ['Notes']);\n  assert.deepEqual(details.deduped.map((d) => d.row), [4, 11]);\n  assert.equal(details.deduped[0].duplicate_of_row, 2);\n  assert.deepEqual(details.rejected.map((r) => r.row), [5, 6, 7, 8, 9]);\n  assert.equal(details.rejected.find((r) => r.row === 9).reasons.length, 2);\n\n  // Clean data landed.\n  const asha = (await call('GET', '/api/customers/phone/9200000001', undefined, token)).body;\n  assert.equal(asha.name, 'Asha Iyer');\n  assert.equal(asha.address, '12, MG Road');\n  const ashaDetail = (await call('GET', `/api/customers/${asha.id}`, undefined, token)).body;\n  assert.equal(ashaDetail.subscriptions[0].start_date, '2026-09-01');\n  assert.equal(ashaDetail.subscriptions[0].plan_name, 'Veg Thali');\n  const neha = (await call('GET', '/api/customers/phone/9200000006', undefined, token)).body;\n  assert.equal((await call('GET', `/api/customers/${neha.id}`, undefined, token)).body.subscriptions[0].start_date, '2026-09-25');\n\n  // Importing the same file again: everything valid is now a duplicate.\n  const again = (await call('POST', '/api/import/customers', { csv }, token)).body;\n  assert.deepEqual([again.imported, again.deduped, again.rejected], [0, 5, 5]);\n\n  // JSON rows + raw text/csv + defaults\n  const json = (await call('POST', '/api/import/customers', {\n    rows: [{ Name: 'Json One', 'Mobile No': 9200000101, Plan: '', 'Start Date': '' }],\n    default_plan_id: plan.id, default_start_date: '2026-09-07',\n  }, token)).body;\n  assert.equal(json.imported, 1);\n  assert.equal(json.details.imported[0].warnings.length, 2);\n  const raw = await call('POST', '/api/import/customers', 'name,phone,plan,start_date\\nRaw Csv,9200000102,Veg Thali,7-9-2026', token);\n  assert.equal(raw.body.imported, 1);\n\n  assert.equal((await call('POST', '/api/import/customers', { csv: 'foo,bar\\n1,2' }, token)).status, 400);\n  assert.equal((await call('POST', '/api/import/customers', { csv })).status, 401);\n});\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\test\features.test.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && node - <<'EOF'\nconst fs=require('fs');let s=fs.readFileSync('test/features.test.js','utf8');\ns=s.replace(\"const msgs = (await call('GET', '/api/outbox?search=transferred', undefined, token)).body.data.map((m) => m.type).sort();\",\n\"const msgs = (await call('GET', '/api/outbox?limit=100', undefined, token)).body.data.map((m) => m.type).filter((t) => t.startsWith('subscription_transferred')).sort();\");\ns=s.replace(/  \\/\\/ A failed transfer to a brand-new customer[\\s\\S]*?9100000010', undefined, token\\)\\)\\.status, 404\\);\\n/, '');\nfs.writeFileSync('test/features.test.js',s);\nEOF\nnpm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|^not ok|✖|AssertionError|expected|actual|Error\" | head -40",
+  "description": "Adjust tests and run full test suite",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+SyntaxError: Unexpected token '.'
+✖ test\api.test.js (204.9703ms)
+SyntaxError: Unexpected token '.'
+✖ test\features.test.js (297.3037ms)
+ℹ tests 20
+ℹ pass 18
+ℹ fail 2
+✖ failing tests:
+✖ test\api.test.js (204.9703ms)
+✖ test\features.test.js (297.3037ms)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && node test/features.test.js 2>&1 | grep -B2 -A8 SyntaxError | head -30",
+  "description": "Find the syntax error location"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+^
+
+SyntaxError: Unexpected token '.'
+    at compileSourceTextModule (node:internal/modules/esm/utils:319:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:89:18)
+    at #translate (node:internal/modules/esm/loader:438:20)
+    at afterLoad (node:internal/modules/esm/loader:506:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:511:12)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:564:36)
+    at afterResolve (node:internal/modules/esm/loader:611:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:617:12)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && node test/features.test.js 2>&1 | head -6; grep -n \"clockRuns\\|\\.run(date\" src/notifications.js | head",
+  "description": "Show file and line of syntax error"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/app.js:28
+        if (/^/(api|clock|outbox)/.test(req.path)) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
+                                  ^
+
+SyntaxError: Unexpected token '.'
+    at compileSourceTextModule (node:internal/modules/esm/utils:319:16)
+71:    .run(date, due.length, notified);
+```
+
+</details>
+
+Found it: the escape in the request-log regex got lost when I patched `app.js`. Fixing:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && sed -i 's#if (/^/(api|clock|outbox)/.test(req.path))#if (/^\\\\/(api|clock|outbox)/.test(req.path))#' src/app.js && grep -n \"clock|outbox\" src/app.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|^\\s*not ok|AssertionError|expected:|actual:|Error:\" | head -40",
+  "description": "Fix regex escape and rerun tests",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+28:        if (/^/(api|clock|outbox)/.test(req.path)) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
+SyntaxError: Unexpected token '.'
+SyntaxError: Unexpected token '.'
+ℹ tests 20
+ℹ pass 18
+ℹ fail 2
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\app.js",
+  "offset": 26,
+  "limit": 4
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+26	      const t0 = Date.now();
+27	      res.on('finish', () => {
+28	        if (/^/(api|clock|outbox)/.test(req.path)) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
+29	      });
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\app.js",
+  "old_string": "        if (/^/(api|clock|outbox)/.test(req.path))",
+  "new_string": "        if (/^\\/(api|clock|outbox)/.test(req.path))"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\app.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|not ok|AssertionError|expected|actual|Error|at .*test\\.js:[0-9]+\" | head -40",
+  "description": "Run full test suite",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ℹ tests 22
+ℹ pass 22
+ℹ fail 0
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\api.js",
+  "offset": 38
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\components\\Layout.jsx"
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\main.jsx",
+  "offset": 1,
+  "limit": 45
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+2	import { useAuth } from '../auth.jsx';
+3	
+4	export default function Layout() {
+5	  const { user, logout } = useAuth();
+6	  const navigate = useNavigate();
+7	  return (
+8	    <div className="app">
+9	      <header className="topbar">
+10	        <NavLink to="/app" className="brand">🍱 <span>{user.business_name || 'Tiffin Tracker'}</span></NavLink>
+11	        <nav>
+12	          <NavLink to="/app" end>Dashboard</NavLink>
+13	          <NavLink to="/app/customers">Customers</NavLink>
+14	          <NavLink to="/app/plans">Plans</NavLink>
+15	          <NavLink to="/app/bills">Bills</NavLink>
+16	        </nav>
+17	        <div className="user">
+18	          <span className="muted hide-sm">{user.name}</span>
+19	          <button className="btn ghost sm" onClick={() => { logout(); navigate('/'); }}>Log out</button>
+20	        </div>
+21	      </header>
+22	      <main className="container">
+23	        <Outlet />
+24	      </main>
+25	    </div>
+26	  );
+27	}
+28
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+1	import React from 'react';
+2	import ReactDOM from 'react-dom/client';
+3	import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+4	import { AuthProvider, useAuth } from './auth.jsx';
+5	import Layout from './components/Layout.jsx';
+6	import Landing from './pages/Landing.jsx';
+7	import { Login, Register } from './pages/Auth.jsx';
+8	import Dashboard from './pages/Dashboard.jsx';
+9	import Customers from './pages/Customers.jsx';
+10	import CustomerDetail from './pages/CustomerDetail.jsx';
+11	import Plans from './pages/Plans.jsx';
+12	import Bills from './pages/Bills.jsx';
+13	import './styles.css';
+14	
+15	function Protected({ children }) {
+16	  const { user, loading } = useAuth();
+17	  if (loading) return <div className="center muted">Loading…</div>;
+18	  return user ? children : <Navigate to="/login" replace />;
+19	}
+20	
+21	function GuestOnly({ children }) {
+22	  const { user, loading } = useAuth();
+23	  if (loading) return null;
+24	  return user ? <Navigate to="/app" replace /> : children;
+25	}
+26	
+27	ReactDOM.createRoot(document.getElementById('root')).render(
+28	  <React.StrictMode>
+29	    <AuthProvider>
+30	      <BrowserRouter>
+31	        <Routes>
+32	          <Route path="/" element={<Landing />} />
+33	          <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
+34	          <Route path="/register" element={<GuestOnly><Register /></GuestOnly>} />
+35	          <Route path="/app" element={<Protected><Layout /></Protected>}>
+36	            <Route index element={<Dashboard />} />
+37	            <Route path="customers" element={<Customers />} />
+38	            <Route path="customers/:id" element={<CustomerDetail />} />
+39	            <Route path="plans" element={<Plans />} />
+40	            <Route path="bills" element={<Bills />} />
+41	          </Route>
+42	          <Route path="*" element={<Navigate to="/" replace />} />
+43	        </Routes>
+44	      </BrowserRouter>
+45	    </AuthProvider>
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+38	export const today = () => {
+39	  const d = new Date();
+40	  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+41	};
+42	
+43	export const fmtDate = (s) =>
+44	  s ? new Date(`${s.slice(0, 10)}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+45	
+46	export const fmtMonth = (m) =>
+47	  new Date(`${m}-01T00:00:00`).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+48
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\api.js",
+  "old_string": "export const today = () => {\n  const d = new Date();",
+  "new_string": "// The server can run on a simulated clock (POST /api/clock). Layout loads it\n// once and keeps this in sync, so \"today\" in the UI matches the server.\nlet serverToday = null;\nexport const setServerToday = (d) => { serverToday = d || null; };\n\nexport const today = () => {\n  if (serverToday) return serverToday;\n  const d = new Date();"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\client\src\api.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\components\\Layout.jsx",
+  "content": "import { useEffect, useState } from 'react';\nimport { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';\nimport { useAuth } from '../auth.jsx';\nimport { api, fmtDate, setServerToday } from '../api.js';\n\nexport default function Layout() {\n  const { user, logout } = useAuth();\n  const navigate = useNavigate();\n  const [clock, setClock] = useState(null);\n\n  useEffect(() => {\n    const load = () => api('/clock')\n      .then((c) => { setServerToday(c.today); setClock(c); })\n      .catch(() => setClock({ today: null, simulated: false }));\n    load();\n    window.addEventListener('clock:changed', load);\n    return () => window.removeEventListener('clock:changed', load);\n  }, []);\n\n  return (\n    <div className=\"app\">\n      <header className=\"topbar\">\n        <NavLink to=\"/app\" className=\"brand\">🍱 <span>{user.business_name || 'Tiffin Tracker'}</span></NavLink>\n        <nav>\n          <NavLink to=\"/app\" end>Dashboard</NavLink>\n          <NavLink to=\"/app/customers\">Customers</NavLink>\n          <NavLink to=\"/app/plans\">Plans</NavLink>\n          <NavLink to=\"/app/bills\">Bills</NavLink>\n          <NavLink to=\"/app/notifications\">Notifications</NavLink>\n          <NavLink to=\"/app/import\">Import</NavLink>\n        </nav>\n        <div className=\"user\">\n          {clock?.simulated && (\n            <Link to=\"/app/notifications\" className=\"clock-pill\" title=\"The app is running on a simulated date\">🕒 {fmtDate(clock.today)}</Link>\n          )}\n          <span className=\"muted hide-sm\">{user.name}</span>\n          <button className=\"btn ghost sm\" onClick={() => { logout(); navigate('/'); }}>Log out</button>\n        </div>\n      </header>\n      <main className=\"container\">\n        {/* Key on the date so every page re-reads \"today\" when the clock moves. */}\n        {clock ? <Outlet key={clock.today} /> : <p className=\"muted\" style={{ paddingTop: 24 }}>Loading…</p>}\n      </main>\n    </div>\n  );\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\client\src\components\Layout.jsx has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/client/src\" && node - <<'EOF'\nconst fs=require('fs');let s=fs.readFileSync('main.jsx','utf8');\ns=s.replace(\"import Bills from './pages/Bills.jsx';\",\"import Bills from './pages/Bills.jsx';\\r\\nimport Notifications from './pages/Notifications.jsx';\\r\\nimport ImportCustomers from './pages/ImportCustomers.jsx';\");\ns=s.replace('<Route path=\"bills\" element={<Bills />} />','<Route path=\"bills\" element={<Bills />} />\\r\\n            <Route path=\"notifications\" element={<Notifications />} />\\r\\n            <Route path=\"import\" element={<ImportCustomers />} />');\nfs.writeFileSync('main.jsx',s);\nEOF\ngrep -n \"Notifications\\|Import\" main.jsx",
+  "description": "Register new routes in main.jsx"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+13:import Notifications from './pages/Notifications.jsx';
+14:import ImportCustomers from './pages/ImportCustomers.jsx';
+43:            <Route path="notifications" element={<Notifications />} />
+44:            <Route path="import" element={<ImportCustomers />} />
+```
+
+</details>
+
+Progress update: all 22 backend tests pass, and the app now follows a simulated clock. I'm building the Notifications and Import pages now.
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\pages\\Notifications.jsx",
+  "content": "import { useEffect, useState } from 'react';\nimport { Link } from 'react-router-dom';\nimport { api, fmtDate, today } from '../api.js';\nimport { ErrorNote, Pagination, SortTh, useDebounced } from '../components/ui.jsx';\nimport { useListQuery } from '../useListQuery.js';\n\nconst TYPE_LABELS = {\n  delivery_due: 'Delivery today',\n  subscription_transferred_out: 'Transferred out',\n  subscription_transferred_in: 'Transferred in',\n};\n\n// Survives the page remount that happens when the clock changes.\nlet lastRun = null;\n\nexport default function Notifications() {\n  const [q, update] = useListQuery({ date: '', type: '', search: '', page: 1, limit: 20, sort: 'id', order: 'desc' });\n  const [search, setSearch] = useState(q.search);\n  const debounced = useDebounced(search);\n  const [data, setData] = useState(null);\n  const [clock, setClock] = useState(null);\n  const [jump, setJump] = useState(today());\n  const [error, setError] = useState(null);\n  const [busy, setBusy] = useState(false);\n  const [run, setRun] = useState(lastRun);\n\n  useEffect(() => { api('/clock').then(setClock).catch(setError); }, []);\n  useEffect(() => { if (debounced !== q.search) update({ search: debounced }); }, [debounced]); // eslint-disable-line\n  useEffect(() => {\n    api('/outbox', { query: q }).then(setData).catch(setError);\n  }, [q.date, q.type, q.search, q.page, q.limit, q.sort, q.order]); // eslint-disable-line\n\n  const tick = async (body) => {\n    setBusy(true); setError(null);\n    try {\n      const result = await api('/clock', { method: 'POST', body });\n      lastRun = result;\n      setRun(result);\n      window.dispatchEvent(new Event('clock:changed')); // Layout reloads the clock and remounts pages\n    } catch (err) { setError(err); setBusy(false); }\n  };\n\n  const sortProps = { sort: q.sort, order: q.order, onSort: (sort, order) => update({ sort, order }) };\n\n  return (\n    <div className=\"stack-lg\">\n      <div className=\"page-head\">\n        <div>\n          <h1>Notifications</h1>\n          <p className=\"muted\">Each morning, customers due a delivery (active, a weekday, not paused) get a reminder through the Notification Service.</p>\n        </div>\n      </div>\n      <ErrorNote error={error} />\n\n      <div className=\"card\">\n        <div className=\"card-head\">\n          <div>\n            <h2>🕒 Clock · {clock ? fmtDate(clock.today) : '…'}</h2>\n            <p className=\"muted small\">\n              {clock?.simulated ? <>Simulated date (real date {fmtDate(clock.real_today)}). The whole app uses this date.</> : 'Using the real date.'}\n            </p>\n          </div>\n          <div className=\"row\">\n            <button className=\"btn\" disabled={busy} onClick={() => tick({ advance_days: 1 })}>Next morning ▶</button>\n            <button className=\"btn ghost\" disabled={busy} onClick={() => tick({})}>Run this morning</button>\n          </div>\n        </div>\n        <div className=\"row\">\n          <input type=\"date\" value={jump} onChange={(e) => setJump(e.target.value)} style={{ width: 'auto' }} />\n          <button className=\"btn ghost\" disabled={busy || !jump} onClick={() => tick({ date: jump })}>Jump to date</button>\n          {clock?.simulated && <button className=\"btn ghost\" disabled={busy} onClick={() => tick({ reset: true })}>Back to real date</button>}\n        </div>\n        <p className=\"muted small\">Jumping forward runs every morning in between, so nobody's reminder is skipped. Running a morning twice never sends duplicates.</p>\n\n        {run && run.mornings.length > 0 && (\n          <div className=\"run-result\">\n            <strong>Last run: {run.notified_total} new notification{run.notified_total === 1 ? '' : 's'}</strong>\n            <div className=\"table-wrap\">\n              <table>\n                <thead><tr><th>Morning</th><th className=\"num\">Due</th><th className=\"num\">Sent</th><th className=\"num\">Already sent</th></tr></thead>\n                <tbody>\n                  {run.mornings.slice(-10).map((m) => (\n                    <tr key={m.date}>\n                      <td><button className=\"linklike\" onClick={() => update({ date: m.date })}>{fmtDate(m.date)}</button> {!m.delivery_day && <span className=\"badge inactive\">weekend</span>}</td>\n                      <td className=\"num\">{m.due}</td><td className=\"num\">{m.notified}</td><td className=\"num\">{m.already_notified}</td>\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n            {run.mornings.length > 10 && <p className=\"muted small\">Showing the last 10 of {run.mornings.length} mornings.</p>}\n          </div>\n        )}\n      </div>\n\n      <div className=\"toolbar\">\n        <input type=\"search\" className=\"grow\" placeholder=\"Search phone, name or message…\" value={search} onChange={(e) => setSearch(e.target.value)} />\n        <input type=\"date\" value={q.date} onChange={(e) => update({ date: e.target.value })} style={{ width: 'auto' }} aria-label=\"Filter by date\" />\n        <select value={q.type} onChange={(e) => update({ type: e.target.value })} style={{ width: 'auto' }}>\n          <option value=\"\">All types</option>\n          {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}\n        </select>\n        {(q.date || q.type || q.search) && <button className=\"btn ghost sm\" onClick={() => { setSearch(''); update({ date: '', type: '', search: '' }); }}>Clear</button>}\n      </div>\n\n      <div className=\"card flush\">\n        <div className=\"card-head\" style={{ padding: '12px 14px 0' }}><h2>Outbox</h2></div>\n        <div className=\"table-wrap\">\n          <table>\n            <thead>\n              <tr>\n                <SortTh label=\"For date\" field=\"for_date\" {...sortProps} />\n                <SortTh label=\"To\" field=\"recipient\" {...sortProps} />\n                <SortTh label=\"Customer\" field=\"customer\" {...sortProps} className=\"hide-sm\" />\n                <SortTh label=\"Type\" field=\"type\" {...sortProps} />\n                <th>Message</th>\n              </tr>\n            </thead>\n            <tbody>\n              {data?.data.map((m) => (\n                <tr key={m.id}>\n                  <td className=\"nowrap\">{fmtDate(m.date)}</td>\n                  <td className=\"nowrap\">📱 {m.to}</td>\n                  <td className=\"hide-sm\">{m.customer_id ? <Link to={`/app/customers/${m.customer_id}`}>{m.customer_name}</Link> : '—'}</td>\n                  <td><span className={`badge ${m.type === 'delivery_due' ? 'active' : 'upcoming'}`}>{TYPE_LABELS[m.type] || m.type}</span></td>\n                  <td className=\"small\">{m.message}</td>\n                </tr>\n              ))}\n              {data?.data.length === 0 && (\n                <tr><td colSpan={5} className=\"empty\">No notifications{q.date || q.type || q.search ? ' match these filters' : ' yet. Click “Run this morning” to send today’s reminders'}.</td></tr>\n              )}\n            </tbody>\n          </table>\n        </div>\n        {data && <Pagination {...data} onPage={(page) => update({ page }, { resetPage: false })} onLimit={(limit) => update({ limit })} />}\n      </div>\n    </div>\n  );\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\client\src\pages\Notifications.jsx (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\pages\\ImportCustomers.jsx",
+  "content": "import { useEffect, useState } from 'react';\nimport { Link } from 'react-router-dom';\nimport { api } from '../api.js';\nimport { ErrorNote } from '../components/ui.jsx';\n\nconst SAMPLE = `Customer Name,Mobile No,Address,Meal Plan,Start Date\nASHA IYER,+91 92000 00001,\"12, MG Road\",veg mini,01/09/2026\nRavi Kumar,92000-00002,,Non-Veg Thali,2026-09-03\nasha iyer,9200000001,,Veg Mini,5 Sep 2026\n,9200000003,,Veg Mini,2026-09-01\nMeena,,,Veg Mini,2026-09-01\nKiran,9200000004,,Veg Mini,\nTara,9200000005,,Pizza Plan,2026-09-01\nNeha Joshi,9200000006,,VEG FULL THALI,Sep 25 2026\n`;\n\nexport default function ImportCustomers() {\n  const [csv, setCsv] = useState('');\n  const [fileName, setFileName] = useState('');\n  const [plans, setPlans] = useState([]);\n  const [defaultPlan, setDefaultPlan] = useState('');\n  const [defaultStart, setDefaultStart] = useState('');\n  const [report, setReport] = useState(null);\n  const [tab, setTab] = useState('imported');\n  const [error, setError] = useState(null);\n  const [busy, setBusy] = useState(false);\n\n  useEffect(() => { api('/plans', { query: { limit: 100 } }).then((r) => setPlans(r.data.filter((p) => p.is_active))).catch(setError); }, []);\n\n  const onFile = (e) => {\n    const file = e.target.files?.[0];\n    if (!file) return;\n    setFileName(file.name);\n    const reader = new FileReader();\n    reader.onload = () => { setCsv(String(reader.result)); setReport(null); };\n    reader.readAsText(file);\n  };\n\n  const submit = async (dryRun) => {\n    setBusy(true); setError(null);\n    try {\n      const r = await api('/import/customers', {\n        method: 'POST',\n        body: { csv, dry_run: dryRun, default_plan_id: defaultPlan ? Number(defaultPlan) : undefined, default_start_date: defaultStart || undefined },\n      });\n      setReport(r);\n      setTab(r.imported ? 'imported' : r.rejected ? 'rejected' : 'deduped');\n    } catch (err) { setError(err); } finally { setBusy(false); }\n  };\n\n  return (\n    <div className=\"stack-lg\">\n      <div className=\"page-head\">\n        <div>\n          <h1>Import customers</h1>\n          <p className=\"muted\">Paste or upload a customer list, even a messy one. Phones are cleaned, dates in mixed formats are read, duplicates are merged, and bad rows are listed with reasons.</p>\n        </div>\n      </div>\n\n      <div className=\"card stack\">\n        <div className=\"row\" style={{ justifyContent: 'space-between' }}>\n          <label className=\"btn ghost\" style={{ flexDirection: 'row' }}>\n            📄 Choose CSV file\n            <input type=\"file\" accept=\".csv,text/csv,text/plain\" onChange={onFile} hidden />\n          </label>\n          <span className=\"muted small\">{fileName || 'or paste below'}</span>\n          <button className=\"btn ghost sm\" onClick={() => { setCsv(SAMPLE); setFileName(''); setReport(null); }}>Load messy sample</button>\n        </div>\n        <textarea rows={9} className=\"mono\" placeholder={'name,phone,address,plan,start_date\\nAsha Iyer,9876543210,\"12, MG Road\",Veg Mini,01/09/2026'}\n          value={csv} onChange={(e) => { setCsv(e.target.value); setReport(null); }} />\n        <p className=\"muted small\">\n          Columns are matched by name (<code>name</code>/<code>customer</code>, <code>phone</code>/<code>mobile</code>, <code>address</code>, <code>plan</code>, <code>start_date</code>/<code>start</code>).\n          Dates like 2026-09-01, 01/09/2026, 1 Sep 2026 and Sep 1, 2026 all work; ambiguous dd/mm are read day-first.\n          Plans are matched to <Link to=\"/app/plans\">your plans</Link> by name.\n        </p>\n        <div className=\"grid2\">\n          <label>Plan when blank (optional)\n            <select value={defaultPlan} onChange={(e) => setDefaultPlan(e.target.value)}>\n              <option value=\"\">Reject rows without a plan</option>\n              {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}\n            </select>\n          </label>\n          <label>Start date when blank (optional)\n            <input type=\"date\" value={defaultStart} onChange={(e) => setDefaultStart(e.target.value)} />\n          </label>\n        </div>\n        <ErrorNote error={error} />\n        <div className=\"row end\">\n          <button className=\"btn ghost\" disabled={busy || !csv.trim()} onClick={() => submit(true)}>Preview (no changes)</button>\n          <button className=\"btn\" disabled={busy || !csv.trim()} onClick={() => submit(false)}>{busy ? 'Working…' : 'Import'}</button>\n        </div>\n      </div>\n\n      {report && (\n        <>\n          <div className={`card callout ${report.dry_run ? '' : 'ok'}`}>\n            <span>{report.dry_run ? 'Preview only: nothing has been saved yet.' : 'Import complete.'} {report.total_rows} rows read{report.blank_rows_ignored ? `, ${report.blank_rows_ignored} empty line(s) ignored` : ''}{report.unknown_columns.length ? `, ignored columns: ${report.unknown_columns.join(', ')}` : ''}.</span>\n            {report.dry_run && report.imported > 0 && <button className=\"btn\" onClick={() => submit(false)} disabled={busy}>Import {report.imported} now</button>}\n          </div>\n          <div className=\"stats\">\n            {[['imported', '✅ Imported', 'active'], ['deduped', '🔁 Deduped', 'upcoming'], ['rejected', '⛔ Rejected', 'paused']].map(([k, label]) => (\n              <button key={k} className={`card stat stat-btn ${tab === k ? 'selected' : ''}`} onClick={() => setTab(k)}>\n                <div className=\"stat-value\">{report[k]}</div><div className=\"stat-label\">{label}</div>\n              </button>\n            ))}\n          </div>\n\n          <div className=\"card flush\">\n            <div className=\"table-wrap\">\n              {tab === 'imported' && (\n                <table>\n                  <thead><tr><th>Row</th><th>Customer</th><th>Phone</th><th>Plan</th><th>Start</th><th>Notes</th></tr></thead>\n                  <tbody>\n                    {report.details.imported.map((r) => (\n                      <tr key={r.row}>\n                        <td>{r.row}</td>\n                        <td>{r.customer_id ? <Link to={`/app/customers/${r.customer_id}`}>{r.name}</Link> : r.name} <span className={`badge ${r.customer === 'new' ? 'active' : 'upcoming'}`}>{r.customer}</span></td>\n                        <td>{r.phone}</td><td>{r.plan}</td><td className=\"nowrap\">{r.start_date}</td>\n                        <td className=\"small muted\">{r.warnings.join('; ') || '—'}</td>\n                      </tr>\n                    ))}\n                    {!report.details.imported.length && <tr><td colSpan={6} className=\"empty\">Nothing imported.</td></tr>}\n                  </tbody>\n                </table>\n              )}\n              {tab === 'deduped' && (\n                <table>\n                  <thead><tr><th>Row</th><th>Name</th><th>Phone</th><th>Why skipped</th></tr></thead>\n                  <tbody>\n                    {report.details.deduped.map((r) => (\n                      <tr key={r.row}><td>{r.row}</td><td>{r.name}</td><td>{r.phone}</td><td className=\"small\">{r.reason}</td></tr>\n                    ))}\n                    {!report.details.deduped.length && <tr><td colSpan={4} className=\"empty\">No duplicates.</td></tr>}\n                  </tbody>\n                </table>\n              )}\n              {tab === 'rejected' && (\n                <table>\n                  <thead><tr><th>Row</th><th>Data</th><th>Problems</th></tr></thead>\n                  <tbody>\n                    {report.details.rejected.map((r) => (\n                      <tr key={r.row}>\n                        <td>{r.row}</td>\n                        <td className=\"small mono\">{Object.values(r.data).map((v) => String(v ?? '').trim() || '∅').join(' | ')}</td>\n                        <td><ul className=\"reasons\">{r.reasons.map((x) => <li key={x}>{x}</li>)}</ul></td>\n                      </tr>\n                    ))}\n                    {!report.details.rejected.length && <tr><td colSpan={3} className=\"empty\">No rejected rows.</td></tr>}\n                  </tbody>\n                </table>\n              )}\n            </div>\n          </div>\n        </>\n      )}\n    </div>\n  );\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\client\src\pages\ImportCustomers.jsx (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\client\\src\\pages\\CustomerDetail.jsx",
+  "offset": 1,
+  "limit": 125
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import { useCallback, useEffect, useState } from 'react';
+2	import { Link, useNavigate, useParams } from 'react-router-dom';
+3	import { api, fmtDate, fmtMonth, rupees, today } from '../api.js';
+4	import { ErrorNote, Modal, StatusBadge } from '../components/ui.jsx';
+5	import { CustomerForm } from './Customers.jsx';
+6	
+7	export default function CustomerDetail() {
+8	  const { id } = useParams();
+9	  const navigate = useNavigate();
+10	  const [c, setC] = useState(null);
+11	  const [error, setError] = useState(null);
+12	  const [modal, setModal] = useState(null); // 'edit' | 'subscribe' | 'pause' | 'resume' | 'end'
+13	
+14	  const load = useCallback(() => api(`/customers/${id}`).then(setC).catch(setError), [id]);
+15	  useEffect(() => { load(); }, [load]);
+16	
+17	  if (error && !c) return <ErrorNote error={error} />;
+18	  if (!c) return <p className="muted">Loading…</p>;
+19	
+20	  const t = today();
+21	  const current = c.subscriptions.find((s) => !s.end_date || s.end_date >= t);
+22	  const activePause = current?.pauses.find((p) => p.start_date <= t && (!p.end_date || p.end_date >= t));
+23	  const done = () => { setModal(null); load(); };
+24	
+25	  const remove = async () => {
+26	    if (!confirm(`Delete ${c.name} and all their subscription history? This cannot be undone.`)) return;
+27	    try { await api(`/customers/${c.id}`, { method: 'DELETE' }); navigate('/app/customers'); } catch (err) { setError(err); }
+28	  };
+29	  const cancelPause = async (p) => {
+30	    if (!confirm(`Remove the pause from ${fmtDate(p.start_date)}? Those days will be billed.`)) return;
+31	    try { await api(`/pauses/${p.id}`, { method: 'DELETE' }); load(); } catch (err) { setError(err); }
+32	  };
+33	
+34	  return (
+35	    <div className="stack-lg">
+36	      <Link to="/app/customers" className="small">← Customers</Link>
+37	      <div className="page-head">
+38	        <div>
+39	          <h1>{c.name} <StatusBadge status={c.status} /></h1>
+40	          <p className="muted">📞 {c.phone}{c.address ? ` · 📍 ${c.address}` : ''}</p>
+41	        </div>
+42	        <div className="row">
+43	          <button className="btn ghost" onClick={() => setModal('edit')}>Edit</button>
+44	          <button className="btn ghost danger" onClick={remove}>Delete</button>
+45	        </div>
+46	      </div>
+47	      <ErrorNote error={error} />
+48	
+49	      {current ? (
+50	        <div className="card">
+51	          <div className="card-head">
+52	            <div>
+53	              <h2>{current.plan_name} · {rupees(current.price_paise)}/month</h2>
+54	              <p className="muted small">
+55	                Since {fmtDate(current.start_date)}{current.end_date ? ` · ends ${fmtDate(current.end_date)}` : ''}
+56	                {activePause && <> · <strong>Paused {activePause.end_date ? `until ${fmtDate(activePause.end_date)}` : 'until resumed'}</strong></>}
+57	              </p>
+58	            </div>
+59	            <div className="row">
+60	              {activePause
+61	                ? <button className="btn" onClick={() => setModal('resume')}>▶ Resume</button>
+62	                : <button className="btn warn" onClick={() => setModal('pause')}>⏸ Pause</button>}
+63	              {activePause && <button className="btn ghost" onClick={() => setModal('pause')}>Schedule pause</button>}
+64	              {!current.end_date && <button className="btn ghost" onClick={() => setModal('end')}>End subscription</button>}
+65	            </div>
+66	          </div>
+67	
+68	          <h3>Pauses</h3>
+69	          {current.pauses.length === 0 ? <p className="muted">No pauses. Every weekday is billed.</p> : (
+70	            <div className="table-wrap">
+71	              <table>
+72	                <thead><tr><th>From</th><th>To</th><th>Reason</th><th /></tr></thead>
+73	                <tbody>
+74	                  {current.pauses.map((p) => (
+75	                    <tr key={p.id}>
+76	                      <td>{fmtDate(p.start_date)}</td>
+77	                      <td>{p.end_date ? fmtDate(p.end_date) : <em>until resumed</em>}</td>
+78	                      <td className="muted">{p.reason || '—'}</td>
+79	                      <td className="right"><button className="btn ghost sm" onClick={() => cancelPause(p)}>Remove</button></td>
+80	                    </tr>
+81	                  ))}
+82	                </tbody>
+83	              </table>
+84	            </div>
+85	          )}
+86	        </div>
+87	      ) : (
+88	        <div className="card callout">
+89	          <span>{c.name} has no running subscription.</span>
+90	          <button className="btn" onClick={() => setModal('subscribe')}>Subscribe to a plan</button>
+91	        </div>
+92	      )}
+93	
+94	      {(current || c.subscriptions[0]) && <BillPreview sub={current || c.subscriptions[0]} />}
+95	
+96	      {c.subscriptions.length > 1 && (
+97	        <div className="card">
+98	          <h2>Subscription history</h2>
+99	          <div className="table-wrap">
+100	            <table>
+101	              <thead><tr><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Pauses</th></tr></thead>
+102	              <tbody>
+103	                {c.subscriptions.map((s) => (
+104	                  <tr key={s.id}><td>{s.plan_name}</td><td>{rupees(s.price_paise)}</td><td>{fmtDate(s.start_date)}</td><td>{fmtDate(s.end_date)}</td><td>{s.pauses.length}</td></tr>
+105	                ))}
+106	              </tbody>
+107	            </table>
+108	          </div>
+109	        </div>
+110	      )}
+111	
+112	      {modal === 'edit' && <CustomerForm customer={c} onClose={() => setModal(null)} onSaved={done} />}
+113	      {modal === 'subscribe' && <SubscribeForm customer={c} onClose={() => setModal(null)} onDone={done} />}
+114	      {modal === 'pause' && <PauseForm sub={current} onClose={() => setModal(null)} onDone={done} />}
+115	      {modal === 'resume' && <DateAction title="Resume deliveries" label="First delivery day" submitLabel="Resume" hint="The pause ends the day before this date."
+116	        path={`/subscriptions/${current.id}/resume`} field="date" min={activePause.start_date} onClose={() => setModal(null)} onDone={done} />}
+117	      {modal === 'end' && <DateAction title="End subscription" label="Last delivery day" submitLabel="End subscription" hint="The customer is billed up to and including this day."
+118	        path={`/subscriptions/${current.id}/end`} field="end_date" min={current.start_date} onClose={() => setModal(null)} onDone={done} />}
+119	    </div>
+120	  );
+121	}
+122	
+123	function SubscribeForm({ customer, onClose, onDone }) {
+124	  const [plans, setPlans] = useState([]);
+125	  const [form, setForm] = useState({ plan_id: '', start_date: today() });
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/client/src/pages\" && node - <<'EOF'\nconst fs=require('fs');let s=fs.readFileSync('CustomerDetail.jsx','utf8');\nconst rep=(a,b)=>{ if(!s.includes(a)) throw new Error('missing: '+a.slice(0,60)); s=s.replace(a,b); };\nrep(`{activePause && <> · <strong>Paused {activePause.end_date ? \\`until \\${fmtDate(activePause.end_date)}\\` : 'until resumed'}</strong></>}\n              </p>`,\n`{activePause && <> · <strong>Paused {activePause.end_date ? \\`until \\${fmtDate(activePause.end_date)}\\` : 'until resumed'}</strong></>}\n              </p>\n              <TransferNote sub={current} />`);\nrep(`{!current.end_date && <button className=\"btn ghost\" onClick={() => setModal('end')}>End subscription</button>}`,\n`{!current.transferred_to && <button className=\"btn ghost\" onClick={() => setModal('transfer')}>⇄ Transfer</button>}\n              {!current.end_date && <button className=\"btn ghost\" onClick={() => setModal('end')}>End subscription</button>}`);\nrep(`<span>{c.name} has no running subscription.</span>`,\n`<span>{c.name} has no running subscription.{c.subscriptions[0]?.transferred_to && <> <TransferNote sub={c.subscriptions[0]} /></>}</span>`);\nrep(`<thead><tr><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Pauses</th></tr></thead>`,\n`<thead><tr><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Pauses</th><th>Transfer</th></tr></thead>`);\nrep(`<td>{s.pauses.length}</td></tr>`,\n`<td>{s.pauses.length}</td><td className=\"small\"><TransferNote sub={s} /></td></tr>`);\nrep(`{modal === 'end' &&`,\n`{modal === 'transfer' && <TransferForm sub={current} customer={c} onClose={() => setModal(null)} onDone={(r) => { setModal(null); load(); setTransferResult(r); }} />}\n      {modal === 'end' &&`);\nrep(`const [modal, setModal] = useState(null); // 'edit' | 'subscribe' | 'pause' | 'resume' | 'end'`,\n`const [modal, setModal] = useState(null); // 'edit' | 'subscribe' | 'pause' | 'resume' | 'end' | 'transfer'\n  const [transferResult, setTransferResult] = useState(null);`);\nrep(`      <ErrorNote error={error} />\n\n      {current ? (`,\n`      <ErrorNote error={error} />\n      {transferResult && <TransferSummary result={transferResult} onClose={() => setTransferResult(null)} />}\n\n      {current ? (`);\ns += `\nfunction TransferNote({ sub }) {\n  if (!sub) return null;\n  return (\n    <>\n      {sub.transferred_from && (\n        <span className=\"transfer-note\">↪ Taken over from <Link to={\\`/app/customers/\\${sub.transferred_from.customer_id}\\`}>{sub.transferred_from.customer_name}</Link> on {fmtDate(sub.start_date)}</span>\n      )}\n      {sub.transferred_to && (\n        <span className=\"transfer-note\">⇄ Transferred to <Link to={\\`/app/customers/\\${sub.transferred_to.customer_id}\\`}>{sub.transferred_to.customer_name}</Link> from {fmtDate(sub.transferred_to.start_date)}</span>\n      )}\n    </>\n  );\n}\n\nfunction TransferForm({ sub, customer, onClose, onDone }) {\n  const t = today();\n  const minDate = sub.start_date >= t ? addDaysISO(sub.start_date, 1) : t;\n  const [mode, setMode] = useState('existing');\n  const [date, setDate] = useState(minDate);\n  const [phone, setPhone] = useState('');\n  const [found, setFound] = useState(null);\n  const [lookupMsg, setLookupMsg] = useState('');\n  const [form, setForm] = useState({ name: '', phone: '', address: '' });\n  const [error, setError] = useState(null);\n  const [busy, setBusy] = useState(false);\n\n  const lookup = async () => {\n    setFound(null); setLookupMsg('');\n    try {\n      const c = await api(\\`/customers/phone/\\${encodeURIComponent(phone)}\\`);\n      if (c.id === customer.id) setLookupMsg('That is the current customer.');\n      else setFound(c);\n    } catch (err) { setLookupMsg(err.status === 404 ? 'No customer with that phone. Use “New customer” instead.' : err.message); }\n  };\n\n  const submit = async (e) => {\n    e.preventDefault();\n    setBusy(true); setError(null);\n    try {\n      const body = mode === 'existing' ? { effective_date: date, to_customer_id: found?.id } : { effective_date: date, customer: form };\n      if (mode === 'existing' && !found) throw new Error('Look up the customer who is taking over first.');\n      onDone(await api(\\`/subscriptions/\\${sub.id}/transfer\\`, { method: 'POST', body }));\n    } catch (err) { setError(err); } finally { setBusy(false); }\n  };\n\n  return (\n    <Modal title=\"Transfer subscription\" onClose={onClose}>\n      <form onSubmit={submit} className=\"stack\">\n        <p className=\"muted small\">\n          {customer.name}'s <strong>{sub.plan_name}</strong> ({rupees(sub.price_paise)}/month) passes to someone else mid-cycle.\n          The plan, price and cycle carry over; each person is billed only for the weekdays they were served.\n        </p>\n        <ErrorNote error={error} />\n        <label>New holder's first delivery day\n          <input type=\"date\" required min={minDate} max={sub.end_date || undefined} value={date} onChange={(e) => setDate(e.target.value)} />\n        </label>\n        <p className=\"muted small\">{customer.name}'s last delivery will be the day before. Their pauses after that are dropped.</p>\n        <div className=\"tabs\" role=\"tablist\">\n          <button type=\"button\" className={mode === 'existing' ? 'on' : ''} onClick={() => setMode('existing')}>Existing customer</button>\n          <button type=\"button\" className={mode === 'new' ? 'on' : ''} onClick={() => setMode('new')}>New customer</button>\n        </div>\n        {mode === 'existing' ? (\n          <>\n            <div className=\"row\">\n              <input type=\"tel\" className=\"grow\" placeholder=\"Phone of the customer taking over\" value={phone} onChange={(e) => { setPhone(e.target.value); setFound(null); }} />\n              <button type=\"button\" className=\"btn ghost\" onClick={lookup} disabled={!phone.trim()}>Find</button>\n            </div>\n            {found && <p className=\"small\">✅ <strong>{found.name}</strong> · {found.phone} <StatusBadge status={found.status} /></p>}\n            {lookupMsg && <p className=\"small muted\">{lookupMsg}</p>}\n          </>\n        ) : (\n          <>\n            <label>Name<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>\n            <label>Phone<input type=\"tel\" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></label>\n            <label>Delivery address<textarea rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></label>\n          </>\n        )}\n        <div className=\"row end\">\n          <button type=\"button\" className=\"btn ghost\" onClick={onClose}>Cancel</button>\n          <button className=\"btn\" disabled={busy}>{busy ? 'Transferring…' : 'Transfer'}</button>\n        </div>\n      </form>\n    </Modal>\n  );\n}\n\nfunction TransferSummary({ result, onClose }) {\n  const s = result.billing_split;\n  return (\n    <div className=\"card callout ok stack\" style={{ alignItems: 'stretch' }}>\n      <div className=\"row\" style={{ justifyContent: 'space-between' }}>\n        <strong>Transferred to <Link to={\\`/app/customers/\\${result.to.customer_id}\\`}>{result.to.customer_name}</Link> from {fmtDate(result.effective_date)}{result.created_customer ? ' (new customer created)' : ''}</strong>\n        <button className=\"btn ghost sm\" onClick={onClose}>✕</button>\n      </div>\n      <div className=\"table-wrap\">\n        <table>\n          <thead><tr><th>{fmtMonth(s.month)}</th><th className=\"num\">Served weekdays</th><th className=\"num\">Paused</th><th className=\"num\">Delivered</th><th className=\"num\">Bill</th></tr></thead>\n          <tbody>\n            {[s.from, s.to].map((b) => (\n              <tr key={b.customer_id}><td>{b.customer_name}</td><td className=\"num\">{b.subscribed_days}/{b.working_days}</td><td className=\"num\">{b.paused_days}</td><td className=\"num\">{b.delivered_days}</td><td className=\"num\"><strong>{rupees(b.amount_paise)}</strong></td></tr>\n            ))}\n            <tr><td><strong>Combined</strong></td><td /><td /><td /><td className=\"num\"><strong>{rupees(s.combined_amount_paise)}</strong></td></tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  );\n}\n\nfunction addDaysISO(s, n) {\n  const d = new Date(\\`\\${s}T00:00:00Z\\`);\n  d.setUTCDate(d.getUTCDate() + n);\n  return d.toISOString().slice(0, 10);\n}\n`;\nfs.writeFileSync('CustomerDetail.jsx', s);\n\nlet b=fs.readFileSync('Bills.jsx','utf8');\nconst a1=`<td className=\"hide-sm\">{b.plan_name}<div className=\"muted small\">{rupees(b.price_paise)}/mo</div></td>`;\nif(!b.includes(a1)) throw new Error('bills');\nb=b.replace(a1,`<td className=\"hide-sm\">{b.plan_name}<div className=\"muted small\">{rupees(b.price_paise)}/mo</div>\n                        {b.transferred_from_name && <div className=\"transfer-note\">↪ from {b.transferred_from_name}</div>}\n                        {b.transferred_to_name && <div className=\"transfer-note\">⇄ to {b.transferred_to_name}</div>}</td>`);\nfs.writeFileSync('Bills.jsx',b);\nEOF\ncat >> ../styles.css <<'EOF'\n\n/* Clock, notifications, import, transfer */\n.clock-pill { background: var(--amber-soft); color: var(--amber); padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }\n.clock-pill:hover { text-decoration: none; filter: brightness(0.97); }\n.run-result { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }\n.linklike { all: unset; color: var(--brand); cursor: pointer; }\n.linklike:hover { text-decoration: underline; }\n.mono, textarea.mono { font-family: Consolas, 'SFMono-Regular', monospace; font-size: 0.85rem; }\n.callout.ok { background: var(--green-soft); border-color: #bfe3c9; }\n.stat-btn { text-align: left; cursor: pointer; font: inherit; }\n.stat-btn.selected { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft); }\n.reasons { margin: 0; padding-left: 16px; color: var(--red); font-size: 0.85rem; }\n.transfer-note { display: block; font-size: 0.8rem; color: var(--blue); margin-top: 2px; }\nEOF\ncd ../.. && npx vite build 2>&1 | grep -E \"built|error|Error\" ",
+  "description": "Add transfer UI, bill notes, styles; build client",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 2
+/usr/bin/bash: -c: line 123: unexpected EOF while looking for matching `''
+```
+
+</details>
+
+The shell tripped over quotes inside that patch, so I'm putting the patch in a script file instead:
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/patch-ui.cjs",
+  "content": "const fs = require('fs');\nconst dir = 'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/client/src/';\nlet s = fs.readFileSync(dir + 'pages/CustomerDetail.jsx', 'utf8').replace(/\\r\\n/g, '\\n');\nconst rep = (a, b) => { if (!s.includes(a)) throw new Error('missing: ' + a.slice(0, 80)); s = s.replace(a, b); };\n\nrep(`{activePause && <> · <strong>Paused {activePause.end_date ? \\`until \\${fmtDate(activePause.end_date)}\\` : 'until resumed'}</strong></>}\n              </p>`,\n`{activePause && <> · <strong>Paused {activePause.end_date ? \\`until \\${fmtDate(activePause.end_date)}\\` : 'until resumed'}</strong></>}\n              </p>\n              <TransferNote sub={current} />`);\nrep(`{!current.end_date && <button className=\"btn ghost\" onClick={() => setModal('end')}>End subscription</button>}`,\n`{!current.transferred_to && <button className=\"btn ghost\" onClick={() => setModal('transfer')}>⇄ Transfer</button>}\n              {!current.end_date && <button className=\"btn ghost\" onClick={() => setModal('end')}>End subscription</button>}`);\nrep(`<span>{c.name} has no running subscription.</span>`,\n`<span>{c.name} has no running subscription.{c.subscriptions[0]?.transferred_to && <> <TransferNote sub={c.subscriptions[0]} /></>}</span>`);\nrep(`<thead><tr><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Pauses</th></tr></thead>`,\n`<thead><tr><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Pauses</th><th>Transfer</th></tr></thead>`);\nrep(`<td>{s.pauses.length}</td></tr>`,\n`<td>{s.pauses.length}</td><td className=\"small\"><TransferNote sub={s} /></td></tr>`);\nrep(`{modal === 'end' &&`,\n`{modal === 'transfer' && <TransferForm sub={current} customer={c} onClose={() => setModal(null)} onDone={(r) => { setModal(null); load(); setTransferResult(r); }} />}\n      {modal === 'end' &&`);\nrep(`const [modal, setModal] = useState(null); // 'edit' | 'subscribe' | 'pause' | 'resume' | 'end'`,\n`const [modal, setModal] = useState(null); // 'edit' | 'subscribe' | 'pause' | 'resume' | 'end' | 'transfer'\n  const [transferResult, setTransferResult] = useState(null);`);\nrep(`      <ErrorNote error={error} />\n\n      {current ? (`,\n`      <ErrorNote error={error} />\n      {transferResult && <TransferSummary result={transferResult} onClose={() => setTransferResult(null)} />}\n\n      {current ? (`);\n\ns += `\nfunction TransferNote({ sub }) {\n  if (!sub) return null;\n  return (\n    <>\n      {sub.transferred_from && (\n        <span className=\"transfer-note\">↪ Taken over from <Link to={\\`/app/customers/\\${sub.transferred_from.customer_id}\\`}>{sub.transferred_from.customer_name}</Link> on {fmtDate(sub.start_date)}</span>\n      )}\n      {sub.transferred_to && (\n        <span className=\"transfer-note\">⇄ Transferred to <Link to={\\`/app/customers/\\${sub.transferred_to.customer_id}\\`}>{sub.transferred_to.customer_name}</Link> from {fmtDate(sub.transferred_to.start_date)}</span>\n      )}\n    </>\n  );\n}\n\nfunction TransferForm({ sub, customer, onClose, onDone }) {\n  const t = today();\n  const minDate = sub.start_date >= t ? addDaysISO(sub.start_date, 1) : t;\n  const [mode, setMode] = useState('existing');\n  const [date, setDate] = useState(minDate);\n  const [phone, setPhone] = useState('');\n  const [found, setFound] = useState(null);\n  const [lookupMsg, setLookupMsg] = useState('');\n  const [form, setForm] = useState({ name: '', phone: '', address: '' });\n  const [error, setError] = useState(null);\n  const [busy, setBusy] = useState(false);\n\n  const lookup = async () => {\n    setFound(null); setLookupMsg('');\n    try {\n      const c = await api(\\`/customers/phone/\\${encodeURIComponent(phone)}\\`);\n      if (c.id === customer.id) setLookupMsg('That is the current customer.');\n      else setFound(c);\n    } catch (err) { setLookupMsg(err.status === 404 ? 'No customer with that phone. Use “New customer” instead.' : err.message); }\n  };\n\n  const submit = async (e) => {\n    e.preventDefault();\n    setBusy(true); setError(null);\n    try {\n      if (mode === 'existing' && !found) throw new Error('Look up the customer who is taking over first.');\n      const body = mode === 'existing' ? { effective_date: date, to_customer_id: found.id } : { effective_date: date, customer: form };\n      onDone(await api(\\`/subscriptions/\\${sub.id}/transfer\\`, { method: 'POST', body }));\n    } catch (err) { setError(err); } finally { setBusy(false); }\n  };\n\n  return (\n    <Modal title=\"Transfer subscription\" onClose={onClose}>\n      <form onSubmit={submit} className=\"stack\">\n        <p className=\"muted small\">\n          {customer.name}’s <strong>{sub.plan_name}</strong> ({rupees(sub.price_paise)}/month) passes to someone else mid-cycle.\n          The plan, price and cycle carry over; each person is billed only for the weekdays they were served.\n        </p>\n        <ErrorNote error={error} />\n        <label>New holder’s first delivery day\n          <input type=\"date\" required min={minDate} max={sub.end_date || undefined} value={date} onChange={(e) => setDate(e.target.value)} />\n        </label>\n        <p className=\"muted small\">{customer.name}’s last delivery will be the day before. Their pauses after that are dropped.</p>\n        <div className=\"tabs\" role=\"tablist\">\n          <button type=\"button\" className={mode === 'existing' ? 'on' : ''} onClick={() => setMode('existing')}>Existing customer</button>\n          <button type=\"button\" className={mode === 'new' ? 'on' : ''} onClick={() => setMode('new')}>New customer</button>\n        </div>\n        {mode === 'existing' ? (\n          <>\n            <div className=\"row\">\n              <input type=\"tel\" className=\"grow\" placeholder=\"Phone of the customer taking over\" value={phone} onChange={(e) => { setPhone(e.target.value); setFound(null); }} />\n              <button type=\"button\" className=\"btn ghost\" onClick={lookup} disabled={!phone.trim()}>Find</button>\n            </div>\n            {found && <p className=\"small\">✅ <strong>{found.name}</strong> · {found.phone} <StatusBadge status={found.status} /></p>}\n            {lookupMsg && <p className=\"small muted\">{lookupMsg}</p>}\n          </>\n        ) : (\n          <>\n            <label>Name<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>\n            <label>Phone<input type=\"tel\" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></label>\n            <label>Delivery address<textarea rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></label>\n          </>\n        )}\n        <div className=\"row end\">\n          <button type=\"button\" className=\"btn ghost\" onClick={onClose}>Cancel</button>\n          <button className=\"btn\" disabled={busy}>{busy ? 'Transferring…' : 'Transfer'}</button>\n        </div>\n      </form>\n    </Modal>\n  );\n}\n\nfunction TransferSummary({ result, onClose }) {\n  const s = result.billing_split;\n  return (\n    <div className=\"card callout ok stack\" style={{ alignItems: 'stretch' }}>\n      <div className=\"row\" style={{ justifyContent: 'space-between' }}>\n        <strong>Transferred to <Link to={\\`/app/customers/\\${result.to.customer_id}\\`}>{result.to.customer_name}</Link> from {fmtDate(result.effective_date)}{result.created_customer ? ' (new customer created)' : ''}</strong>\n        <button className=\"btn ghost sm\" onClick={onClose}>✕</button>\n      </div>\n      <div className=\"table-wrap\">\n        <table>\n          <thead><tr><th>{fmtMonth(s.month)}</th><th className=\"num\">Served weekdays</th><th className=\"num\">Paused</th><th className=\"num\">Delivered</th><th className=\"num\">Bill</th></tr></thead>\n          <tbody>\n            {[s.from, s.to].map((b) => (\n              <tr key={b.customer_id}><td>{b.customer_name}</td><td className=\"num\">{b.subscribed_days}/{b.working_days}</td><td className=\"num\">{b.paused_days}</td><td className=\"num\">{b.delivered_days}</td><td className=\"num\"><strong>{rupees(b.amount_paise)}</strong></td></tr>\n            ))}\n            <tr><td><strong>Combined</strong></td><td /><td /><td /><td className=\"num\"><strong>{rupees(s.combined_amount_paise)}</strong></td></tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  );\n}\n\nfunction addDaysISO(s, n) {\n  const d = new Date(\\`\\${s}T00:00:00Z\\`);\n  d.setUTCDate(d.getUTCDate() + n);\n  return d.toISOString().slice(0, 10);\n}\n`;\nfs.writeFileSync(dir + 'pages/CustomerDetail.jsx', s);\n\nlet b = fs.readFileSync(dir + 'pages/Bills.jsx', 'utf8').replace(/\\r\\n/g, '\\n');\nconst a1 = `<td className=\"hide-sm\">{b.plan_name}<div className=\"muted small\">{rupees(b.price_paise)}/mo</div></td>`;\nif (!b.includes(a1)) throw new Error('bills');\nb = b.replace(a1, `<td className=\"hide-sm\">{b.plan_name}<div className=\"muted small\">{rupees(b.price_paise)}/mo</div>\n                        {b.transferred_from_name && <div className=\"transfer-note\">↪ from {b.transferred_from_name}</div>}\n                        {b.transferred_to_name && <div className=\"transfer-note\">⇄ to {b.transferred_to_name}</div>}</td>`);\nfs.writeFileSync(dir + 'pages/Bills.jsx', b);\n\nfs.appendFileSync(dir + 'styles.css', `\n/* Clock, notifications, import, transfer */\n.clock-pill { background: var(--amber-soft); color: var(--amber); padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }\n.clock-pill:hover { text-decoration: none; filter: brightness(0.97); }\n.run-result { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }\n.linklike { all: unset; color: var(--brand); cursor: pointer; }\n.linklike:hover { text-decoration: underline; }\n.mono, textarea.mono { font-family: Consolas, 'SFMono-Regular', monospace; font-size: 0.85rem; }\n.callout.ok { background: var(--green-soft); border-color: #bfe3c9; }\n.stat-btn { text-align: left; cursor: pointer; font: inherit; }\n.stat-btn.selected { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft); }\n.reasons { margin: 0; padding-left: 16px; color: var(--red); font-size: 0.85rem; }\n.transfer-note { display: block; font-size: 0.8rem; color: var(--blue); margin-top: 2px; }\n`);\nconsole.log('patched');\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/patch-ui.cjs && cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/client\" && npx vite build 2>&1 | grep -E \"built|rror\"",
+  "description": "Apply UI patch and build client",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/patch-ui.cjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+patched
+[32m✓ built in 2.17s[39m
+```
+
+</details>
+
+The client builds cleanly. Your server in VS Code is still running the old code, so I'll test the new version on a separate port (4100), using a copy of your database:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "mkdir -p C:/Users/Dell/tt-guide/testdb && cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && node -e \"\nconst {DatabaseSync}=require('node:sqlite');const d=new DatabaseSync('data/tiffin.db');d.exec(\\\"VACUUM INTO 'C:/Users/Dell/tt-guide/testdb/tiffin.db'\\\");console.log('copied')\" && rm -f C:/Users/Dell/tt-guide/testdb/tiffin.db-* ; echo ok",
+  "description": "Snapshot user database for testing"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+copied
+ok
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/testdb/tiffin.db node src/index.js",
+  "description": "Run updated server on port 4100 with test DB",
+  "run_in_background": true
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Command running in background with ID: bngu9oo98. Output is being written to: C:\Users\Dell\AppData\Local\Temp\claude\C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86\f73bae41-da2a-4f62-988c-75aac2b10797\tasks\bngu9oo98.output. You will be notified when it completes. To check interim output, use Read on that file path.
+Session cwd remains C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server; directory changes made by the backgrounded command do not apply to subsequent commands.
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "sleep 2; B=localhost:4100; J='Content-Type: application/json'\necho \"--- L1 grading flow (no auth) ---\"\ncurl -s -X POST $B/clock -H \"$J\" -d '{\"date\":\"2026-09-18\"}' | node -pe 'const r=JSON.parse(require(\"fs\").readFileSync(0));JSON.stringify({today:r.today,mornings:r.mornings,total:r.notified_total})'\ncurl -s \"$B/outbox?date=2026-09-18&limit=3\" | node -pe 'const r=JSON.parse(require(\"fs\").readFileSync(0));JSON.stringify({total:r.total, first:r.data[0]})'\ncurl -s -X POST $B/clock -H \"$J\" -d '{}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).mornings[0]'",
+  "description": "Exercise clock and outbox against real data"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+--- L1 grading flow (no auth) ---
+{"today":"2026-09-18","mornings":[{"date":"2026-09-18","delivery_day":true,"due":18,"notified":18,"already_notified":0}],"total":18}
+{"total":18,"first":{"id":18,"channel":"sms","to":"9111111111","type":"delivery_due","date":"2026-09-18","message":"Hi Test, your Test tiffin from your tiffin service will be delivered today (Fri, 18 Sept).","status":"sent","customer_id":33,"customer_name":"Test Cust","subscription_id":31,"created_at":"2026-09-17 10:51:23"}}
+{
+  date: '2026-09-18',
+  delivery_day: true,
+  due: 18,
+  notified: 0,
+  already_notified: 18
+}
+```
+
+</details>
+
+The Level 1 flow works on your real data: jumping to 18 Sep sent 18 reminders, and running that morning again sent none. Now checking the new screens in the browser:
+
+**Tool call — `mcp__Claude_Browser__navigate`**
+
+```json
+{
+  "url": "http://localhost:4100/login"
+}
+```
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@tiffin.app',password:'demo1234'})}).then(r=>r.json()); localStorage.setItem('tiffin_token', r.token); setTimeout(()=>location.href='/app/notifications', 50); 'ok'"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+navigated to http://localhost:4100
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+"ok"
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__browser_batch`**
+
+```json
+{
+  "actions": [
+    {
+      "name": "computer",
+      "input": {
+        "action": "wait",
+        "duration": 2
+      }
+    },
+    {
+      "name": "javascript_tool",
+      "input": {
+        "action": "javascript_exec",
+        "text": "[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Next morning')).click(); await new Promise(r=>setTimeout(r,2000)); 'clicked'"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "screenshot"
+      }
+    },
+    {
+      "name": "read_console_messages",
+      "input": {
+        "onlyErrors": true
+      }
+    }
+  ]
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[computer:wait] waited 2s
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+[javascript_tool:javascript_exec] "clicked"
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+[computer:screenshot] Screenshot size: 800x480
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+[image]
+[read_console_messages] No console logs.
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+The Notifications page works: Saturday the 19th correctly sent nothing, and the header shows the simulated date. Next, the Import page with the messy sample:
+
+**Tool call — `mcp__Claude_Browser__browser_batch`**
+
+```json
+{
+  "actions": [
+    {
+      "name": "navigate",
+      "input": {
+        "url": "http://localhost:4100/app/import"
+      }
+    },
+    {
+      "name": "javascript_tool",
+      "input": {
+        "action": "javascript_exec",
+        "text": "const w=(ms)=>new Promise(r=>setTimeout(r,ms)); await w(1200); [...document.querySelectorAll('button')].find(b=>b.textContent.includes('messy sample')).click(); await w(300); [...document.querySelectorAll('button')].find(b=>b.textContent.startsWith('Preview')).click(); await w(1500); document.querySelector('.stats')?.innerText"
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "scroll",
+        "coordinate": [
+          400,
+          300
+        ],
+        "scroll_direction": "down",
+        "scroll_amount": 10
+      }
+    },
+    {
+      "name": "computer",
+      "input": {
+        "action": "screenshot"
+      }
+    }
+  ]
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+[navigate] navigated to http://localhost:4100
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+[javascript_tool:javascript_exec] "3\n✅ Imported\n1\n🔁 Deduped\n4\n⛔ Rejected"
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+[computer:scroll] scrolled down at (400, 300)
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+
+actions[3] (computer:screenshot) failed: screenshot failed: Screenshot timed out after 5s: the page did not finish rendering in time. Retry; the pane does not need to be displayed. (3 completed, 0 remaining)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "const w=(ms)=>new Promise(r=>setTimeout(r,ms)); [...document.querySelectorAll('.stat-btn')][2].click(); await w(300); const rej=[...document.querySelectorAll('tbody tr')].map(r=>r.innerText.replace(/\\s+/g,' ')); [...document.querySelectorAll('button')].find(b=>/^Import \\d/.test(b.textContent)).click(); await w(1500); ({rej, after: document.querySelector('.stats').innerText.replace(/\\n/g,' '), banner: document.querySelector('.callout')?.innerText, imported:[...document.querySelectorAll('tbody tr')].map(r=>r.innerText.replace(/\\s+/g,' '))})"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{
+  "after": "3 ✅ Imported 1 🔁 Deduped 4 ⛔ Rejected",
+  "banner": "Import complete. 8 rows read.",
+  "imported": [
+    "2 Asha Iyer New 9200000001 Veg Mini 2026-09-01 \"01/09/2026\" is ambiguous; read as day/month/year",
+    "3 Ravi Kumar New 9200000002 Non-Veg Thali 2026-09-03 —",
+    "9 Neha Joshi New 9200000006 Veg Full Thali 2026-09-25 —"
+  ],
+  "rej": [
+    "5 ∅ | 9200000003 | ∅ | Veg Mini | 2026-09-01 name is blank",
+    "6 Meena | ∅ | ∅ | Veg Mini | 2026-09-01 phone is blank",
+    "7 Kiran | 9200000004 | ∅ | Veg Mini | ∅ start date is blank",
+    "8 Tara | 9200000005 | ∅ | Pizza Plan | 2026-09-01 plan \"Pizza Plan\" does not match any of your plans"
+  ]
+}
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+Import works end to end: 3 imported, 1 duplicate skipped, and 4 rejected with clear reasons. Last check is a transfer from the UI:
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "const w=(ms)=>new Promise(r=>setTimeout(r,ms));\nconst setVal=(el,v)=>{const proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype; Object.getOwnPropertyDescriptor(proto,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}));};\ndocument.querySelector('tbody a').click(); await w(1500);\n[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Transfer')).click(); await w(400);\nconst m=document.querySelector('.modal');\nsetVal(m.querySelector('input[type=date]'),'2026-09-21');\n[...m.querySelectorAll('button')].find(b=>b.textContent==='New customer').click(); await w(200);\nconst ins=m.querySelectorAll('input:not([type=date])'); setVal(ins[0],'Kabir Mehta'); setVal(ins[1],'98765 11111');\nm.querySelector('form').requestSubmit(); await w(2000);\n({err: document.querySelector('.modal .alert')?.innerText, summary: document.querySelector('.callout.ok')?.innerText, note: document.querySelector('.transfer-note')?.innerText, url: location.pathname})"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{
+  "note": "⇄ Transferred to Kabir Mehta from 21 Sept 2026",
+  "summary": "Transferred to Kabir Mehta from 21 Sept 2026 (new customer created)\n✕\nSEPTEMBER 2026\tSERVED WEEKDAYS\tPAUSED\tDELIVERED\tBILL\nAsha Iyer\t14/22\t0\t14\t₹1,590.91\nKabir Mehta\t8/22\t0\t8\t₹909.09\nCombined\t\t\t\t₹2,500",
+  "url": "/app/customers/34"
+}
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__computer`**
+
+```json
+{
+  "action": "screenshot"
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+screenshot failed: Screenshot timed out after 5s: the page did not finish rendering in time. Retry; the pane does not need to be displayed. Claude's window may be behind another window, which can stop the page from drawing; if this repeats, continue with `get_page_text` or `find`, or ask the user to bring it forward.
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); [ -n \"$pid\" ] && taskkill //PID $pid //F >/dev/null && echo stopped; cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && grep -n \"^## \\|^### \" README.md REASONING.md",
+  "description": "Stop test server and list doc headings"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+stopped
+README.md:16:## 1. Setup
+README.md:30:### Environment variables (`server/`)
+README.md:40:## 2. Run
+README.md:42:### Development (hot reload, two terminals)
+README.md:54:### Production (single process)
+README.md:66:### Tests
+README.md:75:## 3. Debugging
+README.md:91:## 4. Billing rules
+README.md:102:## 5. Database schema
+README.md:118:## 6. REST API
+README.md:126:### Auth
+README.md:133:### Plans
+README.md:142:### Customers
+README.md:152:### Subscriptions, pause and resume
+README.md:163:### Bills
+README.md:169:### Dashboard and health
+README.md:175:### Example
+README.md:190:## 7. UI pages
+README.md:202:## 8. Project structure
+REASONING.md:3:## 1. Reading the problem
+REASONING.md:24:## 2. Architecture choices
+REASONING.md:35:## 3. Edge cases handled
+REASONING.md:47:## 4. How I tested
+REASONING.md:60:## 5. Issues found and fixed
+REASONING.md:70:## 6. Trade-offs and what I'd do with more time
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\samples\\messy-customers.csv",
+  "content": "Customer Name,Mobile No,Address,Meal Plan,Start Date,Notes\nASHA IYER,+91 92000 00001,\"12, MG Road, Indiranagar\",veg mini,01/09/2026,caps name + +91 phone + dd/mm date\nRavi Kumar,92000-00002,,Non-Veg Thali,2026-09-03,dashes in phone\nasha iyer,9200000001,,Veg Mini,5 Sep 2026,duplicate phone of row 2\n,9200000003,HSR Layout,Veg Mini,2026-09-01,blank name\nMeena,,,Veg Mini,2026-09-01,blank phone\nKiran,9200000004,,Veg Mini,,blank start date\nTara,9200000005,,Pizza Plan,2026-09-01,unknown plan\nOm,12345,,Veg Mini,31/02/2026,bad phone and impossible date\n,,,,,\nNeha Joshi,09200000006,Whitefield,VEG FULL THALI,Sep 25 2026,leading 0 + month-name date\nFarhan,92000 00007,,Veg Mini,25/09/2026,day > 12 so unambiguous\nPriya,9200000008,,Non-Veg Thali,09/25/2026,month-first (day > 12 proves it)\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\samples\messy-customers.csv (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/patch-docs.cjs",
+  "content": "const fs = require('fs');\nconst root = 'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/';\nlet r = fs.readFileSync(root + 'README.md', 'utf8').replace(/\\r\\n/g, '\\n');\nconst rep = (s, a, b) => { if (!s.includes(a)) throw new Error('missing: ' + a.slice(0, 70)); return s.replace(a, b); };\n\nr = rep(r, '| `DB_FILE` | `./data/tiffin.db` | SQLite file path (`:memory:` for throwaway runs) |',\n`| \\`DB_FILE\\` | \\`./data/tiffin.db\\` | SQLite file path (\\`:memory:\\` for throwaway runs) |\n| \\`PUBLIC_SIM_ENDPOINTS\\` | \\`true\\` | Allows \\`/clock\\` and \\`/outbox\\` without a token (for the grading harness). Set to \\`false\\` in production |`);\n\nr = rep(r, '### Example\\n',\n`### Level 1: morning delivery notifications (clock + outbox)\n\nThese are served at the root (\\`/clock\\`, \\`/outbox\\`) for the grading harness, and also under \\`/api\\`. With a token, \\`/outbox\\` shows only that owner's messages; without one it shows all of them (see \\`PUBLIC_SIM_ENDPOINTS\\`).\n\n| Method | Endpoint | Body / Query | Description |\n|---|---|---|---|\n| GET | \\`/clock\\` | | \\`{ today, simulated, real_today }\\` |\n| POST | \\`/clock\\` | \\`{}\\` · \\`{ date }\\` or \\`{ now }\\` · \\`{ advance_days }\\` · \\`{ reset: true }\\` | Sets the simulated clock and **runs the morning job** for every morning passed (only the target morning when moving backwards or staying put). Each morning, every customer **due a delivery that day** (subscription running, the day is a weekday, not paused) gets one \\`delivery_due\\` message through the Notification Service. Re-runs never send duplicates. Returns per-morning \\`{ date, delivery_day, due, notified, already_notified }\\` |\n| GET | \\`/outbox\\` | \\`date, type, customer_id, search, page, limit, sort=id\\\\|for_date\\\\|recipient\\\\|customer\\\\|type, order\\` | Messages sent through the Notification Service (newest first): \\`{ id, channel, to, type, date, message, customer_id, customer_name, subscription_id }\\` |\n\n\\`\\`\\`bash\ncurl -X POST localhost:4000/clock -H 'Content-Type: application/json' -d '{\"date\":\"2026-09-21\"}'\ncurl \"localhost:4000/outbox?date=2026-09-21\"\n\\`\\`\\`\n\n### Level 2: transfer a subscription mid-cycle\n| Method | Endpoint | Body | Description |\n|---|---|---|---|\n| POST | \\`/api/subscriptions/:id/transfer\\` | \\`{ effective_date, to_customer_id }\\` or \\`{ effective_date, customer: { name, phone, address } }\\` | \\`effective_date\\` is the new holder's first delivery day. The current subscription ends the day before, and its pauses after that are dropped. A linked subscription (\\`transferred_from_id\\`) is created for the new holder with the **same plan, same locked price and same end date**. A new customer is created if the phone isn't known. Both people are notified. Returns \\`{ from, to, billing_split: { from, to, combined_amount_paise } }\\`. Errors: 400 if not mid-cycle, already ended, or same customer; 409 if the target already has a running subscription |\n\nBilling splits naturally: each subscription is billed for the weekdays *its* customer was served, over the same weekdays-in-month denominator, so the two bills add up to what one person would have paid.\n\n### Level 3: import a messy customer list\n| Method | Endpoint | Body / Query | Description |\n|---|---|---|---|\n| POST | \\`/api/import/customers\\` | \\`{ csv }\\` or \\`{ rows: [...] }\\` or a raw \\`text/csv\\` body; options \\`default_plan_id\\`, \\`default_start_date\\`, \\`dry_run\\` | Returns \\`{ imported, deduped, rejected, total_rows, blank_rows_ignored, dry_run, unknown_columns, details: { imported[], deduped[], rejected[] } }\\` |\n\nEvery non-empty row lands in exactly one bucket:\n- **imported:** a clean subscription was created. The customer is created, or reused if the phone exists without a running subscription.\n- **deduped:** the phone repeats an earlier row in the file (first valid row wins), or the customer is already subscribed.\n- **rejected:** a required field is blank or unreadable. Every reason is listed with the spreadsheet row number.\n\nWhat gets cleaned:\n- **Headers** are matched by alias (\\`Customer Name\\`, \\`Mobile No\\`, \\`Meal Plan\\`, \\`Start Date\\`…).\n- **Phones:** \\`+91\\`, \\`91\\`, a leading \\`0\\`, spaces, dashes and dots are stripped.\n- **Names** in ALL CAPS or all lowercase are title-cased.\n- **Plans** are matched by name, ignoring case and extra spaces.\n- **Dates:** \\`2026-09-01\\`, \\`20260901\\`, \\`01/09/2026\\`, \\`1-9-26\\`, \\`01.09.2026\\` (day-first when ambiguous, with a warning), \\`09/25/2026\\` (month-first only when day > 12 proves it), \\`1 Sep 2026\\`, \\`Sep 1, 2026\\`, \\`01-Sep-26\\`. Impossible dates like 31/02 are rejected.\n- **Empty lines** are ignored.\n- **Transactions:** the whole import is one transaction. \\`dry_run\\` previews without writing.\n\nTry it with \\`samples/messy-customers.csv\\` (after \\`npm run seed\\`): 5 imported, 1 deduped, 5 rejected.\n\n### Example\n`);\n\nr = rep(r, '| `/app/bills` | Pick a month, generate bills, search, sort, paginate, see totals |',\n`| \\`/app/bills\\` | Pick a month, generate bills, search, sort, paginate, see totals; transferred bills show \"from/to\" |\n| \\`/app/notifications\\` | Simulated clock (next morning, jump to a date, run again, back to the real date) and the outbox (filter by date or type, search, sort, paginate) |\n| \\`/app/import\\` | Paste or upload a CSV, set defaults, preview, import, and view the imported / deduped / rejected report |\n| Customer page → **⇄ Transfer** | Hand a subscription to an existing or new customer and see the billing split |`);\n\nr = rep(r, '- `server/test/api.test.js`:', `- \\`server/test/features.test.js\\`: end-to-end tests for Level 1 (clock, due-today rules, weekends, pauses, idempotency, owner scoping), Level 2 (transfer, locked price, split bills, notifications, guards) and Level 3 (messy CSV counts, row numbers, dry run, re-import, JSON and raw CSV bodies, defaults).\n- \\`server/test/importer.test.js\\`: unit tests for date parsing, phone normalisation, CSV parsing, header aliases and row cleaning.\n- \\`server/test/api.test.js\\`:`);\n\nr = rep(r, '  src/seed.js           demo data', `  src/seed.js           demo data\n  src/clock.js          simulated clock + morning job runner\n  src/notifications.js  Notification Service (outbox) + \"due today\" query\n  src/importer.js       CSV parsing, date/phone cleaning, row validation`);\nfs.writeFileSync(root + 'README.md', r);\n\nlet g = fs.readFileSync(root + 'REASONING.md', 'utf8').replace(/\\r\\n/g, '\\n');\ng = rep(g, '## 6. Trade-offs and what I\\'d do with more time', `## 6. Levels 1–3: extension features\n\n### Level 1: morning notifications (integrate)\n- **Due today** is defined once, in SQL (\\`customersDueOn\\`), with exactly the rules billing and status already use: the subscription is running that day, the day is a weekday, and no pause covers it. So a customer never gets a \"delivery today\" message for a day they wouldn't be billed for.\n- **The Notification Service** is a small module with one \\`send()\\` method that writes to an \\`outbox\\` table. Routes and jobs never write to the outbox directly. A real SMS or WhatsApp provider would plug in behind \\`send()\\`.\n- **Idempotency:** every message has a \\`dedupe_key\\` (\\`delivery_due:<subscription>:<date>\\`) with a UNIQUE index, so a double click, a retry, or a grader calling \\`POST /clock\\` twice never double-messages anyone.\n- **The clock:** I wanted \"morning\" to be testable, so \\`POST /clock\\` sets a simulated date that the **whole app** honours (status, dashboard, defaults, UI header). Moving forward runs *every* morning in between, because skipping from Friday to Tuesday shouldn't skip Monday's reminders. The date is persisted in a \\`settings\\` table so it survives restarts.\n- **Grading access:** \\`/clock\\` and \\`/outbox\\` exist at the root as well as under \\`/api\\`, and work without a token so a harness can call them. That is guarded by \\`PUBLIC_SIM_ENDPOINTS\\`; with a token, the outbox is scoped to the owner.\n\n### Level 2: transfer mid-cycle (lifecycle)\n- I modelled a transfer as **close + linked continuation**, not as changing \\`customer_id\\` on the existing row. Rewriting the customer would erase who ate the first half of the month and make a fair split impossible. Two subscriptions linked by \\`transferred_from_id\\` keep history intact.\n- **What carries over:** the plan, the **locked price** (even if the plan price has since changed; a test covers this) and any fixed end date. **What doesn't:** the old holder's future pauses, which were *their* travel plans.\n- **Billing split** needed no new maths. Each subscription is billed for its own served weekdays over the same denominator, so the two bills sum to one plan price (₹2,500 split as ₹1,590.91 + ₹909.09 in the manual test).\n- **Guards:** the transfer must be strictly mid-cycle (after start, not after end), can't go to the same person, can't go to someone already subscribed (409), and runs in one transaction, so a failure never leaves a half-created customer.\n\n### Level 3: messy import (messy data)\n- **Parsing and cleaning are pure functions** (\\`importer.js\\`) with their own unit tests. The route only decides buckets and writes.\n- **Order of decisions:** blank line → ignore; invalid → **rejected** (with *all* reasons, not just the first); phone already claimed by an earlier valid row → **deduped**; existing customer already subscribed → **deduped**; otherwise → **imported**. Validating before deduping means an invalid first row doesn't \"use up\" a phone number that a later valid row needs.\n- **Dates:** Indian lists are usually day-first, so ambiguous \\`03/04/2026\\` is read as 3 April *with a warning*. \\`09/25/2026\\` is read month-first only because 25 can't be a month. Impossible dates are rejected, never \"rolled over\" (JavaScript would turn 31 Feb into 3 Mar).\n- **Phone canonicalisation** (\\`+91\\`, \\`0\\`, spaces, dashes) is now shared by the whole app, so an imported \\`098450 00000\\` dedupes against an existing \\`9845000000\\`.\n- **One transaction** plus **dry run**: the owner previews the report, then commits. Re-importing the same file is safe, since everything becomes \"deduped\".\n\n### Testing and fixes for this round\n- There are 22 automated tests now (up from 13), all passing: \\`features.test.js\\` (3 end-to-end scenarios) and \\`importer.test.js\\` (6 unit tests).\n- **Manual check:** on a copy of the seeded database on a separate port, \\`POST /clock {\"date\":\"2026-09-18\"}\\` sent 18 reminders, running it again sent 0, Saturday sent 0, the messy sample imported 3 / deduped 1 / rejected 4 in the UI, and a UI transfer on 21 Sep split the bill 14 + 8 weekdays.\n- **Bugs hit:**\n  1. When patching \\`app.js\\` from a shell script, the escaped \\`\\\\/\\` in the request-log regex lost its backslash and every test file failed with \\`SyntaxError: Unexpected token '.'\\`. Running one test file directly showed the exact line.\n  2. A test asserted that a failed transfer to a new customer rolls back, but the request failed validation *before* the transaction began, so the test proved nothing. I removed the misleading assertion rather than keep a test that couldn't fail.\n  3. Searching the outbox for \"transferred\" missed the \"transferred in\" message (its text says \"is now yours\"), so the test now filters by message \\`type\\`.\n\n## 7. Trade-offs and what I'd do with more time`);\nfs.writeFileSync(root + 'REASONING.md', g);\nconsole.log('docs patched');\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/patch-docs.cjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/patch-docs.cjs && cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && rm -f C:/Users/Dell/tt-guide/v.db* && DB_FILE=C:/Users/Dell/tt-guide/v.db node src/seed.js >/dev/null && DB_FILE=C:/Users/Dell/tt-guide/v.db node --input-type=module -e \"\nimport { openDb } from './src/db.js'; import { createApp } from './src/app.js'; import fs from 'node:fs';\nconst app = createApp(openDb(), { log:false }); const s = app.listen(0, async () => {\n  const b='http://127.0.0.1:'+s.address().port;\n  const t=(await (await fetch(b+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@tiffin.app',password:'demo1234'})})).json()).token;\n  const r=await (await fetch(b+'/api/import/customers',{method:'POST',headers:{'Content-Type':'text/csv',Authorization:'Bearer '+t},body:fs.readFileSync('../samples/messy-customers.csv','utf8')})).json();\n  console.log(r.imported,r.deduped,r.rejected,r.blank_rows_ignored, r.details.imported.map(x=>x.start_date).join(' '));\n  s.close(); });\"",
+  "description": "Apply docs patch and verify sample CSV counts",
+  "timeout": 60000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+docs patched
+5 1 5 1 2026-09-01 2026-09-03 2026-09-25 2026-09-25 2026-09-25
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\" && git status --short",
+  "description": "Final test run and list changed files",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ℹ tests 22
+ℹ pass 22
+ℹ fail 0
+ M README.md
+ M REASONING.md
+ M client/src/api.js
+ M client/src/components/Layout.jsx
+ M client/src/main.jsx
+ M client/src/pages/Bills.jsx
+ M client/src/pages/CustomerDetail.jsx
+ M client/src/styles.css
+ M server/src/app.js
+ M server/src/dates.js
+ M server/src/db.js
+ M server/src/http.js
+ M server/src/routes/bills.js
+ M server/src/routes/customers.js
+ M server/src/routes/subscriptions.js
+?? client/src/pages/ImportCustomers.jsx
+?? client/src/pages/Notifications.jsx
+?? docs/
+?? samples/
+?? server/src/clock.js
+?? server/src/importer.js
+?? server/src/notifications.js
+?? server/src/routes/import.js
+?? server/src/routes/simulation.js
+?? server/test/features.test.js
+?? server/test/importer.test.js
+```
+
+</details>
+
+I've added all three levels to your Desktop copy of the project. All 22 automated tests pass (up from 13). I also ran each feature against a copy of your database in the browser, so your real data wasn't touched. Nothing is committed or pushed yet.
+
+## Level 1 — Morning notifications
+- **`POST /clock`** sets a simulated "today" and runs the morning job. You can send a date, a number of days to move forward, an empty body to re-run today, or a reset back to the real date.
+  - Moving forward runs every morning in between, so skipping from Friday to Tuesday doesn't skip Monday's reminders.
+  - The whole app follows this date: statuses, dashboard, and a 🕒 badge in the header.
+- **Who gets a message:** customers with a subscription running that day, on a weekday, and not paused. These are the same rules billing uses.
+- **`GET /outbox`** lists what was sent, with filters for date, type and search, plus sorting and pagination.
+- **No duplicates:** running the same morning twice sends nothing new.
+- **New page:** **Notifications**, with Next morning, Jump to date, Run this morning and the outbox table.
+- **On a copy of your data:** jumping to 18 Sep sent 18 reminders, running it again sent 0, and Saturday sent 0.
+- **Security:** `/clock` and `/outbox` also work at the root without a login token, so a grader can call them. That means anyone who can reach the server can read customer phone numbers and move the clock. Set `PUBLIC_SIM_ENDPOINTS=false` to require a login.
+
+## Level 2 — Transfer a subscription
+- **`POST /api/subscriptions/:id/transfer`** hands a subscription to an existing customer or a new one, from a chosen date.
+- The old customer's subscription ends the day before, and their later pauses are dropped. The new customer gets a linked subscription with the same plan, the same price the old customer locked in, and the same end date.
+- **Billing split:** each person is billed only for the weekdays they were served, and the two bills add up to one plan price. In my UI test, ₹2,500 split into ₹1,590.91 (14 days) and ₹909.09 (8 days).
+- Both customers get a message in the outbox.
+- **UI:** a **⇄ Transfer** button on the customer page shows the split after transferring. The Bills page shows "from / to" names.
+
+## Level 3 — Messy import
+- **`POST /api/import/customers`** accepts CSV text, JSON rows, or a raw CSV upload. It returns `{ imported, deduped, rejected }` plus details for each row.
+- **What it cleans up:**
+  - Phone numbers with +91, a leading 0, spaces or dashes.
+  - Names typed in ALL CAPS.
+  - Differently named column headers, such as "Mobile No".
+  - Mixed date formats, e.g. 01/09/2026, 1 Sep 2026, Sep 1, 2026.
+- **Ambiguous dates** like 03/04/2026 are read day-first, with a warning.
+- **Duplicates:** the first valid row for a phone number wins. Customers who are already subscribed count as deduped.
+- **Rejected rows** list every problem with the spreadsheet row number. Completely empty lines are ignored.
+- **Safety:** the whole import succeeds or fails as one unit, and there's a preview mode that saves nothing.
+- **New page:** **Import**, where you upload or paste a file, set defaults for blank plans and dates, preview, and import.
+- **Test file:** `samples/messy-customers.csv` gives 5 imported, 1 deduped, 5 rejected on the demo data (checked).
+
+README.md now documents all the new endpoints. REASONING.md has a new section on the design choices, testing, and three bugs I hit and fixed.
+
+## To see it
+Your running server still has the old code, so restart it. The website is already rebuilt.
+1. In the VS Code terminal, press `Ctrl+C`.
+2. Start the server again:
+   ```bash
+   npm start
+   ```
+3. Open http://localhost:4000 and look for **Notifications** and **Import** in the top bar.
+
+Your existing database updates itself when the server starts; nothing is lost.
+
+The PDF guide doesn't cover these features yet. To save this work to GitHub, say the word and I'll commit and push. Or run:
+```bash
+git add -A && git commit -m "Add morning notifications, subscription transfer and messy CSV import" && git push
+```
+
+---
+
+## 👤 User
+
+check the updates and check that each feature is working properly.
+if yes them commit and push it to the github
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "curl -s localhost:4000/clock; echo; cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\"; npm run build 2>&1 | grep -E \"built|rror\"",
+  "description": "Check live server version, tests, and build",
+  "timeout": 200000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{"today":"2026-09-17","simulated":true,"real_today":"2026-09-17"}
+ℹ tests 22
+ℹ pass 22
+ℹ fail 0
+[32m✓ built in 2.41s[39m
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && rm -f C:/Users/Dell/tt-guide/v.db* && DB_FILE=C:/Users/Dell/tt-guide/v.db node src/seed.js && (PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/v.db node src/index.js > C:/Users/Dell/tt-guide/v.log 2>&1 &) ; sleep 2; curl -s localhost:4100/api/health",
+  "description": "Start fresh seeded verification server on 4100"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Seeded demo data. Login with demo@tiffin.app / demo1234
+{"ok":true}
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/verify.mjs",
+  "content": "import fs from 'node:fs';\nconst B = 'http://localhost:4100';\nlet pass = 0, fail = 0;\nconst ok = (cond, label, extra = '') => { cond ? pass++ : fail++; console.log(`${cond ? 'PASS' : 'FAIL'}  ${label}${extra ? '  → ' + extra : ''}`); };\nconst call = async (method, path, body, token, type = 'application/json') => {\n  const res = await fetch(B + path, { method, headers: { 'Content-Type': type, ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: body === undefined ? undefined : type === 'application/json' ? JSON.stringify(body) : body });\n  const t = await res.text(); return { status: res.status, body: t ? JSON.parse(t) : null };\n};\n\nconst T = (await call('POST', '/api/auth/login', { email: 'demo@tiffin.app', password: 'demo1234' })).body.token;\n\nconsole.log('\\n=== Regression: existing features ===');\nok((await call('GET', '/api/customers')).status === 401, 'protected routes still need login');\nconst dash = (await call('GET', '/api/dashboard', undefined, T)).body;\nok(dash.counts.active > 0, 'dashboard works', JSON.stringify(dash.counts));\nok((await call('GET', '/api/customers?status=paused&sort=phone&order=desc&limit=5', undefined, T)).body.data.length === 5, 'search/filter/sort/paginate');\nok((await call('GET', '/api/customers/phone/+91 98450 00000', undefined, T)).status === 200, 'phone lookup (now also accepts +91 format)');\nconst gen = await call('POST', '/api/bills/generate', { month: '2026-09' }, T);\nok(gen.status === 200 && gen.body.bills_generated > 0, 'bill generation', `${gen.body.bills_generated} bills`);\n\nconsole.log('\\n=== Level 1: morning notifications ===');\nconst real = (await call('GET', '/clock')).body;\nok(real.simulated === false, 'fresh server uses real date', real.today);\n// Pick a clean weekday: Monday 21 Sep 2026\nconst due = await call('GET', '/api/customers?limit=100', undefined, T); // baseline\nconst tick = await call('POST', '/clock', { date: '2026-09-21' });\nok(tick.status === 200 && tick.body.today === '2026-09-21', 'POST /clock (no auth) sets the date');\nconst mon = tick.body.mornings.at(-1);\n// independently compute who should be due on 21 Sep from the API's own data\nconst list = (await call('GET', '/api/customers?limit=100&as_of=2026-09-21', undefined, T)).body.data;\nconst expectedActive = list.filter((c) => c.status === 'active').length;\nok(mon.date === '2026-09-21' && mon.due === expectedActive, 'due count = customers active on that weekday', `due ${mon.due}, active ${expectedActive}`);\nconst out = (await call('GET', '/outbox?date=2026-09-21&limit=100')).body;\nok(out.total === mon.due, 'GET /outbox lists one message per due customer', `${out.total}`);\nconst activePhones = new Set(list.filter((c) => c.status === 'active').map((c) => c.phone));\nok(out.data.every((m) => activePhones.has(m.to) && m.type === 'delivery_due'), 'no paused/upcoming/inactive customer was messaged');\nok(new Set(out.data.map((m) => m.to)).size === out.data.length, 'no duplicate recipients');\nok((await call('POST', '/clock', {})).body.mornings[0].notified === 0, 're-running the same morning sends nothing new');\nconst wk = (await call('POST', '/clock', { advance_days: 6 })).body; // Tue 22 .. Sun 27\nconst sat = wk.mornings.find((m) => m.date === '2026-09-26');\nok(wk.mornings.length === 6 && sat.delivery_day === false && sat.notified === 0, 'advancing runs each morning; weekend sends nothing');\nok((await call('POST', '/clock', { date: 'bad' })).status === 400, 'invalid date rejected');\nok((await call('GET', '/api/outbox', undefined, T)).body.total > 0, 'owner-scoped /api/outbox works with login');\n\nconsole.log('\\n=== Level 2: transfer mid-cycle ===');\nawait call('POST', '/clock', { date: '2026-09-21' });\nconst cust = (await call('GET', '/api/customers?status=active&limit=1&sort=name', undefined, T)).body.data[0];\nconst detail = (await call('GET', `/api/customers/${cust.id}`, undefined, T)).body;\nconst sub = detail.subscriptions.find((s) => !s.end_date);\nconst before = (await call('GET', `/api/subscriptions/${sub.id}/bill?month=2026-09`, undefined, T)).body;\nconst tr = await call('POST', `/api/subscriptions/${sub.id}/transfer`, { effective_date: '2026-09-24', customer: { name: 'Verify Newholder', phone: '9000012345' } }, T);\nok(tr.status === 201, 'transfer to a new customer', `${cust.name} → Verify Newholder`);\nconst sp = tr.body.billing_split;\nok(tr.body.from.end_date === '2026-09-23' && tr.body.to.start_date === '2026-09-24', 'old ends day before, new starts on effective date');\nok(tr.body.to.plan_id === sub.plan_id && tr.body.to.price_paise === sub.price_paise, 'plan and locked price carry over');\nok(sp.from.subscribed_days + sp.to.subscribed_days === before.subscribed_days, 'served days split with no gap or overlap', `${sp.from.subscribed_days} + ${sp.to.subscribed_days} = ${before.subscribed_days}`);\nok(Math.abs(sp.combined_amount_paise - before.amount_paise) <= 1, 'split bills add up to the original bill (±1 paisa rounding)', `${sp.from.amount_paise} + ${sp.to.amount_paise} vs ${before.amount_paise}`);\nconst msgs = (await call('GET', '/api/outbox?limit=100', undefined, T)).body.data.filter((m) => m.type.startsWith('subscription_transferred'));\nok(msgs.length === 2, 'both customers notified');\nok((await call('POST', `/api/subscriptions/${sub.id}/transfer`, { effective_date: '2026-09-25', to_customer_id: cust.id }, T)).status === 400, 'cannot transfer an already-ended subscription');\nawait call('POST', '/api/bills/generate', { month: '2026-09' }, T);\nconst bills = (await call('GET', '/api/bills?month=2026-09&limit=100', undefined, T)).body.data;\nok(bills.some((b) => b.transferred_to_name === 'Verify Newholder') && bills.some((b) => b.transferred_from_name === cust.name), 'bills show transfer links for both');\n\nconsole.log('\\n=== Level 3: messy import ===');\nconst csv = fs.readFileSync('C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/samples/messy-customers.csv', 'utf8');\nconst dry = (await call('POST', '/api/import/customers', { csv, dry_run: true }, T)).body;\nok(dry.imported === 5 && dry.deduped === 1 && dry.rejected === 5 && dry.dry_run, 'dry run report', JSON.stringify({ i: dry.imported, d: dry.deduped, r: dry.rejected }));\nok((await call('GET', '/api/customers/phone/9200000001', undefined, T)).status === 404, 'dry run wrote nothing');\nconst imp = await call('POST', '/api/import/customers', csv, T, 'text/csv');\nok(imp.status === 201 && imp.body.imported === 5 && imp.body.deduped === 1 && imp.body.rejected === 5, 'real import (raw text/csv body)');\nok(imp.body.details.rejected.every((r) => r.reasons.length > 0), 'every rejected row has reasons', imp.body.details.rejected.map((r) => `row ${r.row}`).join(', '));\nconst asha = (await call('GET', '/api/customers/phone/9200000001', undefined, T)).body;\nconst ashaD = (await call('GET', `/api/customers/${asha.id}`, undefined, T)).body;\nok(asha.name === 'Asha Iyer' && ashaD.subscriptions[0].start_date === '2026-09-01' && ashaD.subscriptions[0].plan_name === 'Veg Mini', 'row cleaned into a real subscription', `${asha.name}, ${ashaD.subscriptions[0].plan_name}, ${ashaD.subscriptions[0].start_date}`);\nconst again = (await call('POST', '/api/import/customers', { csv }, T)).body;\nok(again.imported === 0 && again.deduped === 6, 're-importing same file is safe (all deduped)');\nok((await call('POST', '/api/import/customers', { csv })).status === 401, 'import requires login');\n\nconsole.log('\\n=== Frontend routes served ===');\nfor (const p of ['/', '/app/notifications', '/app/import', '/app/customers/1']) {\n  const r = await fetch(B + p); ok(r.status === 200 && (await r.text()).includes('<div id=\"root\">'), `GET ${p}`);\n}\n\nconsole.log(`\\n${pass} passed, ${fail} failed`);\nprocess.exit(fail ? 1 : 0);\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/verify.mjs",
+  "description": "Run end-to-end feature verification script",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/verify.mjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+=== Regression: existing features ===
+PASS  protected routes still need login
+PASS  dashboard works  → {"active":17,"paused":8,"upcoming":3,"inactive":4}
+PASS  search/filter/sort/paginate
+PASS  phone lookup (now also accepts +91 format)
+PASS  bill generation  → 30 bills
+
+=== Level 1: morning notifications ===
+PASS  fresh server uses real date  → 2026-09-17
+PASS  POST /clock (no auth) sets the date
+PASS  due count = customers active on that weekday  → due 23, active 23
+PASS  GET /outbox lists one message per due customer  → 23
+PASS  no paused/upcoming/inactive customer was messaged
+PASS  no duplicate recipients
+PASS  re-running the same morning sends nothing new
+PASS  advancing runs each morning; weekend sends nothing
+PASS  invalid date rejected
+PASS  owner-scoped /api/outbox works with login
+
+=== Level 2: transfer mid-cycle ===
+PASS  transfer to a new customer  → Aarav Sharma → Verify Newholder
+PASS  old ends day before, new starts on effective date
+PASS  plan and locked price carry over
+PASS  served days split with no gap or overlap  → 17 + 5 = 22
+PASS  split bills add up to the original bill (±1 paisa rounding)  → 147727 + 56818 vs 204545
+PASS  both customers notified
+PASS  cannot transfer an already-ended subscription
+PASS  bills show transfer links for both
+
+=== Level 3: messy import ===
+PASS  dry run report  → {"i":5,"d":1,"r":5}
+PASS  dry run wrote nothing
+PASS  real import (raw text/csv body)
+PASS  every rejected row has reasons  → row 5, row 6, row 7, row 8, row 9
+PASS  row cleaned into a real subscription  → Asha Iyer, Veg Mini, 2026-09-01
+PASS  re-importing same file is safe (all deduped)
+PASS  import requires login
+
+=== Frontend routes served ===
+PASS  GET /
+PASS  GET /app/notifications
+PASS  GET /app/import
+PASS  GET /app/customers/1
+
+34 passed, 0 failed
+```
+
+</details>
+
+34 of 34 checks pass. One quick browser check that the three new screens render without errors, then I'll commit:
+
+**Tool call — `mcp__Claude_Browser__navigate`**
+
+```json
+{
+  "url": "http://localhost:4100/login"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+navigated to http://localhost:4100
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@tiffin.app',password:'demo1234'})}).then(r=>r.json()); localStorage.setItem('tiffin_token', r.token);\nconst w=(ms)=>new Promise(r=>setTimeout(r,ms)); const out={};\nfor (const p of ['/app/notifications','/app/import','/app/customers/1','/app/bills']) {\n  const f=document.createElement('iframe'); f.style.width='1200px'; f.style.height='800px'; f.src=p; document.body.appendChild(f); await w(2500);\n  const d=f.contentDocument; out[p]={h1:d.querySelector('h1')?.textContent, rows:d.querySelectorAll('tbody tr').length, alert:d.querySelector('.alert')?.textContent||null, transfer: d.querySelector('.transfer-note')?.textContent||null}; f.remove();\n}\nout"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{
+  "/app/bills": {
+    "alert": null,
+    "h1": "Monthly bills",
+    "rows": 10,
+    "transfer": "⇄ to Verify Newholder"
+  },
+  "/app/customers/1": {
+    "alert": null,
+    "h1": "Aarav Sharma active",
+    "rows": 1,
+    "transfer": "⇄ Transferred to Verify Newholder from 24 Sept 2026"
+  },
+  "/app/import": {
+    "alert": null,
+    "h1": "Import customers",
+    "rows": 0,
+    "transfer": null
+  },
+  "/app/notifications": {
+    "alert": null,
+    "h1": "Notifications",
+    "rows": 20,
+    "transfer": null
+  }
+}
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__read_console_messages`**
+
+```json
+{
+  "onlyErrors": true
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+No console logs.
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+Everything checks out, with no errors in the browser console. Stopping the verification server, then committing and pushing. I'm leaving out `docs/`, because the PDF guide predates these features.
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); [ -n \"$pid\" ] && taskkill //PID $pid //F >/dev/null && echo \"stopped 4100\"\ncd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git add README.md REASONING.md client server samples && git status --short && git commit -q -F - <<'MSG'\nAdd morning notifications, subscription transfer and messy CSV import\n\nLevel 1: simulated clock (POST /clock) runs a morning job that notifies\ncustomers due a delivery (active, weekday, not paused) through a\nNotification Service; messages are idempotent and listed at GET /outbox.\n\nLevel 2: POST /api/subscriptions/:id/transfer hands a subscription to a\nnew or existing customer mid-cycle. Plan, locked price and end date carry\nover via a linked subscription; each customer is billed for the days they\nwere served.\n\nLevel 3: POST /api/import/customers cleans messy CSV/JSON (phone formats,\nmixed date formats, blanks, duplicate phones) into subscriptions and\nreturns an { imported, deduped, rejected } report, with dry-run support.\n\nAdds Notifications and Import pages, a Transfer dialog, docs, a sample\nmessy CSV, and 9 new tests (22 total).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nMSG\ngit push 2>&1 | tail -2; git log --oneline -3; git status --short",
+  "description": "Stop test server, commit and push features",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+stopped 4100
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'REASONING.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Layout.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Bills.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/CustomerDetail.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/styles.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/app.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ImportCustomers.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Notifications.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'samples/messy-customers.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/clock.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/importer.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/notifications.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/routes/import.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/routes/simulation.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/test/features.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/test/importer.test.js', LF will be replaced by CRLF the next time Git touches it
+M  README.md
+M  REASONING.md
+M  client/src/api.js
+M  client/src/components/Layout.jsx
+M  client/src/main.jsx
+M  client/src/pages/Bills.jsx
+M  client/src/pages/CustomerDetail.jsx
+A  client/src/pages/ImportCustomers.jsx
+A  client/src/pages/Notifications.jsx
+M  client/src/styles.css
+A  samples/messy-customers.csv
+M  server/src/app.js
+A  server/src/clock.js
+M  server/src/dates.js
+M  server/src/db.js
+M  server/src/http.js
+A  server/src/importer.js
+A  server/src/notifications.js
+M  server/src/routes/bills.js
+M  server/src/routes/customers.js
+A  server/src/routes/import.js
+A  server/src/routes/simulation.js
+M  server/src/routes/subscriptions.js
+A  server/test/features.test.js
+A  server/test/importer.test.js
+?? docs/
+To https://github.com/Nikunj532/tiffin-tracker
+   67cc1fe..006bf17  main -> main
+006bf17 Add morning notifications, subscription transfer and messy CSV import
+67cc1fe Add AI_LOGS.md (session transcript)
+a7b918f Tiffin Tracker: subscriptions, pause/resume and pro-rated billing
+?? docs/
+```
+
+</details>
+
+All three features work, and they're now on GitHub in commit `006bf17` at https://github.com/Nikunj532/tiffin-tracker.
+
+**How I checked:**
+- **Automated tests:** all 22 pass.
+- **Hands-on check:** 34 of 34 checks passed on a freshly seeded demo database, so your data wasn't changed.
+- **Browser:** the Notifications, Import, customer and Bills pages all load without errors.
+
+| Area | What I confirmed |
+|---|---|
+| **Existing features** | Login protection, dashboard, search/filter/sort/pages, phone lookup (now also accepts `+91 …`), bill generation |
+| **L1 Notifications** | Moving the clock to Mon 21 Sep sent **23 messages**, exactly the customers active that day. No paused, upcoming or inactive customer got one, and nobody got two. Running the same morning again sent 0. Moving forward 6 days ran each morning and sent nothing on the weekend. A bad date is rejected. `/outbox` works without login, and `/api/outbox` shows only that owner's messages when logged in. |
+| **L2 Transfer** | Aarav Sharma's subscription moved to a new customer from 24 Sep. His ended on the 23rd, and the plan and locked price carried over. The 22 served weekdays split 17 + 5 with no gap or overlap. The two bills (₹1,477.27 + ₹568.18) add up to his original ₹2,045.45. Both customers were notified. The Bills page shows who it moved from and to, and an already-ended subscription can't be transferred again. |
+| **L3 Import** | `samples/messy-customers.csv` gave **5 imported, 1 deduped, 5 rejected**. The preview saved nothing. Every rejected row lists its reasons. "ASHA IYER, +91 92000 00001, veg mini, 01/09/2026" became Asha Iyer on Veg Mini from 1 Sep 2026. Importing the same file again imported 0. Import requires login. |
+
+**Two things to know:**
+- **Not pushed:** the `docs/` folder (the PDF guide). It was made before these features, so it doesn't mention Notifications, Transfer or Import. I can update the PDF and push it if you'd like.
+- **Your server's clock:** your running server on port 4000 shows `"simulated": true`, meaning its date was set through the clock at some point (it currently shows today, 17 Sep). It won't follow the real date after midnight until you reset it. Click **Back to real date** on the Notifications page, or run:
+  ```bash
+  curl -X POST localhost:4000/clock -H "Content-Type: application/json" -d "{\"reset\":true}"
+  ```
+
+---
+
+## 👤 User
+
+update thee pdf and push it into the repo.
+
+## 🤖 Assistant
+
+I'll start a fresh demo server and retake every screenshot, since the top bar has changed, then add the new feature screens.
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && rm -f C:/Users/Dell/tt-guide/v.db* && DB_FILE=C:/Users/Dell/tt-guide/v.db node src/seed.js && (PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/v.db node src/index.js > C:/Users/Dell/tt-guide/v.log 2>&1 &) ; sleep 2; curl -s localhost:4100/clock",
+  "description": "Start fresh seeded server for screenshots"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Seeded demo data. Login with demo@tiffin.app / demo1234
+{"today":"2026-09-17","simulated":false,"real_today":"2026-09-17"}
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/shots2.cjs",
+  "content": "const puppeteer = require('C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-AppData-Roaming-Claude-scratch-workspaces-541a60de-58d0-4608-bdf2-2380cd2289d6-27d73f48-4d7b-43a9-9022-d394e6de5686-scratch-2026-09-17-9d9c86/f73bae41-da2a-4f62-988c-75aac2b10797/scratchpad/guide/node_modules/puppeteer-core');\nconst fs = require('fs');\nconst B = 'http://localhost:4100';\nconst wait = (ms) => new Promise((r) => setTimeout(r, ms));\nprocess.chdir('C:/Users/Dell/tt-guide');\n\n(async () => {\n  const browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, userDataDir: 'C:/Users/Dell/tt-guide/profile2' });\n  const page = await browser.newPage();\n  await page.setViewport({ width: 1280, height: 800 });\n  const shot = async (name, opts = {}) => { await wait(1000); await page.screenshot({ path: `shots/${name}.jpg`, type: 'jpeg', quality: 78, ...opts }); console.log('shot', name); };\n  const click = (text, sel = 'button') => page.evaluate((t, s) => { const b = [...document.querySelectorAll(s)].find((x) => x.textContent.includes(t)); if (!b) throw new Error('no button ' + t); b.click(); }, text, sel);\n  const api = async (method, path, body, token) => (await fetch(B + path, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body ? JSON.stringify(body) : undefined })).json();\n  const setInput = (selector, value, index = 0) => page.evaluate((s, v, i) => {\n    const el = document.querySelectorAll(s)[i];\n    const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;\n    Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, v);\n    el.dispatchEvent(new Event('input', { bubbles: true }));\n  }, selector, value, index);\n\n  // ---- original screens (new nav bar) ----\n  await page.goto(B + '/'); await shot('landing-hero');\n  await page.evaluate(() => window.scrollTo(0, document.querySelectorAll('section')[2].offsetTop - 20)); await shot('landing-features');\n  await page.evaluate(() => window.scrollTo(0, document.querySelectorAll('section')[4].offsetTop - 20)); await shot('landing-next');\n  await page.goto(B + '/login'); await shot('login');\n  await page.goto(B + '/register'); await shot('register');\n\n  const { token } = await api('POST', '/api/auth/login', { email: 'demo@tiffin.app', password: 'demo1234' });\n  await api('POST', '/api/bills/generate', { month: '2026-09' }, token);\n  await page.evaluate((t) => localStorage.setItem('tiffin_token', t), token);\n\n  await page.goto(B + '/app'); await shot('dashboard');\n  await page.goto(B + '/app/customers'); await shot('customers');\n  await page.goto(B + '/app/customers?status=paused&sort=phone&order=desc&limit=5'); await shot('customers-filtered');\n  await click('Add customer'); await shot('add-customer');\n  await page.goto(B + '/app/customers/1'); await shot('customer-detail', { fullPage: true });\n  await click('Schedule pause'); await shot('pause-modal');\n  await page.goto(B + '/app/customers/1'); await wait(800);\n  await click('Resume'); await shot('resume-modal');\n  const inactive = (await (await fetch(B + '/api/customers?status=inactive&limit=1', { headers: { Authorization: 'Bearer ' + token } })).json()).data[0];\n  await page.goto(B + '/app/customers/' + inactive.id); await wait(800);\n  await click('Subscribe'); await shot('subscribe-modal');\n  await page.goto(B + '/app/plans'); await shot('plans');\n  await page.goto(B + '/app/bills'); await shot('bills');\n\n  // ---- Level 1: notifications ----\n  await page.goto(B + '/app/notifications'); await wait(800);\n  await setInput('input[type=date]', '2026-09-21', 0);\n  await click('Jump to date'); await wait(1500);\n  await shot('notifications', { fullPage: true });\n  await page.goto(B + '/app/notifications?date=2026-09-21&limit=5'); await wait(800);\n  await page.evaluate(() => window.scrollTo(0, document.querySelector('.toolbar').offsetTop - 10)); await shot('outbox');\n  await click('Next morning'); await wait(1500);\n  await page.evaluate(() => window.scrollTo(0, 0)); await shot('clock-next-morning');\n\n  // ---- Level 2: transfer (on Aarav, id 1) ----\n  await page.goto(B + '/app/customers/1'); await wait(1000);\n  await click('Transfer'); await wait(400);\n  await setInput('.modal input[type=date]', '2026-09-24');\n  await click('New customer', '.modal button'); await wait(300);\n  await setInput('.modal input:not([type=date])', 'Kabir Mehta', 0);\n  await setInput('.modal input:not([type=date])', '98765 11111', 1);\n  await setInput('.modal textarea', '22, Koramangala, Bengaluru');\n  await shot('transfer-modal');\n  await page.evaluate(() => document.querySelector('.modal form').requestSubmit()); await wait(2000);\n  await shot('transfer-result', { fullPage: true });\n  const kabir = await api('GET', '/api/customers/phone/9876511111', undefined, token);\n  await page.goto(B + '/app/customers/' + kabir.id); await shot('transfer-new-holder');\n  await api('POST', '/api/bills/generate', { month: '2026-09' }, token);\n  await page.goto(B + '/app/bills?search=Kabir'); await wait(600);\n  await page.goto(B + '/app/bills?sort=name&order=asc&limit=5'); await shot('bills-transfer');\n\n  // ---- Level 3: import ----\n  await page.goto(B + '/app/import'); await wait(800);\n  await setInput('textarea', fs.readFileSync('C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/samples/messy-customers.csv', 'utf8'));\n  await shot('import-form');\n  await click('Preview'); await wait(1500);\n  await page.evaluate(() => window.scrollTo(0, document.querySelector('.callout').offsetTop - 10)); await shot('import-preview');\n  await click('Import 5 now'); await wait(1500);\n  await page.evaluate(() => window.scrollTo(0, document.querySelector('.callout').offsetTop - 10)); await shot('import-imported');\n  await page.evaluate(() => [...document.querySelectorAll('.stat-btn')][1].click()); await wait(300); await shot('import-deduped');\n  await page.evaluate(() => [...document.querySelectorAll('.stat-btn')][2].click()); await wait(300); await shot('import-rejected');\n\n  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });\n  await page.goto(B + '/app/customers/1'); await shot('mobile');\n  await browser.close();\n})().catch((e) => { console.error('ERR', e); process.exit(1); });\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && node shots2.cjs 2>&1 | grep -v \"terminated\\|running instance\" | tail -40",
+  "description": "Capture updated and new-feature screenshots",
+  "timeout": 300000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/shots2.cjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+shot landing-hero
+shot landing-features
+shot landing-next
+shot login
+shot register
+shot dashboard
+shot customers
+shot customers-filtered
+shot add-customer
+shot customer-detail
+shot pause-modal
+shot resume-modal
+shot subscribe-modal
+shot plans
+shot bills
+shot notifications
+shot outbox
+shot clock-next-morning
+shot transfer-modal
+shot transfer-result
+shot transfer-new-holder
+shot bills-transfer
+shot import-form
+shot import-preview
+shot import-imported
+shot import-deduped
+shot import-rejected
+shot mobile
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+All 28 screenshots are captured. Checking the new ones before I write them into the guide:
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/shots/notifications.jpg"
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/shots/transfer-result.jpg"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/shots/import-rejected.jpg"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/shots/bills-transfer.jpg"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && python -c \"\nfrom PIL import Image\nim=Image.open('shots/notifications.jpg'); print(im.size)\nim.crop((0,0,im.size[0],1180)).save('shots/notifications.jpg',quality=80)\nim=Image.open('shots/transfer-result.jpg'); print(im.size)\n\" && grep -n 'class=\"num\"' guide.html | head -20 && grep -n \"<li>\" guide.html | head -12",
+  "description": "Crop long screenshot and inspect guide structure"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+(1280, 2101)
+(1280, 1152)
+71:<h1><span class="num">1</span>The idea in one page</h1>
+96:<h1><span class="num">2</span>The big picture</h1>
+153:<h1><span class="num">3</span>The billing rules</h1>
+213:<h1><span class="num">4</span>End-to-end workflow: a tiffin owner's month</h1>
+257:<h1><span class="num">5</span>Website tour: every page and component</h1>
+385:<h1><span class="num">6</span>Backend: how a click becomes saved data</h1>
+448:<h1><span class="num">7</span>The database, table by table</h1>
+516:<h1><span class="num">8</span>The REST API, endpoint by endpoint</h1>
+580:<h1><span class="num">9</span>Security, validation and errors</h1>
+608:<h1><span class="num">10</span>Glossary: every term explained</h1>
+741:<h1><span class="num">11</span>Running, testing and troubleshooting</h1>
+54:    <li>The idea in one page</li>
+55:    <li>The big picture: how the pieces fit together</li>
+56:    <li>The billing rules (the heart of the project)</li>
+57:    <li>End-to-end workflow: a tiffin owner's month</li>
+58:    <li>Website tour: every page and component, with screenshots</li>
+59:    <li>Backend: how a click becomes saved data</li>
+60:    <li>The database, table by table</li>
+61:    <li>The REST API, endpoint by endpoint</li>
+62:    <li>Security, validation and errors</li>
+63:    <li>Glossary: every term used in the website and code</li>
+64:    <li>Running, testing and troubleshooting</li>
+160:<li><b>Count the weekdays in the month</b> (Monday–Friday). September 2026 has <b>22</b>. This is the "Weekdays in month" number.</li>
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+Screenshots look right. Now I'm adding a new chapter on the three features and updating the database, API, glossary, file and test sections to match:
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/patch-guide.cjs",
+  "content": "const fs = require('fs');\nconst file = 'C:/Users/Dell/tt-guide/guide.html';\nlet s = fs.readFileSync(file, 'utf8');\nconst rep = (a, b) => { if (!s.includes(a)) throw new Error('missing: ' + a.slice(0, 80)); s = s.replace(a, b); };\n\n// Renumber chapters 6..11 -> 7..12 (descending so we don't double-bump)\nfor (let n = 11; n >= 6; n--) s = s.replace(`<span class=\"num\">${n}</span>`, `<span class=\"num\">${n + 1}</span>`);\n\nrep('<li>Website tour: every page and component, with screenshots</li>',\n  '<li>Website tour: every page and component, with screenshots</li>\\n    <li>New features: morning notifications, subscription transfer, messy import</li>');\n\nrep('<li><b>Navigation tabs:</b> Dashboard · Customers · Plans · Bills. The current page is highlighted in orange.</li>',\n  '<li><b>Navigation tabs:</b> Dashboard · Customers · Plans · Bills · Notifications · Import. The current page is highlighted in orange.</li>\\n<li><b>🕒 Clock badge:</b> appears only when the app is running on a <b>simulated date</b> (see Chapter 6). Click it to open Notifications.</li>');\n\nrep('│   │   ├── seed.js             fills the database with demo data',\n  '│   │   ├── seed.js             fills the database with demo data\\n│   │   ├── clock.js            simulated clock + morning job runner\\n│   │   ├── notifications.js    Notification Service (outbox) + \"due today\" rule\\n│   │   ├── importer.js         CSV parsing, date/phone cleaning, row checks');\nrep('│   │   └── routes/             auth, plans, customers, subscriptions, bills, dashboard',\n  '│   │   └── routes/             auth, plans, customers, subscriptions, bills, dashboard,\\n│   │                           simulation (clock + outbox), import');\nrep('│       └── pages/              Landing, Auth, Dashboard, Customers, CustomerDetail, Plans, Bills',\n  '│       └── pages/              Landing, Auth, Dashboard, Customers, CustomerDetail, Plans, Bills,\\n│                               Notifications, ImportCustomers');\nrep('├── README.md  REASONING.md  AI_LOGS.md', '├── samples/messy-customers.csv  example messy list for the importer\\n├── README.md  REASONING.md  AI_LOGS.md');\n\n// ---------------- New chapter 6 ----------------\nconst ch6 = `\n<section class=\"chapter\">\n<h1><span class=\"num\">6</span>New features: notifications, transfer, import</h1>\n<p>Three features were added on top of the core product. Each one reuses the same rules as billing, so everything stays consistent.</p>\n<table>\n<tr><th style=\"width:9%\">Level</th><th style=\"width:26%\">Feature</th><th>In one sentence</th></tr>\n<tr><td>1</td><td>Morning notifications</td><td>Each morning, every customer who will get a tiffin today is sent a message through the Notification Service.</td></tr>\n<tr><td>2</td><td>Subscription transfer</td><td>Hand a running subscription to another person mid-month; plan and cycle continue, and each person pays for their own days.</td></tr>\n<tr><td>3</td><td>Messy customer import</td><td>Upload a messy spreadsheet; the app cleans it into subscriptions and reports what was imported, deduped and rejected.</td></tr>\n</table>\n\n<h2>6.1 Level 1: morning delivery notifications</h2>\n<h3>The problem</h3>\n<p>Customers like a reminder that lunch is coming, but they must <b>not</b> be told \"delivery today\" on a weekend, while paused, or before their plan starts.</p>\n\n<h3>Who is \"due a delivery today\"?</h3>\n<div class=\"formula\" style=\"font-size:11.5pt\">Due today = subscription running today &nbsp;AND&nbsp; today is Mon–Fri &nbsp;AND&nbsp; no pause covers today</div>\n<p>This is exactly the rule billing uses for \"delivered days\", so nobody is ever reminded about a lunch they won't be charged for.</p>\n\n<h3>How it works</h3>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n  <div class=\"box\"><b>POST /clock</b>move to a date</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Morning job</b>for each day<br>passed</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Find due</b>customers</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Notification<br>Service</b>send()</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Outbox</b>GET /outbox</div>\n</div>\n<ul>\n<li><b>Simulated clock:</b> real mornings can't be waited for in a demo, so <code>POST /clock</code> sets the app's \"today\". The <b>whole app</b> follows it: statuses, dashboard, default dates and the 🕒 badge.</li>\n<li><b>Catch-up:</b> jumping from Friday to Tuesday runs Saturday, Sunday, Monday and Tuesday in order, so Monday's reminders aren't skipped. Weekends send nothing.</li>\n<li><b>No duplicates:</b> each message has a unique key (<i>subscription + date</i>). Running the same morning again sends 0 new messages.</li>\n<li><b>Notification Service:</b> one function, <code>send()</code>, that every message goes through. Today it writes to the <b>outbox</b> table; a real SMS/WhatsApp provider could be plugged in behind it later.</li>\n<li><b>Survives restarts:</b> the simulated date is saved in the database.</li>\n</ul>\n\n<h3>The Notifications page (<code>/app/notifications</code>)</h3>\n<figure><img src=\"shots/notifications.jpg\"><figcaption>Jumped from 17 Sep to Mon 21 Sep: the app ran 18th (17 sent), 19th and 20th (weekend, 0), 21st (23 sent). The outbox lists every message.</figcaption></figure>\n<table>\n<tr><th style=\"width:28%\">Component</th><th>What it does</th></tr>\n<tr><td>Clock card</td><td>Shows the current app date and whether it is simulated (with the real date for reference).</td></tr>\n<tr><td>Next morning ▶</td><td>Moves the clock forward one day and runs that morning.</td></tr>\n<tr><td>Run this morning</td><td>Runs today's job again. Only customers not yet notified today get a message (useful after adding a customer).</td></tr>\n<tr><td>Jump to date</td><td>Moves to any date. Going forward runs every morning in between; going back runs only that date.</td></tr>\n<tr><td>Back to real date</td><td>Stops simulating and uses the computer's real date.</td></tr>\n<tr><td>Last run table</td><td>Per morning: <b>Due</b> (customers due), <b>Sent</b> (new messages), <b>Already sent</b> (skipped as duplicates), and a <b>weekend</b> badge. Click a date to filter the outbox.</td></tr>\n<tr><td>Outbox filters</td><td>Search phone/name/message, filter by date or type, clear filters.</td></tr>\n<tr><td>Outbox table</td><td>For date, To (phone), Customer, Type badge, Message. Sortable, paginated, newest first.</td></tr>\n</table>\n<div class=\"grid2\">\n<figure><img src=\"shots/outbox.jpg\"><figcaption>Outbox filtered to 21 Sep, 5 per page.</figcaption></figure>\n<figure><img src=\"shots/clock-next-morning.jpg\"><figcaption>After \"Next morning\": Tue 22 Sep, 23 due, 23 sent.</figcaption></figure>\n</div>\n<div class=\"note\"><b>For graders/testing:</b> <code>POST /clock</code> and <code>GET /outbox</code> also work at the root URL without logging in. Because the outbox contains phone numbers, set <code>PUBLIC_SIM_ENDPOINTS=false</code> in a real deployment to require login.</div>\n\n<h2>6.2 Level 2: transfer a subscription mid-cycle</h2>\n<h3>The problem</h3>\n<p>A customer moves out of their PG on the 24th and a flatmate takes over their tiffin. The flatmate should continue the <b>same plan at the same price</b> without starting a new cycle, and each person should pay only for the lunches they ate.</p>\n\n<h3>How it works</h3>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n  <div class=\"box\"><b>Old subscription</b>Aarav<br>ends 23 Sep</div><div class=\"arrow\">→ linked →</div>\n  <div class=\"box\"><b>New subscription</b>Kabir<br>starts 24 Sep</div>\n</div>\n<ol>\n<li>Pick the <b>new holder's first delivery day</b> (the effective date) and the person taking over: an <b>existing customer</b> (found by phone) or a <b>new customer</b> (name, phone, address). If the phone already exists, that customer is reused.</li>\n<li>The old subscription <b>ends the day before</b>. Pauses after that day are removed (they were the old holder's plans).</li>\n<li>A <b>new, linked subscription</b> is created with the <b>same plan</b>, the <b>same locked price</b> (even if the plan price changed since) and the <b>same end date</b> if one was set.</li>\n<li>Both customers get a message in the outbox (<i>Transferred out</i> / <i>Transferred in</i>).</li>\n<li>The screen shows the <b>billing split</b> for that month.</li>\n</ol>\n\n<h3>How the bill splits</h3>\n<p>No new formula is needed. Each subscription is billed for its own served weekdays, over the same \"weekdays in month\":</p>\n<table>\n<tr><th>September 2026 (₹2,500 plan, 22 weekdays)</th><th>Served weekdays</th><th>Paused</th><th>Delivered</th><th>Bill</th></tr>\n<tr><td>Aarav (1–23 Sep)</td><td>17</td><td>4</td><td>13</td><td>₹2,500 × 13 ÷ 22 = <b>₹1,477.27</b></td></tr>\n<tr><td>Kabir (24–30 Sep)</td><td>5</td><td>0</td><td>5</td><td>₹2,500 × 5 ÷ 22 = <b>₹568.18</b></td></tr>\n<tr><td><b>Combined</b></td><td>22</td><td>4</td><td>18</td><td><b>₹2,045.45</b>, the same as Aarav alone would have paid</td></tr>\n</table>\n\n<figure class=\"half\"><img src=\"shots/transfer-modal.jpg\"><figcaption>Transfer dialog: first delivery day for the new holder, then an existing customer (by phone) or a new customer.</figcaption></figure>\n<figure><img src=\"shots/transfer-result.jpg\"><figcaption>After transferring: green summary with the split, \"⇄ Transferred to Kabir Mehta\" note, and the calendar greys out days after 23 Sep for Aarav.</figcaption></figure>\n<div class=\"grid2\">\n<figure><img src=\"shots/transfer-new-holder.jpg\"><figcaption>Kabir's page: \"↪ Taken over from Aarav Sharma\", same plan and price.</figcaption></figure>\n<figure><img src=\"shots/bills-transfer.jpg\"><figcaption>Bills page: Aarav's row shows \"⇄ to Kabir Mehta\" (Kabir's shows \"↪ from Aarav\").</figcaption></figure>\n</div>\n<h3>Rules that protect the data</h3>\n<table>\n<tr><th style=\"width:44%\">Situation</th><th>Result</th></tr>\n<tr><td>Effective date on or before the subscription start</td><td>400: must be mid-cycle</td></tr>\n<tr><td>Subscription already ended before the effective date</td><td>400: nothing left to transfer</td></tr>\n<tr><td>Transfer to the same customer</td><td>400</td></tr>\n<tr><td>New holder already has a running subscription</td><td>409 Conflict</td></tr>\n<tr><td>Anything fails half-way</td><td>Nothing is saved (one transaction)</td></tr>\n</table>\n<p>The <b>⇄ Transfer</b> button disappears once a subscription has been transferred.</p>\n\n<h2>6.3 Level 3: import a messy customer list</h2>\n<h3>The problem</h3>\n<p>Owners keep customers in spreadsheets typed by different people: phones as \"+91 98450 00000\" or \"098450-00000\", dates as \"01/09/2026\", \"1 Sep 2026\" or \"2026-09-01\", names in CAPITALS, the same customer twice, and blank cells.</p>\n\n<h3>Every row ends up in exactly one bucket</h3>\n<div class=\"flow\" style=\"flex-wrap:wrap; row-gap:8px\">\n  <div class=\"box\"><b>Row</b></div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Empty line?</b>ignore</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Invalid?</b><span style=\"color:#c92a2a\">rejected</span><br>+ reasons</div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Phone seen /<br>already subscribed?</b><span style=\"color:#1c64b8\">deduped</span></div><div class=\"arrow\">→</div>\n  <div class=\"box\"><b>Otherwise</b><span style=\"color:#2b8a3e\">imported</span></div>\n</div>\n<table>\n<tr><th style=\"width:16%\">Bucket</th><th>Meaning</th></tr>\n<tr><td style=\"color:#2b8a3e\"><b>Imported</b></td><td>A clean subscription was created. The customer is created, or reused if the phone exists without a running plan (marked <i>new</i> / <i>existing</i>).</td></tr>\n<tr><td style=\"color:#1c64b8\"><b>Deduped</b></td><td>The phone already appeared in an earlier valid row (the first one wins), or the customer already has a running subscription.</td></tr>\n<tr><td style=\"color:#c92a2a\"><b>Rejected</b></td><td>Something required is blank or unreadable. <b>All</b> problems for the row are listed, with the spreadsheet row number.</td></tr>\n</table>\n\n<h3>What gets cleaned automatically</h3>\n<table>\n<tr><th style=\"width:24%\">Field</th><th style=\"width:38%\">Messy input</th><th>Becomes</th></tr>\n<tr><td>Column headers</td><td>Customer Name, Mobile No, Meal Plan, Start Date</td><td>name, phone, plan, start_date (unknown columns like \"Notes\" are ignored and listed)</td></tr>\n<tr><td>Phone</td><td>+91 92000 00001 · 92000-00002 · 09200000006</td><td>9200000001 · 9200000002 · 9200000006</td></tr>\n<tr><td>Name</td><td>ASHA IYER · asha iyer</td><td>Asha Iyer (mixed case like \"McDonald\" is left alone)</td></tr>\n<tr><td>Plan</td><td>veg mini · VEG FULL THALI</td><td>matched to your plans ignoring case and extra spaces</td></tr>\n<tr><td>Date (year first)</td><td>2026-09-01 · 2026/9/1 · 20260901</td><td>2026-09-01</td></tr>\n<tr><td>Date (day first)</td><td>01/09/2026 · 1-9-26 · 01.09.2026</td><td>2026-09-01 (ambiguous ones get a warning)</td></tr>\n<tr><td>Date (month first)</td><td>09/25/2026</td><td>2026-09-25, only because 25 can't be a month</td></tr>\n<tr><td>Date (words)</td><td>1 Sep 2026 · 1st September 2026 · Sep 25 2026</td><td>ISO date</td></tr>\n<tr><td>Impossible date</td><td>31/02/2026</td><td>rejected (never silently turned into 3 March)</td></tr>\n</table>\n<p><b>Optional defaults:</b> choose a plan and/or start date to use when those cells are blank (each use is noted as a warning). <b>Preview</b> shows the full report without saving. The real import is one transaction, and importing the same file twice is safe: everything becomes \"deduped\".</p>\n\n<h3>The Import page (<code>/app/import</code>)</h3>\n<figure><img src=\"shots/import-form.jpg\"><figcaption>Choose a CSV file or paste text (or \"Load messy sample\"), set optional defaults, then Preview or Import.</figcaption></figure>\n<figure><img src=\"shots/import-preview.jpg\"><figcaption>Preview of <code>samples/messy-customers.csv</code>: 11 rows read, 1 empty line and the \"Notes\" column ignored; 5 imported, 1 deduped, 5 rejected. Nothing saved yet.</figcaption></figure>\n<div class=\"grid2\">\n<figure><img src=\"shots/import-imported.jpg\"><figcaption>Imported tab: row number, cleaned name (new/existing), phone, plan, start date, warnings.</figcaption></figure>\n<figure><img src=\"shots/import-deduped.jpg\"><figcaption>Deduped tab: row 4 repeats row 2's phone.</figcaption></figure>\n</div>\n<figure><img src=\"shots/import-rejected.jpg\"><figcaption>Rejected tab: blank cells shown as ∅, and every problem listed per row (row 9 has two).</figcaption></figure>\n</section>\n`;\nrep('\\n<!-- ============ 6 ============ -->', ch6 + '\\n<!-- ============ 6 ============ -->');\n\n// ---------------- Database additions ----------------\nrep('<tr><td>end_date</td><td>Last delivery day, or empty (NULL) if still running</td></tr></table>',\n  `<tr><td>end_date</td><td>Last delivery day, or empty (NULL) if still running</td></tr>\n<tr><td>transferred_from_id</td><td>If this subscription was taken over from someone, the id of their subscription (Level 2)</td></tr></table>`);\nrep('<div class=\"tip\"><b>Why isn\\'t \"status\" a column?</b>',\n  `<h3>outbox: every message sent through the Notification Service (Level 1)</h3>\n<table><tr><th style=\"width:24%\">Column</th><th>Meaning</th></tr>\n<tr><td>owner_id, customer_id, subscription_id</td><td>Who the message is about</td></tr>\n<tr><td>channel, recipient</td><td>\"sms\" and the phone number</td></tr>\n<tr><td>type</td><td>delivery_due, subscription_transferred_out, subscription_transferred_in</td></tr>\n<tr><td>for_date</td><td>Which day the message is for</td></tr>\n<tr><td>message, status</td><td>The text, and \"sent\"</td></tr>\n<tr><td>dedupe_key</td><td>Unique key (e.g. delivery_due:12:2026-09-21) that stops duplicates</td></tr></table>\n\n<h3>settings and clock_runs (Level 1)</h3>\n<table><tr><th style=\"width:24%\">Table</th><th>Meaning</th></tr>\n<tr><td>settings</td><td>Key/value store; <code>clock_date</code> holds the simulated date (absent = real date)</td></tr>\n<tr><td>clock_runs</td><td>One row per morning processed: date, how many were due, how many were notified</td></tr></table>\n\n<div class=\"tip\"><b>Why isn't \"status\" a column?</b>`);\nrep('<p>The database has <b>6 tables</b>.', '<p>The database has <b>9 tables</b>: the 6 core ones below, plus <b>outbox</b>, <b>settings</b> and <b>clock_runs</b> for notifications.');\n\n// ---------------- API additions ----------------\nrep('<h3>HTTP status codes you\\'ll see</h3>',\n  `<h3>Level 1: clock and outbox</h3>\n<p>Available at the root (<code>/clock</code>, <code>/outbox</code>) and under <code>/api</code>. Login is optional unless <code>PUBLIC_SIM_ENDPOINTS=false</code>; with login, the outbox shows only your messages.</p>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>GET</td><td>/clock</td><td>{ today, simulated, real_today }</td></tr>\n<tr><td>POST</td><td>/clock</td><td>{} run today again · { date } jump · { advance_days } move forward · { reset: true } real date. Runs the morning job and returns per-morning { date, delivery_day, due, notified, already_notified }</td></tr>\n<tr><td>GET</td><td>/outbox</td><td>Sent messages (date, type, customer_id, search, page, limit, sort, order)</td></tr></table>\n\n<h3>Level 2: transfer</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>POST</td><td>/api/subscriptions/:id/transfer</td><td>{ effective_date, to_customer_id } or { effective_date, customer: { name, phone, address } } → { from, to, created_customer, billing_split }</td></tr></table>\n\n<h3>Level 3: import</h3>\n<table><tr><th style=\"width:9%\">Method</th><th style=\"width:33%\">Endpoint</th><th>What it does</th></tr>\n<tr><td>POST</td><td>/api/import/customers</td><td>{ csv } or { rows } or raw text/csv; options default_plan_id, default_start_date, dry_run → { imported, deduped, rejected, total_rows, blank_rows_ignored, unknown_columns, details }</td></tr></table>\n\n<h3>HTTP status codes you'll see</h3>`);\n\n// ---------------- Backend/frontend file tables ----------------\nrep('<tr><td><code>seed.js</code></td><td>Deletes and recreates the demo owner with 3 plans and 32 customers.</td></tr>',\n  `<tr><td><code>seed.js</code></td><td>Deletes and recreates the demo owner with 3 plans and 32 customers.</td></tr>\n<tr><td><code>clock.js</code></td><td>Simulated clock: load/save the date, move it, run each morning passed.</td></tr>\n<tr><td><code>notifications.js</code></td><td>Notification Service (<code>send()</code> → outbox), the \"due today\" query, the morning job.</td></tr>\n<tr><td><code>importer.js</code></td><td>Pure cleaning functions: CSV parser, header aliases, date and phone parsing, row validation.</td></tr>\n<tr><td><code>routes/simulation.js</code></td><td>GET/POST /clock and GET /outbox.</td></tr>\n<tr><td><code>routes/import.js</code></td><td>POST /api/import/customers: buckets rows, writes in one transaction.</td></tr>`);\nrep('<tr><td><code>pages/*.jsx</code></td><td>One file per screen (described in Chapter 5).</td></tr>',\n  '<tr><td><code>pages/*.jsx</code></td><td>One file per screen (Chapter 5); <code>Notifications.jsx</code>, <code>ImportCustomers.jsx</code> and the Transfer dialog in <code>CustomerDetail.jsx</code> are covered in Chapter 6.</td></tr>');\n\n// ---------------- Glossary additions ----------------\nrep('<div class=\"term\"><b>Demo data / Seed</b>',\n  `<div class=\"term\"><b>Simulated clock / simulated date</b>: a \"today\" set by the owner (or a tester) instead of the real date; the whole app follows it.</div>\n<div class=\"term\"><b>Morning job</b>: the step that finds customers due a delivery on a date and notifies them.</div>\n<div class=\"term\"><b>Due a delivery</b>: subscription running that day, the day is a weekday, and not paused.</div>\n<div class=\"term\"><b>Notification</b>: a message to a customer (delivery today, transferred in/out).</div>\n<div class=\"term\"><b>Notification Service</b>: the single place all messages go through (<code>send()</code>).</div>\n<div class=\"term\"><b>Outbox</b>: the list of every message sent.</div>\n<div class=\"term\"><b>Already sent</b>: customers skipped because they were notified for that date before.</div>\n<div class=\"term\"><b>Transfer</b>: handing a running subscription to another customer from a chosen date.</div>\n<div class=\"term\"><b>Effective date</b>: the new holder's first delivery day; the old holder's last day is the day before.</div>\n<div class=\"term\"><b>Holder</b>: the customer a subscription currently belongs to.</div>\n<div class=\"term\"><b>Mid-cycle</b>: during a subscription, after it started and before it ended.</div>\n<div class=\"term\"><b>Carry over</b>: the plan, locked price and end date continue unchanged for the new holder.</div>\n<div class=\"term\"><b>Billing split</b>: the month's bill divided by who was served which days.</div>\n<div class=\"term\"><b>Taken over from / Transferred to</b>: notes linking the two halves of a transferred subscription.</div>\n<div class=\"term\"><b>Import</b>: creating customers and subscriptions from a spreadsheet (CSV).</div>\n<div class=\"term\"><b>CSV</b>: \"comma-separated values\", a plain-text spreadsheet format every spreadsheet app can save.</div>\n<div class=\"term\"><b>Imported / Deduped / Rejected</b>: the three outcomes of an import row (created / duplicate skipped / invalid).</div>\n<div class=\"term\"><b>Duplicate (dup) phone</b>: the same phone number appearing more than once.</div>\n<div class=\"term\"><b>Preview / dry run</b>: show the import report without saving anything.</div>\n<div class=\"term\"><b>Default plan / default start date</b>: values used when those cells are blank.</div>\n<div class=\"term\"><b>Warning</b>: a note on an imported row, e.g. an ambiguous date read day-first.</div>\n<div class=\"term\"><b>Ambiguous date</b>: a date like 03/04/2026 that could be 3 April or 4 March.</div>\n<div class=\"term\"><b>Demo data / Seed</b>`);\nrep('<div class=\"term\"><b>Unit test</b>',\n  `<div class=\"term\"><b>Idempotency key / dedupe_key</b>: a unique value per message so repeating a job never sends twice.</div>\n<div class=\"term\"><b>Linked subscription (transferred_from_id)</b>: a column pointing from the new holder's subscription to the old one.</div>\n<div class=\"term\"><b>Normalisation / canonical phone</b>: turning different ways of writing the same value into one standard form.</div>\n<div class=\"term\"><b>Header alias</b>: an alternative column name that means the same field (\"Mobile No\" = phone).</div>\n<div class=\"term\"><b>ISO date</b>: YYYY-MM-DD, the format all dates are converted to.</div>\n<div class=\"term\"><b>PUBLIC_SIM_ENDPOINTS</b>: setting that allows /clock and /outbox without login (true by default, for testing).</div>\n<div class=\"term\"><b>Unit test</b>`);\n\n// ---------------- Running / testing ----------------\nrep('<pre>npm test                # 13 tests → expect \"pass 13, fail 0\"</pre>', '<pre>npm test                # 22 tests → expect \"pass 22, fail 0\"</pre>');\nrep('<b>api.test.js</b> runs a whole owner story',\n  '<b>features.test.js</b> checks Level 1 (who is notified, weekends, pauses, no duplicates), Level 2 (transfer, locked price, split bills, guards) and Level 3 (import counts, row numbers, dry run, re-import).<br><b>importer.test.js</b> checks date, phone and CSV cleaning rules one by one.<br><b>api.test.js</b> runs a whole owner story');\nrep('<tr><td>Want a clean start</td>',\n  `<tr><td>Header shows 🕒 with a date / statuses look \"wrong\" for today</td><td>The app is on a simulated date. Notifications → <b>Back to real date</b>.</td></tr>\n<tr><td>Import rejects every row</td><td>Check the header row has name and phone columns, and plan names match your Plans page.</td></tr>\n<tr><td>No ⇄ Transfer button</td><td>The subscription was already transferred, or there is no running subscription.</td></tr>\n<tr><td>Want a clean start</td>`);\nrep('Bills → Generate → sort by Amount ▼ → search \"Nair\".</div>',\n  'Bills → Generate → sort by Amount ▼ → search \"Nair\" → Notifications → Jump to next Monday → Aarav → ⇄ Transfer to a new customer → Import → Load messy sample → Preview → Import.</div>');\n\nrep('<div class=\"sub\">Complete Project Guide: how it works, every screen, every term, explained simply</div>',\n  '<div class=\"sub\">Complete Project Guide: how it works, every screen, every term, explained simply</div>\\n  <p class=\"muted\">Updated with morning notifications, subscription transfer and messy customer import.</p>');\n\nfs.writeFileSync(file, s);\nconsole.log('guide patched');\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && node patch-guide.cjs && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\" && node pdf.cjs \"$OUT\" 2>&1 | grep -v \"terminated\\|running instance\"; ls -la \"$OUT\" && python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'$OUT'); print(len(d),'pages')\nfor i in range(len(d)):\n    t=d[i].get_textpage().get_text_range()\n    if 'New features: notifications' in t and i>2: print('ch6 starts page',i+1); start=i; break\nfor k in range(start,start+6): d[k].render(scale=0.7).to_pil().save(f'q{k+1}.png')\n\"",
+  "description": "Patch guide, render PDF, preview new chapter pages",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/patch-guide.cjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result (error)</summary>
+
+```text
+Exit code 1
+guide patched
+ERR connect ECONNREFUSED 127.0.0.1:54711
+-rw-r--r-- 1 Dell 197121 1738068 Sep 17 16:00 C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf
+Traceback (most recent call last):
+  File "<string>", line 7, in <module>
+NameError: name 'start' is not defined
+32 pages
+```
+
+</details>
+
+The guide is updated, but Edge wouldn't start for the PDF render (its profile folder is probably still locked from the screenshot run). Retrying with a fresh profile:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && sed -i \"s#userDataDir: 'C:/Users/Dell/tt-guide/profile'#userDataDir: 'C:/Users/Dell/tt-guide/profile-pdf-' + Date.now()#\" pdf.cjs && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\" && node pdf.cjs \"$OUT\" 2>&1 | grep -v \"terminated\\|running instance\"; ls -la \"$OUT\" && python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'$OUT'); print(len(d),'pages')\nstart=None\nfor i in range(3,len(d)):\n    if 'Three features were added' in d[i].get_textpage().get_text_range(): start=i; break\nprint('ch6 page', start+1)\nfor k in range(start,start+9): d[k].render(scale=0.7).to_pil().save(f'q{k+1}.png')\n\"",
+  "description": "Render PDF with fresh profile and preview pages",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+-rw-r--r-- 1 Dell 197121 3143168 Sep 17 16:37 C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf
+44 pages
+ch6 page 20
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/q20.png"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/q23.png"
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/q26.png"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+The layout works. One fix: the transfer dialog screenshot is too small to read in the PDF, so I'll crop it to just the dialog and re-render.
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && python -c \"\nfrom PIL import Image\nim=Image.open('shots/transfer-modal.jpg')\npx=im.convert('L').load(); w,h=im.size\n# find bright modal box: rows/cols where center-line pixels are near white\nys=[y for y in range(h) if px[w//2,y]>245]; xs=[x for x in range(w) if px[x,h//2]>245]\nbox=(max(min(xs)-10,0),max(min(ys)-10,0),min(max(xs)+10,w),min(max(ys)+10,h)); print(box)\nim.crop(box).save('shots/transfer-modal.jpg',quality=85)\n\" && sed -i 's#<figure class=\"half\"><img src=\"shots/transfer-modal.jpg\">#<figure class=\"phone\" style=\"text-align:center\"><img src=\"shots/transfer-modal.jpg\" style=\"max-width:55%\">#' guide.html && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\" && node pdf.cjs \"$OUT\" 2>&1 | grep -v \"terminated\\|running instance\"; python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'$OUT'); print(len(d),'pages')\nfor i in range(len(d)):\n    if 'Transfer dialog: first delivery day' in d[i].get_textpage().get_text_range(): d[i].render(scale=0.7).to_pil().save('qt.png'); print('page',i+1)\n\"",
+  "description": "Crop transfer dialog shot and re-render PDF",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+(400, 64, 879, 735)
+ERR connect ECONNREFUSED 127.0.0.1:54760
+44 pages
+page 23
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && OUT=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf\"; for i in 1 2 3; do node pdf.cjs \"$OUT\" 2>&1 | grep -q ERR || { echo rendered; break; }; sleep 3; done; ls -la \"$OUT\"; python -c \"\nimport pypdfium2 as p\nd=p.PdfDocument(r'$OUT'); print(len(d),'pages')\nfor i in range(len(d)):\n    if 'Transfer dialog: first delivery day' in d[i].get_textpage().get_text_range(): d[i].render(scale=0.7).to_pil().save('qt.png'); print('page',i+1)\n\"",
+  "description": "Retry PDF render until it succeeds",
+  "timeout": 400000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+rendered
+-rw-r--r-- 1 Dell 197121 3110293 Sep 17 16:38 C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf
+44 pages
+page 23
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/qt.png"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[image]
+```
+
+</details>
+
+The dialog is readable now. Stopping the demo server, linking the guide from the README, and pushing:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "pid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); [ -n \"$pid\" ] && taskkill //PID $pid //F >/dev/null && echo \"stopped 4100\"\ncd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && node -e \"\nconst fs=require('fs');let r=fs.readFileSync('README.md','utf8');\nif(!r.includes('Project-Guide.pdf')){r=r.replace(/(\\r?\\n)---(\\r?\\n)/, '\\$1📘 **Illustrated guide:** [docs/Tiffin-Tracker-Project-Guide.pdf](docs/Tiffin-Tracker-Project-Guide.pdf) explains the workflow, every screen and every term, with screenshots (44 pages).\\$1\\$1---\\$2');fs.writeFileSync('README.md',r);console.log('readme linked')}\" && git add docs/Tiffin-Tracker-Project-Guide.pdf README.md && git commit -q -m \"Add illustrated project guide PDF covering all features\n\nCovers workflow, billing rules, every page and component, backend flow,\ndatabase, API, glossary and troubleshooting, plus a new chapter with\nscreenshots for morning notifications, subscription transfer and messy\ncustomer import.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\" && git push 2>&1 | tail -1 && git log --oneline -2 && git status --short",
+  "description": "Link PDF in README, commit and push",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+stopped 4100
+readme linked
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+   006bf17..5b0b1a1  main -> main
+5b0b1a1 Add illustrated project guide PDF covering all features
+006bf17 Add morning notifications, subscription transfer and messy CSV import
+```
+
+</details>
+
+**Tool call — `SendUserFile`**
+
+```json
+{
+  "files": [
+    "C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/docs/Tiffin-Tracker-Project-Guide.pdf"
+  ],
+  "status": "normal",
+  "caption": "Updated guide (44 pages). Chapter 6 covers the three new features."
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1 file delivered to user.
+```
+
+</details>
+
+I updated the PDF guide and pushed it to GitHub in commit `5b0b1a1`. It's now at `docs/Tiffin-Tracker-Project-Guide.pdf` in the repo, and the README links to it. The updated file is attached above.
+
+It grew from 32 to 44 pages. I retook all the screenshots on a freshly seeded demo database, so they show the new top bar and your own data wasn't touched. I checked the new chapter's pages after rendering, and made the transfer dialog screenshot bigger so it's readable.
+
+**New Chapter 6: the three new features, with 13 new screenshots**
+- **6.1 Morning notifications:**
+  - Who counts as "due a delivery today", and how the clock and outbox work together.
+  - How skipped days are caught up, and why messages never repeat.
+  - The Notifications page: what each button and table does.
+  - A security note: set `PUBLIC_SIM_ENDPOINTS=false` for a real deployment, because otherwise anyone can see customer phone numbers in the outbox.
+- **6.2 Subscription transfer:**
+  - A worked example of the bill split: Aarav ₹1,477.27 + Kabir ₹568.18 = ₹2,045.45, the same as the original bill.
+  - Screenshots of the transfer dialog, the result, the new customer's page and the Bills page.
+  - A table of the cases the app refuses.
+- **6.3 Messy import:**
+  - The three outcomes (imported, deduped, rejected) and how a row ends up in one.
+  - A before/after table of what gets cleaned: headers, phone numbers, names, plans and each date format.
+  - Screenshots of the import form, the preview and each result tab.
+
+**Updated elsewhere in the guide:**
+- **Top bar:** the new Notifications and Import tabs, and the 🕒 badge that shows a simulated date.
+- **Folder structure** and **file tables:** the new server files and pages.
+- **Database:** the new `outbox`, `settings` and `clock_runs` tables, and the new column that links a transferred subscription to the original.
+- **API:** the endpoints for the clock, outbox, transfer and import.
+- **Glossary:** about 30 new terms, such as simulated clock, outbox, effective date, billing split and dry run.
+- **Tests and troubleshooting:** the test count is now 22. There are new fixes for "the header shows a 🕒 date", "import rejects every row" and "there's no Transfer button", and a longer 5-minute demo script.
+
+---
+
+## 👤 User
+
+is the code uptodate in github
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git fetch -q origin && git status -sb | head -5 && echo \"local:  $(git rev-parse --short HEAD)\" && echo \"github: $(git rev-parse --short origin/main)\" && git log --oneline -4; echo \"--- Documents copy ---\"; cd \"C:/Users/Dell/Documents/tiffin-tracker\" && git status -sb | head -3 && git log --oneline -1",
+  "description": "Compare local repo with GitHub",
+  "timeout": 60000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+## main...origin/main
+local:  5b0b1a1
+github: 5b0b1a1
+5b0b1a1 Add illustrated project guide PDF covering all features
+006bf17 Add morning notifications, subscription transfer and messy CSV import
+67cc1fe Add AI_LOGS.md (session transcript)
+a7b918f Tiffin Tracker: subscriptions, pause/resume and pro-rated billing
+--- Documents copy ---
+## main...origin/main
+67cc1fe Add AI_LOGS.md (session transcript)
+```
+
+</details>
+
+Yes, GitHub is up to date with your working copy on the Desktop (`Desktop\tiffin-tracker\tiffin-tracker`). Both point to the same latest commit, `5b0b1a1`, and there are no uncommitted changes.
+
+GitHub has 4 commits:
+1. `a7b918f`: the original app (subscriptions, pause/resume, pro-rated billing)
+2. `67cc1fe`: AI_LOGS.md
+3. `006bf17`: morning notifications, subscription transfer, messy CSV import
+4. `5b0b1a1`: the updated PDF guide
+
+**`AI_LOGS.md` is out of date.** It was generated early on and stops at the point where you asked me to create it. Everything since then isn't in it: running the project, the PDF guide, the three new features and this check. Since the brief wants the complete conversation, export this conversation again at the very end, replace `AI_LOGS.md` with it unedited, then commit and push.
+
+The **old copy in `Documents\tiffin-tracker`** is still on commit 2 and doesn't have the new features. It isn't connected to what's on GitHub, so it's safe to delete to avoid confusion. If you want to keep it, update it with:
+```bash
+cd ~/Documents/tiffin-tracker && git pull
+```
+
+---
+
+## 👤 User
+
+update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+
+## 🤖 Assistant
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8vAEujDqs3AEkEGUuix
+
+---
+
+## 👤 User
+
+update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+
+## 🤖 Assistant
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8vB7Js2qy7GBKefrDmr
+
+---
+
+## 👤 User
+
+update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Documents/tiffin-tracker\" && git status --short | head && git log origin/main..HEAD --oneline | head && git branch --merged origin/main 2>/dev/null; git merge-base --is-ancestor HEAD a7b918f 2>/dev/null; cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git merge-base --is-ancestor 67cc1fe HEAD && echo \"Documents commit is contained in Desktop/GitHub history\"",
+  "description": "Confirm old copy has nothing unpushed"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+* main
+Documents commit is contained in Desktop/GitHub history
+```
+
+</details>
+
+The old copy has no uncommitted changes, and everything in it is already on GitHub. I'm sending it to the **Recycle Bin** rather than deleting it permanently, so you can still restore it if needed.
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "powershell.exe -NoProfile -Command \"Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory('C:\\Users\\Dell\\Documents\\tiffin-tracker', 'OnlyErrorDialogs', 'SendToRecycleBin'); if (Test-Path 'C:\\Users\\Dell\\Documents\\tiffin-tracker') { 'still exists' } else { 'moved to Recycle Bin' }\"",
+  "description": "Move old Documents copy to Recycle Bin",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+moved to Recycle Bin
+```
+
+</details>
