@@ -10,6 +10,8 @@ import Customers from './pages/Customers.jsx';
 import CustomerDetail from './pages/CustomerDetail.jsx';
 import Plans from './pages/Plans.jsx';
 import Bills from './pages/Bills.jsx';
+import Notifications from './pages/Notifications.jsx';
+import ImportCustomers from './pages/ImportCustomers.jsx';
 import './styles.css';
 
 function Protected({ children }) {
@@ -38,6 +40,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="customers/:id" element={<CustomerDetail />} />
             <Route path="plans" element={<Plans />} />
             <Route path="bills" element={<Bills />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="import" element={<ImportCustomers />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

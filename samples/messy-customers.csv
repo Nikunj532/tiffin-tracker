@@ -1,0 +1,13 @@
+Customer Name,Mobile No,Address,Meal Plan,Start Date,Notes
+ASHA IYER,+91 92000 00001,"12, MG Road, Indiranagar",veg mini,01/09/2026,caps name + +91 phone + dd/mm date
+Ravi Kumar,92000-00002,,Non-Veg Thali,2026-09-03,dashes in phone
+asha iyer,9200000001,,Veg Mini,5 Sep 2026,duplicate phone of row 2
+,9200000003,HSR Layout,Veg Mini,2026-09-01,blank name
+Meena,,,Veg Mini,2026-09-01,blank phone
+Kiran,9200000004,,Veg Mini,,blank start date
+Tara,9200000005,,Pizza Plan,2026-09-01,unknown plan
+Om,12345,,Veg Mini,31/02/2026,bad phone and impossible date
+,,,,,
+Neha Joshi,09200000006,Whitefield,VEG FULL THALI,Sep 25 2026,leading 0 + month-name date
+Farhan,92000 00007,,Veg Mini,25/09/2026,day > 12 so unambiguous
+Priya,9200000008,,Non-Veg Thali,09/25/2026,month-first (day > 12 proves it)

@@ -75,7 +75,10 @@ export default function billRoutes(db) {
     const summary = db.prepare(`SELECT COUNT(*) AS n, COALESCE(SUM(b.amount_paise), 0) AS total,
       COALESCE(SUM(b.delivered_days), 0) AS delivered, COALESCE(SUM(b.paused_days), 0) AS paused ${from}`).get(...args);
     const rows = db.prepare(`
-      SELECT b.*, c.id AS customer_id, c.name AS customer_name, c.phone AS customer_phone, pl.name AS plan_name
+      SELECT b.*, c.id AS customer_id, c.name AS customer_name, c.phone AS customer_phone, pl.name AS plan_name,
+        s.start_date, s.end_date,
+        (SELECT fc.name FROM subscriptions fs JOIN customers fc ON fc.id = fs.customer_id WHERE fs.id = s.transferred_from_id) AS transferred_from_name,
+        (SELECT tc.name FROM subscriptions ts JOIN customers tc ON tc.id = ts.customer_id WHERE ts.transferred_from_id = s.id) AS transferred_to_name
       ${from} ORDER BY ${p.orderBy}, b.id LIMIT ? OFFSET ?`).all(...args, p.limit, p.offset);
     const lastGenerated = db.prepare(`SELECT MAX(b.generated_at) AS at ${from}`).get(...args).at;
 

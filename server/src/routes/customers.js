@@ -3,6 +3,7 @@ import {
   badRequest, h, HttpError, normalizePhone, notFound, pageParams, paged, PHONE_RE, str,
 } from '../http.js';
 import { isValidDate, todayLocal } from '../dates.js';
+import { transferLinks } from './subscriptions.js';
 
 // Status is derived from dates, never stored, so it can't go stale.
 //   paused   – has a subscription running on @t and a pause covering @t
@@ -117,7 +118,7 @@ export default function customerRoutes(db) {
       SELECT s.*, pl.name AS plan_name FROM subscriptions s JOIN plans pl ON pl.id = s.plan_id
       WHERE s.customer_id = ? ORDER BY s.start_date DESC`).all(customer.id);
     const pauseStmt = db.prepare('SELECT * FROM pauses WHERE subscription_id = ? ORDER BY start_date DESC');
-    for (const s of subscriptions) s.pauses = pauseStmt.all(s.id);
+    for (const s of subscriptions) Object.assign(s, { pauses: pauseStmt.all(s.id) }, transferLinks(db, s));
     res.json({ ...customer, subscriptions });
   }));
 

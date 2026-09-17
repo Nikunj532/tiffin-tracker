@@ -76,7 +76,9 @@ export default function Bills() {
                   {data?.data.map((b) => (
                     <tr key={b.id}>
                       <td><Link to={`/app/customers/${b.customer_id}`}>{b.customer_name}</Link><div className="muted small">{b.customer_phone}</div></td>
-                      <td className="hide-sm">{b.plan_name}<div className="muted small">{rupees(b.price_paise)}/mo</div></td>
+                      <td className="hide-sm">{b.plan_name}<div className="muted small">{rupees(b.price_paise)}/mo</div>
+                        {b.transferred_from_name && <div className="transfer-note">↪ from {b.transferred_from_name}</div>}
+                        {b.transferred_to_name && <div className="transfer-note">⇄ to {b.transferred_to_name}</div>}</td>
                       <td className="num">{b.subscribed_days}/{b.working_days}</td>
                       <td className="num">{b.paused_days}</td>
                       <td className="num">{b.delivered_days}</td>

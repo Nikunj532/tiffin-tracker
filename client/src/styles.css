@@ -192,3 +192,16 @@ button.sort.active span { opacity: 1; color: var(--brand); }
   .topbar { gap: 8px; }
   .band { padding: 28px 16px !important; }
 }
+
+/* Clock, notifications, import, transfer */
+.clock-pill { background: var(--amber-soft); color: var(--amber); padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.clock-pill:hover { text-decoration: none; filter: brightness(0.97); }
+.run-result { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.linklike { all: unset; color: var(--brand); cursor: pointer; }
+.linklike:hover { text-decoration: underline; }
+.mono, textarea.mono { font-family: Consolas, 'SFMono-Regular', monospace; font-size: 0.85rem; }
+.callout.ok { background: var(--green-soft); border-color: #bfe3c9; }
+.stat-btn { text-align: left; cursor: pointer; font: inherit; }
+.stat-btn.selected { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft); }
+.reasons { margin: 0; padding-left: 16px; color: var(--red); font-size: 0.85rem; }
+.transfer-note { display: block; font-size: 0.8rem; color: var(--blue); margin-top: 2px; }

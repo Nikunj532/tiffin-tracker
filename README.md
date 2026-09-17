@@ -34,6 +34,7 @@ Demo login after seeding: **demo@tiffin.app / demo1234** (3 plans, 32 customers 
 | `PORT` | `4000` | API port |
 | `JWT_SECRET` | insecure dev value (warns at startup) | Signs login tokens; **set this in production** |
 | `DB_FILE` | `./data/tiffin.db` | SQLite file path (`:memory:` for throwaway runs) |
+| `PUBLIC_SIM_ENDPOINTS` | `true` | Allows `/clock` and `/outbox` without a token (for the grading harness). Set to `false` in production |
 
 The server doesn't read `.env` files by itself. Export the variables in your shell, or run with `node --env-file=.env src/index.js`.
 
@@ -70,6 +71,8 @@ npm test
 ```
 
 - `server/test/billing.test.js`: 12 unit tests for the billing rules (mid-month start, weekday and weekend pauses, open-ended pauses, pauses spanning two months, a fully paused month, ended subscriptions, leap-year February, rounding).
+- `server/test/features.test.js`: end-to-end tests for Level 1 (clock, due-today rules, weekends, pauses, idempotency, owner scoping), Level 2 (transfer, locked price, split bills, notifications, guards) and Level 3 (messy CSV counts, row numbers, dry run, re-import, JSON and raw CSV bodies, defaults).
+- `server/test/importer.test.js`: unit tests for date parsing, phone normalisation, CSV parsing, header aliases and row cleaning.
 - `server/test/api.test.js`: an end-to-end run against an in-memory database covering register/login, plan and customer validation, subscribe, pause, overlap rejection, resume, bill preview, bill generation (including regenerating), phone lookup, search, pagination, sorting, SQL-injection-safe sort keys, and making sure one owner can't see another owner's data.
 
 ## 3. Debugging
@@ -172,6 +175,49 @@ Common query params: `page` (default 1), `limit` (1–100, default 10), `sort`, 
 | GET | `/api/dashboard` | `as_of?` | Active, paused, upcoming and inactive counts, tiffins to deliver today, projected month revenue, customers paused today |
 | GET | `/api/health` | | Liveness check |
 
+### Level 1: morning delivery notifications (clock + outbox)
+
+These are served at the root (`/clock`, `/outbox`) for the grading harness, and also under `/api`. With a token, `/outbox` shows only that owner's messages; without one it shows all of them (see `PUBLIC_SIM_ENDPOINTS`).
+
+| Method | Endpoint | Body / Query | Description |
+|---|---|---|---|
+| GET | `/clock` | | `{ today, simulated, real_today }` |
+| POST | `/clock` | `{}` · `{ date }` or `{ now }` · `{ advance_days }` · `{ reset: true }` | Sets the simulated clock and **runs the morning job** for every morning passed (only the target morning when moving backwards or staying put). Each morning, every customer **due a delivery that day** (subscription running, the day is a weekday, not paused) gets one `delivery_due` message through the Notification Service. Re-runs never send duplicates. Returns per-morning `{ date, delivery_day, due, notified, already_notified }` |
+| GET | `/outbox` | `date, type, customer_id, search, page, limit, sort=id\|for_date\|recipient\|customer\|type, order` | Messages sent through the Notification Service (newest first): `{ id, channel, to, type, date, message, customer_id, customer_name, subscription_id }` |
+
+```bash
+curl -X POST localhost:4000/clock -H 'Content-Type: application/json' -d '{"date":"2026-09-21"}'
+curl "localhost:4000/outbox?date=2026-09-21"
+```
+
+### Level 2: transfer a subscription mid-cycle
+| Method | Endpoint | Body | Description |
+|---|---|---|---|
+| POST | `/api/subscriptions/:id/transfer` | `{ effective_date, to_customer_id }` or `{ effective_date, customer: { name, phone, address } }` | `effective_date` is the new holder's first delivery day. The current subscription ends the day before, and its pauses after that are dropped. A linked subscription (`transferred_from_id`) is created for the new holder with the **same plan, same locked price and same end date**. A new customer is created if the phone isn't known. Both people are notified. Returns `{ from, to, billing_split: { from, to, combined_amount_paise } }`. Errors: 400 if not mid-cycle, already ended, or same customer; 409 if the target already has a running subscription |
+
+Billing splits naturally: each subscription is billed for the weekdays *its* customer was served, over the same weekdays-in-month denominator, so the two bills add up to what one person would have paid.
+
+### Level 3: import a messy customer list
+| Method | Endpoint | Body / Query | Description |
+|---|---|---|---|
+| POST | `/api/import/customers` | `{ csv }` or `{ rows: [...] }` or a raw `text/csv` body; options `default_plan_id`, `default_start_date`, `dry_run` | Returns `{ imported, deduped, rejected, total_rows, blank_rows_ignored, dry_run, unknown_columns, details: { imported[], deduped[], rejected[] } }` |
+
+Every non-empty row lands in exactly one bucket:
+- **imported:** a clean subscription was created. The customer is created, or reused if the phone exists without a running subscription.
+- **deduped:** the phone repeats an earlier row in the file (first valid row wins), or the customer is already subscribed.
+- **rejected:** a required field is blank or unreadable. Every reason is listed with the spreadsheet row number.
+
+What gets cleaned:
+- **Headers** are matched by alias (`Customer Name`, `Mobile No`, `Meal Plan`, `Start Date`…).
+- **Phones:** `+91`, `91`, a leading `0`, spaces, dashes and dots are stripped.
+- **Names** in ALL CAPS or all lowercase are title-cased.
+- **Plans** are matched by name, ignoring case and extra spaces.
+- **Dates:** `2026-09-01`, `20260901`, `01/09/2026`, `1-9-26`, `01.09.2026` (day-first when ambiguous, with a warning), `09/25/2026` (month-first only when day > 12 proves it), `1 Sep 2026`, `Sep 1, 2026`, `01-Sep-26`. Impossible dates like 31/02 are rejected.
+- **Empty lines** are ignored.
+- **Transactions:** the whole import is one transaction. `dry_run` previews without writing.
+
+Try it with `samples/messy-customers.csv` (after `npm run seed`): 5 imported, 1 deduped, 5 rejected.
+
 ### Example
 
 ```bash
@@ -197,7 +243,10 @@ curl -s -X POST localhost:4000/api/bills/generate -H "Authorization: Bearer $TOK
 | `/app/customers` | Search, status tabs, sortable columns, pagination, add customer |
 | `/app/customers/:id` | Subscribe, pause, resume, end; pause history; monthly bill with a day-by-day calendar |
 | `/app/plans` | Create, edit, retire and delete plans (search, sort, paginate) |
-| `/app/bills` | Pick a month, generate bills, search, sort, paginate, see totals |
+| `/app/bills` | Pick a month, generate bills, search, sort, paginate, see totals; transferred bills show "from/to" |
+| `/app/notifications` | Simulated clock (next morning, jump to a date, run again, back to the real date) and the outbox (filter by date or type, search, sort, paginate) |
+| `/app/import` | Paste or upload a CSV, set defaults, preview, import, and view the imported / deduped / rejected report |
+| Customer page → **⇄ Transfer** | Hand a subscription to an existing or new customer and see the billing split |
 
 ## 8. Project structure
 
@@ -209,6 +258,9 @@ server/
   src/http.js           errors, auth middleware, pagination/sort whitelist
   src/routes/*.js       auth, plans, customers, subscriptions, bills, dashboard
   src/seed.js           demo data
+  src/clock.js          simulated clock + morning job runner
+  src/notifications.js  Notification Service (outbox) + "due today" query
+  src/importer.js       CSV parsing, date/phone cleaning, row validation
   test/                 unit and API tests
 client/
   src/pages/*.jsx       Landing, Auth, Dashboard, Customers, CustomerDetail, Plans, Bills

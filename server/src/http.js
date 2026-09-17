@@ -58,8 +58,25 @@ export function str(v, max = 200) {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
 }
 
+/**
+ * Canonical phone form used for storage, lookup and de-duplication.
+ * Strips spaces/dashes/dots/brackets and Indian prefixes (+91, 91, 0) from
+ * 10-digit mobiles, so "+91 98450-00000", "098450 00000" and "9845000000"
+ * are the same customer.
+ */
 export function normalizePhone(v) {
-  return typeof v === 'string' ? v.replace(/[\s\-()]/g, '') : '';
+  if (typeof v !== 'string' && typeof v !== 'number') return '';
+  let p = String(v).trim().replace(/[\s\-().]/g, '');
+  if (/^\+91\d{10}$/.test(p)) p = p.slice(3);
+  else if (/^91\d{10}$/.test(p)) p = p.slice(2);
+  else if (/^0\d{10}$/.test(p)) p = p.slice(1);
+  return p;
+}
+
+/** Like requireAuth, but lets anonymous requests through (req.userId stays undefined). */
+export function optionalAuth(req, res, next) {
+  if (!req.headers.authorization) return next();
+  return requireAuth(req, res, next);
 }
 
 export const PHONE_RE = /^\+?\d{10,13}$/;

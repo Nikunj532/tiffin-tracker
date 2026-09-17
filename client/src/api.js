@@ -35,7 +35,13 @@ export async function api(path, { method = 'GET', body, query } = {}) {
 export const rupees = (paise) =>
   `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
+// The server can run on a simulated clock (POST /api/clock). Layout loads it
+// once and keeps this in sync, so "today" in the UI matches the server.
+let serverToday = null;
+export const setServerToday = (d) => { serverToday = d || null; };
+
 export const today = () => {
+  if (serverToday) return serverToday;
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };

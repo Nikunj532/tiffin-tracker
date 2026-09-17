@@ -41,7 +41,21 @@ export function isWeekday(s) {
   return day !== 0 && day !== 6;
 }
 
+// Simulated "today" set through POST /clock. null = use the real date.
+let clockOverride = null;
+export function setClockOverride(date) {
+  clockOverride = date || null;
+}
+export function getClockOverride() {
+  return clockOverride;
+}
+
+/** Today's date, honouring the simulated clock when one is set. */
 export function todayLocal() {
+  return clockOverride ?? realToday();
+}
+
+export function realToday() {
   const now = new Date();
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, '0');

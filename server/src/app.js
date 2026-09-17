@@ -10,17 +10,22 @@ import customerRoutes from './routes/customers.js';
 import subscriptionRoutes from './routes/subscriptions.js';
 import billRoutes from './routes/bills.js';
 import dashboardRoutes from './routes/dashboard.js';
+import simulationRoutes from './routes/simulation.js';
+import importRoutes from './routes/import.js';
+import { loadClock } from './clock.js';
 
 export function createApp(db, { log = true } = {}) {
   const app = express();
   app.use(cors());
-  app.use(express.json({ limit: '100kb' }));
+  app.use(express.json({ limit: '2mb' }));
+  app.use(express.text({ type: ['text/csv', 'text/plain'], limit: '2mb' }));
+  loadClock(db);
 
   if (log) {
     app.use((req, res, next) => {
       const t0 = Date.now();
       res.on('finish', () => {
-        if (req.path.startsWith('/api')) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
+        if (/^\/(api|clock|outbox)/.test(req.path)) console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - t0}ms)`);
       });
       next();
     });
@@ -32,6 +37,11 @@ export function createApp(db, { log = true } = {}) {
   app.use('/api/customers', requireAuth, customerRoutes(db));
   app.use('/api/bills', requireAuth, billRoutes(db));
   app.use('/api/dashboard', requireAuth, dashboardRoutes(db));
+  app.use('/api/import', requireAuth, importRoutes(db));
+  // Simulated clock + Notification Service outbox, at /clock & /outbox and under /api.
+  const sim = simulationRoutes(db);
+  app.use('/api', sim);
+  app.use('/', sim);
   app.use('/api', requireAuth, subscriptionRoutes(db));
   app.use('/api', (_req, _res, next) => next(new HttpError(404, 'API route not found')));
 
