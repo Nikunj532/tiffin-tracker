@@ -6772,3 +6772,1101 @@ moved to Recycle Bin
 ```
 
 </details>
+
+Now exporting this conversation and rebuilding `AI_LOGS.md` from it:
+
+**Tool call — `mcp__ccd_session_mgmt__export_transcript`**
+
+```json
+{
+  "session_id": "self"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+Exported this session's transcript "Tiffin billing system workflow" to C:\Users\Dell\Downloads\session-export-1789643855269.zip (9 MB, 9166085 bytes). The zip holds the conversation transcript, its subagent transcripts and session metadata, not the app's logs; nothing was uploaded.
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "X=/c/Users/Dell/AppData/Local/Temp/tt-export; cp $X/conv.js /c/Users/Dell/tt-guide/conv.js 2>/dev/null; rm -rf /c/Users/Dell/tt-guide/export2 && mkdir -p /c/Users/Dell/tt-guide/export2 && cd /c/Users/Dell/tt-guide/export2 && unzip -q \"C:/Users/Dell/Downloads/session-export-1789643855269.zip\" && cp ../conv.js . && node conv.js \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/AI_LOGS.md\" && F=\"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/AI_LOGS.md\" && ls -la \"$F\" && grep -c \"^## 👤 User\" \"$F\" && grep -n \"^## 👤 User\" -A2 \"$F\" | grep -v \"^--$\\|User$\\|-$\" | tail -8",
+  "description": "Rebuild AI_LOGS.md from fresh transcript export",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+messages 623
+-rw-r--r-- 1 Dell 197121 591839 Sep 17 16:47 C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/AI_LOGS.md
+23
+3810-what does this site is mainly for
+3834-integrate the followiing features to the project.
+5888-check the updates and check that each feature is working properly.
+6200-update thee pdf and push it into the repo.
+6648-is the code uptodate in github
+6698-update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+6716-update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+6734-update AI_LOGS.md and delete The old copy in Documents\tiffin-tracker is still on commit 2 and doesn't have the new features.
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+The rebuilt log has all 23 of your messages through this request (your last message appears three times in the log because it was repeated inside the message). Committing and pushing:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git add AI_LOGS.md && git commit -q -m \"Update AI_LOGS.md with the full session transcript\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\" && git push 2>&1 | tail -1 && git fetch -q && echo \"local $(git rev-parse --short HEAD) / github $(git rev-parse --short origin/main)\" && git status --short && ls \"C:/Users/Dell/Documents/tiffin-tracker\" 2>&1 | head -1",
+  "description": "Commit and push updated AI logs, verify",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+5b0b1a1..3024ebe  main -> main
+local 3024ebe / github 3024ebe
+ls: cannot access 'C:/Users/Dell/Documents/tiffin-tracker': No such file or directory
+```
+
+</details>
+
+API Error: Opus 5's safeguards flagged this message (https://www.anthropic.com/legal/aup). This sometimes happens with safe, normal conversations. Claude Code can't respond to this message with Opus 5.
+
+Try rephrasing the request in a new session or change your model.
+
+Learn more: https://support.claude.com/en/articles/16049681
+
+Details: `[reasoning_extraction]`
+
+Request ID: req_011Cf8vGQbowZn3oQdYEkru7
+
+---
+
+## 👤 User
+
+continue
+
+## 🤖 Assistant
+
+Both jobs are done, and GitHub matches your local project at commit `3024ebe` with nothing left uncommitted.
+
+**1. `AI_LOGS.md` is updated and pushed.**
+- I rebuilt it from a fresh export of this conversation. It went from about 210 KB to 592 KB and now covers all 23 of your messages, up to "update AI_LOGS.md and delete…".
+- That last message appears three times in the log, because you pasted it three times into one message.
+- The log shows your messages, my replies, and every command I ran with its output, in order. Hidden system messages and my internal reasoning aren't included, and screenshots show as `[image]`.
+
+**2. The old `Documents\tiffin-tracker` copy is gone.**
+- First I confirmed it had no unsaved changes and nothing that isn't already on GitHub.
+- I moved it to the **Recycle Bin** rather than deleting it permanently, so you can still restore it. Empty the Recycle Bin if you want it gone for good.
+
+Your only project copy is now **`Desktop\tiffin-tracker\tiffin-tracker`**.
+
+**One thing to do before you submit:** the log can only include the conversation up to the moment it was exported. This reply and anything you ask after it aren't in it. When you're completely finished, ask me to "update AI_LOGS.md" one last time, or export the conversation yourself and replace the file without editing it.
+
+---
+
+## 👤 User
+
+help me check the autheticity of users. by logging different users and check if there is any crash or if user write anything they are being loggedin. 
+check validation
+
+## 🤖 Assistant
+
+I'll check this in three ways:
+1. **Login and signup abuse:** wrong passwords, SQL-injection strings, wrong data types, empty or broken requests, and odd characters.
+2. **Tokens:** forged, tampered, expired or used after logout.
+3. **Data separation:** whether one user can read or change another user's data.
+
+For every attempt I'll record whether the server crashed (500) or let someone in who shouldn't be. It runs on a fresh test database on port 4100, set up the way yours runs (no `JWT_SECRET` set).
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && rm -f C:/Users/Dell/tt-guide/a.db* && DB_FILE=C:/Users/Dell/tt-guide/a.db node src/seed.js >/dev/null && (env -u JWT_SECRET PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/a.db node src/index.js > C:/Users/Dell/tt-guide/a.log 2>&1 &); sleep 2; curl -s localhost:4100/api/health",
+  "description": "Start fresh audit server on 4100"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{"ok":true}
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/audit.mjs",
+  "content": "// Authentication & validation audit. Usage: node audit.mjs [baseUrl]\nimport { createRequire } from 'node:module';\nconst require = createRequire('C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/package.json');\nconst jwt = require('jsonwebtoken');\n\nconst B = process.argv[2] || 'http://localhost:4100';\nconst results = { pass: 0, fail: 0, crashes: [], failures: [] };\nconst ok = (cond, label, extra = '') => {\n  if (cond) results.pass++; else { results.fail++; results.failures.push(label + (extra ? ` → ${extra}` : '')); }\n  console.log(`${cond ? 'PASS' : 'FAIL'}  ${label}${extra ? '  → ' + extra : ''}`);\n};\nasync function raw(method, path, { body, token, type = 'application/json', rawBody } = {}) {\n  const headers = {};\n  if (type) headers['Content-Type'] = type;\n  if (token !== undefined) headers.Authorization = token.startsWith?.('Bearer') || token === '' ? token : `Bearer ${token}`;\n  const res = await fetch(B + path, { method, headers, body: rawBody !== undefined ? rawBody : body !== undefined ? JSON.stringify(body) : undefined });\n  const text = await res.text();\n  let json = null; try { json = JSON.parse(text); } catch {}\n  if (res.status >= 500) results.crashes.push(`${method} ${path} ${rawBody ?? JSON.stringify(body ?? '')}`.slice(0, 160));\n  return { status: res.status, body: json, text };\n}\nconst post = (p, body, token) => raw('POST', p, { body, token });\nconst get = (p, token) => raw('GET', p, { token });\nconst alive = async () => (await get('/api/health')).status === 200;\n\n// ---------------------------------------------------------------- setup\nconst stamp = Date.now();\nconst alice = { name: 'Alice', business_name: 'Alice Tiffins', email: `alice${stamp}@test.com`, password: 'alicepass123' };\nconst bob = { name: 'Bob', business_name: 'Bob Dabba', email: `bob${stamp}@test.com`, password: 'bobpass4567' };\nconst A = (await post('/api/auth/register', alice)).body.token;\nconst Bt = (await post('/api/auth/register', bob)).body.token;\n\nconsole.log('\\n=== 1. Registration validation ===');\nconst regCases = [\n  ['empty body', {}],\n  ['missing password', { name: 'X', email: `x1${stamp}@t.com` }],\n  ['short password (7)', { name: 'X', email: `x2${stamp}@t.com`, password: '1234567' }],\n  ['bad email', { name: 'X', email: 'not-an-email', password: 'password123' }],\n  ['email with spaces inside', { name: 'X', email: 'a b@c.com', password: 'password123' }],\n  ['blank name', { name: '   ', email: `x3${stamp}@t.com`, password: 'password123' }],\n  ['name as number', { name: 12345, email: `x4${stamp}@t.com`, password: 'password123' }],\n  ['email as object (NoSQL-style)', { name: 'X', email: { $gt: '' }, password: 'password123' }],\n  ['password as array', { name: 'X', email: `x5${stamp}@t.com`, password: ['password123'] }],\n  ['password as number', { name: 'X', email: `x6${stamp}@t.com`, password: 12345678 }],\n  ['null values', { name: null, email: null, password: null }],\n];\nfor (const [label, body] of regCases) {\n  const r = await post('/api/auth/register', body);\n  ok(r.status === 400 && !r.body?.token, `register rejects: ${label}`, `${r.status}`);\n}\nok((await post('/api/auth/register', alice)).status === 409, 'register rejects duplicate email');\nok((await post('/api/auth/register', { ...alice, email: alice.email.toUpperCase() })).status === 409, 'register rejects duplicate email in different case');\nok((await post('/api/auth/register', { ...alice, email: `  ${alice.email}  ` })).status === 409, 'register rejects duplicate email with spaces');\nconst xss = await post('/api/auth/register', { name: '<script>alert(1)</script>', email: `xss${stamp}@t.com`, password: 'password123' });\nok(xss.status === 201, 'HTML in name is stored as plain text (React escapes on display)');\nconst longName = await post('/api/auth/register', { name: 'N'.repeat(5000), email: `long${stamp}@t.com`, password: 'password123' });\nok(longName.status === 201 && longName.body.user.name.length === 100, 'very long name trimmed to 100 chars', `${longName.body?.user?.name?.length}`);\nconst bigBody = await raw('POST', '/api/auth/register', { rawBody: JSON.stringify({ name: 'x', email: 'big@t.com', password: 'p'.repeat(3_000_000) }) });\nok(bigBody.status === 413 || bigBody.status === 400, 'oversized body (3 MB) refused, not crashed', `${bigBody.status}`);\nconst unicode = await post('/api/auth/register', { name: 'प्रिया 🍱', email: `uni${stamp}@t.com`, password: 'पासवर्ड१२३४' });\nok(unicode.status === 201, 'unicode name + password accepted');\nok((await post('/api/auth/login', { email: `uni${stamp}@t.com`, password: 'पासवर्ड१२३४' })).status === 200, 'unicode password logs in');\n\nconsole.log('\\n=== 2. Login: only correct credentials get in ===');\nconst loginCases = [\n  ['wrong password', { email: alice.email, password: 'wrongpass123' }],\n  ['correct password, different case', { email: alice.email, password: alice.password.toUpperCase() }],\n  ['password with extra space', { email: alice.email, password: alice.password + ' ' }],\n  ['empty password', { email: alice.email, password: '' }],\n  ['no password field', { email: alice.email }],\n  ['unknown email', { email: `nobody${stamp}@t.com`, password: alice.password }],\n  ['other user\\'s password', { email: alice.email, password: bob.password }],\n  ['empty body', {}],\n  [\"SQL injection in email: ' OR '1'='1\", { email: \"' OR '1'='1\", password: \"' OR '1'='1\" }],\n  ['SQL injection: email --', { email: `${alice.email}' --`, password: 'x' }],\n  ['SQL injection: UNION', { email: \"x' UNION SELECT 1,2,3,4,5,6 --\", password: 'x' }],\n  ['object in password (NoSQL-style)', { email: alice.email, password: { $ne: '' } }],\n  ['array in password', { email: alice.email, password: [alice.password] }],\n  ['true as password', { email: alice.email, password: true }],\n  ['object in email', { email: { $ne: null }, password: alice.password }],\n  ['null everything', { email: null, password: null }],\n  ['random garbage', { email: '💩'.repeat(50), password: '\\u0000\\u0000\\u0000' }],\n];\nfor (const [label, body] of loginCases) {\n  const r = await post('/api/auth/login', body);\n  ok(r.status === 401 && !r.body?.token, `login refused: ${label}`, `${r.status}`);\n}\nok((await post('/api/auth/login', { email: alice.email, password: alice.password })).status === 200, 'correct credentials log in');\nok((await post('/api/auth/login', { email: `  ${alice.email.toUpperCase()} `, password: alice.password })).status === 200, 'email is case/space-insensitive (by design)');\nconst sameMsg = (await post('/api/auth/login', { email: alice.email, password: 'wrongpass1' })).body.error === (await post('/api/auth/login', { email: `nope${stamp}@t.com`, password: 'x' })).body.error;\nok(sameMsg, 'same error for wrong password vs unknown email (no account enumeration at login)');\n\n// bcrypt only uses the first 72 bytes of a password\nconst p72 = 'a'.repeat(72);\nconst trunc = await post('/api/auth/register', { name: 'T', email: `trunc${stamp}@t.com`, password: p72 + 'SECRET-PART' });\nconst truncLogin = await post('/api/auth/login', { email: `trunc${stamp}@t.com`, password: p72 + 'totally-different' });\nok(trunc.status === 400 || truncLogin.status === 401, 'long passwords: different characters after byte 72 must NOT log in', `register ${trunc.status}, login ${truncLogin.status}`);\n\nconsole.log('\\n=== 3. Malformed requests ===');\nconst malformed = [\n  ['broken JSON', { rawBody: '{\"email\": \"a@b.com\", \"password\": ', type: 'application/json' }],\n  ['JSON null', { rawBody: 'null', type: 'application/json' }],\n  ['JSON array', { rawBody: '[1,2,3]', type: 'application/json' }],\n  ['plain text body', { rawBody: 'email=a@b.com&password=x', type: 'text/plain' }],\n  ['form-encoded body', { rawBody: 'email=a@b.com&password=x', type: 'application/x-www-form-urlencoded' }],\n  ['no content type', { rawBody: '{\"email\":\"a@b.com\"}', type: null }],\n];\nfor (const [label, opts] of malformed) {\n  const r = await raw('POST', '/api/auth/login', opts);\n  ok(r.status >= 400 && r.status < 500 && !r.body?.token, `login with ${label} → 4xx, no token`, `${r.status}`);\n}\n\nconsole.log('\\n=== 4. Tokens: forged, tampered, expired ===');\nconst protectedGet = '/api/customers';\nconst tokenCases = [\n  ['no Authorization header', undefined],\n  ['empty header', ''],\n  ['\"Bearer\" with no token', 'Bearer '],\n  ['garbage token', 'abc.def.ghi'],\n  ['token without Bearer prefix', A.replace(/^/, '')],\n  ['tampered payload (user id changed)', (() => { const [h, , s] = A.split('.'); const p = Buffer.from(JSON.stringify({ sub: 2, iat: Math.floor(Date.now() / 1000) })).toString('base64url'); return `${h}.${p}.${s}`; })()],\n  ['tampered signature', A.slice(0, -3) + (A.endsWith('abc') ? 'xyz' : 'abc')],\n  ['alg \"none\" token', (() => { const h = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url'); const p = Buffer.from(JSON.stringify({ sub: 1 })).toString('base64url'); return `${h}.${p}.`; })()],\n  ['signed with a random secret', jwt.sign({ sub: 1 }, 'some-other-secret')],\n  ['expired token', jwt.sign({ sub: 1, exp: Math.floor(Date.now() / 1000) - 60 }, 'dev-only-secret-change-me')],\n];\nfor (const [label, t] of tokenCases) {\n  const headers = t === undefined ? {} : { Authorization: label === 'token without Bearer prefix' ? t : (t.startsWith('Bearer') || t === '' ? t : `Bearer ${t}`) };\n  const r = await fetch(B + protectedGet, { headers });\n  ok(r.status === 401, `rejects ${label}`, `${r.status}`);\n}\nconst forged = jwt.sign({ sub: 1 }, 'dev-only-secret-change-me', { expiresIn: '1h' });\nconst forgedRes = await get('/api/auth/me', forged);\nok(forgedRes.status === 401, 'token forged with the default secret from the public repo must be rejected', forgedRes.status === 200 ? `LOGGED IN AS ${forgedRes.body.user.email}` : `${forgedRes.status}`);\nconst ghost = jwt.sign({ sub: 999999 }, 'dev-only-secret-change-me', { expiresIn: '1h' });\nconst ghostPlan = await post('/api/plans', { name: 'Ghost', price_paise: 100 }, ghost);\nok(ghostPlan.status === 401, 'token for a non-existent user cannot create data', `${ghostPlan.status}`);\nconst oldA = A;\nok((await get('/api/auth/me', oldA)).status === 200, 'valid token works');\n\nconsole.log('\\n=== 5. Every protected endpoint needs login ===');\nconst endpoints = [\n  ['GET', '/api/auth/me'], ['GET', '/api/plans'], ['POST', '/api/plans'], ['GET', '/api/plans/1'], ['PUT', '/api/plans/1'], ['DELETE', '/api/plans/1'],\n  ['GET', '/api/customers'], ['POST', '/api/customers'], ['GET', '/api/customers/1'], ['PUT', '/api/customers/1'], ['DELETE', '/api/customers/1'],\n  ['GET', '/api/customers/phone/9845000000'], ['POST', '/api/customers/1/subscriptions'], ['GET', '/api/subscriptions/1'],\n  ['POST', '/api/subscriptions/1/pause'], ['POST', '/api/subscriptions/1/resume'], ['POST', '/api/subscriptions/1/end'],\n  ['POST', '/api/subscriptions/1/transfer'], ['GET', '/api/subscriptions/1/bill'], ['DELETE', '/api/pauses/1'],\n  ['GET', '/api/bills'], ['POST', '/api/bills/generate'], ['GET', '/api/dashboard'], ['POST', '/api/import/customers'],\n];\nfor (const [m, p] of endpoints) {\n  const r = await raw(m, p, { body: {} });\n  ok(r.status === 401, `${m} ${p} without login → 401`, `${r.status}`);\n}\n\nconsole.log('\\n=== 6. Users cannot see or change each other\\'s data ===');\nconst demo = (await post('/api/auth/login', { email: 'demo@tiffin.app', password: 'demo1234' })).body.token;\nconst demoCust = (await get('/api/customers?limit=1', demo)).body.data[0];\nconst demoSub = (await get(`/api/customers/${demoCust.id}`, demo)).body.subscriptions[0];\nconst demoPlan = (await get('/api/plans?limit=1', demo)).body.data[0];\nconst cross = [\n  ['read customer', 'GET', `/api/customers/${demoCust.id}`],\n  ['edit customer', 'PUT', `/api/customers/${demoCust.id}`, { name: 'Hacked', phone: '9999999999' }],\n  ['delete customer', 'DELETE', `/api/customers/${demoCust.id}`],\n  ['phone lookup', 'GET', `/api/customers/phone/${demoCust.phone}`],\n  ['read plan', 'GET', `/api/plans/${demoPlan.id}`],\n  ['edit plan', 'PUT', `/api/plans/${demoPlan.id}`, { name: 'Hacked', price_paise: 1 }],\n  ['delete plan', 'DELETE', `/api/plans/${demoPlan.id}`],\n  ['subscribe their customer', 'POST', `/api/customers/${demoCust.id}/subscriptions`, { plan_id: demoPlan.id }],\n  ['read subscription', 'GET', `/api/subscriptions/${demoSub.id}`],\n  ['pause their subscription', 'POST', `/api/subscriptions/${demoSub.id}/pause`, { start_date: '2026-10-01', end_date: '2026-10-02' }],\n  ['resume their subscription', 'POST', `/api/subscriptions/${demoSub.id}/resume`, {}],\n  ['end their subscription', 'POST', `/api/subscriptions/${demoSub.id}/end`, {}],\n  ['transfer their subscription', 'POST', `/api/subscriptions/${demoSub.id}/transfer`, { effective_date: '2026-09-25', customer: { name: 'Thief', phone: '9111122222' } }],\n  ['read their bill', 'GET', `/api/subscriptions/${demoSub.id}/bill`],\n];\nfor (const [label, m, p, body] of cross) {\n  const r = await raw(m, p, { body: body ?? {}, token: A });\n  ok(r.status === 404, `Alice cannot ${label} of demo owner`, `${r.status}`);\n}\nconst aliceList = (await get('/api/customers?limit=100', A)).body;\nok(aliceList.total === 0, 'Alice\\'s customer list does not include demo customers', `${aliceList.total}`);\nconst alicePlan = (await post('/api/plans', { name: 'Alice Plan', price_paise: 200000 }, A)).body;\nconst aliceCust = (await post('/api/customers', { name: 'Alice Cust', phone: '9333300000' }, A)).body;\nok((await post(`/api/customers/${aliceCust.id}/subscriptions`, { plan_id: demoPlan.id }, A)).status === 400, 'Alice cannot subscribe her customer to the demo owner\\'s plan');\nconst aliceSub = (await post(`/api/customers/${aliceCust.id}/subscriptions`, { plan_id: alicePlan.id, start_date: '2026-09-01' }, A)).body;\nok((await post(`/api/subscriptions/${aliceSub.id}/transfer`, { effective_date: '2026-09-25', to_customer_id: demoCust.id }, A)).status === 400, 'Alice cannot transfer to the demo owner\\'s customer');\nok((await post('/api/customers', { name: 'Same phone', phone: demoCust.phone }, A)).status === 201, 'different owners may each have a customer with the same phone');\nconst dup = (await post('/api/import/customers', { csv: `name,phone,plan,start_date\\nX,${demoCust.phone},Alice Plan,2026-09-01` }, A)).body;\nok(dup.details?.imported?.[0]?.customer === 'existing' || dup.deduped === 1, 'import only matches Alice\\'s own customers', JSON.stringify({ i: dup.imported, d: dup.deduped }));\nok((await get('/api/bills?month=2026-09', A)).body.total === 0, 'Alice sees no demo bills');\nok((await get('/api/outbox?limit=100', A)).body.data.every((m) => m.customer_name !== demoCust.name), 'Alice\\'s outbox has no demo customers');\nok((await get(`/api/customers/${demoCust.id}`, demo)).body.name === demoCust.name, 'demo data unchanged after all attempts');\n\nconsole.log('\\n=== 7. Input validation on data endpoints (crash hunting) ===');\nconst fuzz = [\n  ['plan price huge number', 'POST', '/api/plans', { name: 'Big', price_paise: 1e20 }],\n  ['plan price negative', 'POST', '/api/plans', { name: 'Neg', price_paise: -5 }],\n  ['plan price decimal', 'POST', '/api/plans', { name: 'Dec', price_paise: 10.5 }],\n  ['plan price string', 'POST', '/api/plans', { name: 'Str', price_paise: 'abc' }],\n  ['plan name object', 'POST', '/api/plans', { name: { a: 1 }, price_paise: 100 }],\n  ['customer phone letters', 'POST', '/api/customers', { name: 'P', phone: 'abcdefghij' }],\n  ['customer phone object', 'POST', '/api/customers', { name: 'P', phone: { x: 1 } }],\n  ['customer id text', 'GET', '/api/customers/abc'],\n  ['customer id negative', 'GET', '/api/customers/-1'],\n  ['customer id huge', 'GET', '/api/customers/99999999999999999999'],\n  ['customer id SQL', 'GET', \"/api/customers/1%20OR%201=1\"],\n  ['subscribe plan_id object', 'POST', `/api/customers/${aliceCust.id}/subscriptions`, { plan_id: { id: 1 } }],\n  ['subscribe plan_id array', 'POST', `/api/customers/${aliceCust.id}/subscriptions`, { plan_id: [1, 2] }],\n  ['subscribe bad date', 'POST', `/api/customers/${aliceCust.id}/subscriptions`, { plan_id: alicePlan.id, start_date: '2026-02-30' }],\n  ['subscribe date object', 'POST', `/api/customers/${aliceCust.id}/subscriptions`, { plan_id: alicePlan.id, start_date: { y: 2026 } }],\n  ['pause dates as numbers', 'POST', `/api/subscriptions/${aliceSub.id}/pause`, { start_date: 20260901, end_date: 20260902 }],\n  ['pause reason object', 'POST', `/api/subscriptions/${aliceSub.id}/pause`, { start_date: '2026-10-05', end_date: '2026-10-06', reason: { a: 1 } }],\n  ['transfer to_customer_id object', 'POST', `/api/subscriptions/${aliceSub.id}/transfer`, { effective_date: '2026-09-25', to_customer_id: { id: 1 } }],\n  ['transfer to_customer_id array', 'POST', `/api/subscriptions/${aliceSub.id}/transfer`, { effective_date: '2026-09-25', to_customer_id: [1] }],\n  ['transfer customer as string', 'POST', `/api/subscriptions/${aliceSub.id}/transfer`, { effective_date: '2026-09-25', customer: 'bob' }],\n  ['bills bad month', 'GET', '/api/bills?month=2026-13'],\n  ['bills month array', 'GET', '/api/bills?month[]=2026-09'],\n  ['generate month object', 'POST', '/api/bills/generate', { month: { m: 9 } }],\n  ['list page huge', 'GET', '/api/customers?page=99999999999&limit=100000'],\n  ['list page negative/text', 'GET', '/api/customers?page=-5&limit=abc'],\n  ['list sort injection', 'GET', '/api/customers?sort=name;DROP%20TABLE%20users&order=desc;--'],\n  ['list sort array', 'GET', '/api/customers?sort[]=name&order[]=desc'],\n  ['list search array', 'GET', '/api/customers?search[]=a&status[]=paused'],\n  ['as_of garbage', 'GET', '/api/customers?as_of=yesterday'],\n  ['outbox customer_id array', 'GET', '/api/outbox?customer_id=1&customer_id=2'],\n  ['outbox customer_id text', 'GET', '/api/outbox?customer_id=abc'],\n  ['outbox date array', 'GET', '/api/outbox?date[]=2026-09-01'],\n  ['import csv number', 'POST', '/api/import/customers', { csv: 12345 }],\n  ['import rows of junk', 'POST', '/api/import/customers', { rows: [null, 'text', 42, [], { phone: { x: 1 } }] }],\n  ['import default_plan_id object', 'POST', '/api/import/customers', { csv: 'name,phone\\nA,9000000000', default_plan_id: { a: 1 } }],\n  ['import default_start_date bad', 'POST', '/api/import/customers', { csv: 'name,phone\\nA,9000000000', default_start_date: '31/31/2026' }],\n  ['clock days as string', 'POST', '/clock', { advance_days: 'ten' }],\n  ['clock days huge', 'POST', '/clock', { advance_days: 100000 }],\n  ['clock date object', 'POST', '/clock', { date: { d: 1 } }],\n];\nfor (const [label, m, p, body] of fuzz) {\n  const r = await raw(m, p, { body: body ?? undefined, token: A });\n  ok(r.status < 500, `no crash: ${label}`, `${r.status}${r.body?.error ? ' ' + r.body.error : ''}`);\n}\nok((await get('/api/plans?limit=100', A)).body.data.every((p) => p.price_paise > 0 && Number.isInteger(p.price_paise) && p.price_paise < 1e12), 'no invalid plan price was saved');\nawait raw('POST', '/clock', { body: { reset: true } });\n\nconsole.log('\\n=== 8. Logout & session ===');\nconst fresh = (await post('/api/auth/login', { email: bob.email, password: bob.password })).body.token;\nok((await get('/api/auth/me', fresh)).body.user.email === bob.email, 'token identifies the right user (Bob)');\nok((await get('/api/auth/me', A)).body.user.email === alice.email, 'token identifies the right user (Alice)');\n\nconsole.log(`\\nServer still alive: ${await alive()}`);\nconsole.log(`\\n${results.pass} passed, ${results.fail} failed, ${results.crashes.length} server errors (5xx)`);\nif (results.failures.length) console.log('\\nFAILURES:\\n- ' + results.failures.join('\\n- '));\nif (results.crashes.length) console.log('\\n5xx RESPONSES:\\n- ' + [...new Set(results.crashes)].join('\\n- '));\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && node audit.mjs 2>&1 | grep -v \"^PASS\" ; echo \"--- server log errors ---\"; grep -i -A3 \"error\" a.log | head -30",
+  "description": "Run auth and validation audit",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/audit.mjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+=== 1. Registration validation ===
+
+=== 2. Login: only correct credentials get in ===
+FAIL  long passwords: different characters after byte 72 must NOT log in  → register 201, login 200
+
+=== 3. Malformed requests ===
+
+=== 4. Tokens: forged, tampered, expired ===
+FAIL  token forged with the default secret from the public repo must be rejected  → LOGGED IN AS demo@tiffin.app
+FAIL  token for a non-existent user cannot create data  → 500
+
+=== 5. Every protected endpoint needs login ===
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+[TypeError: Request with GET/HEAD method cannot have body.]
+
+Node.js v24.20.0
+--- server log errors ---
+Error: FOREIGN KEY constraint failed
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/plans.js:42:8
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js:17:17
+    at Layer.handle [as handle_request] (C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\node_modules\express\lib\router\layer.js:95:5)
+--
+  code: 'ERR_SQLITE_ERROR',
+  errcode: 787,
+  errstr: 'constraint failed'
+}
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && sed -i \"s#const res = await fetch(B + path, { method, headers, body: rawBody !== undefined ? rawBody : body !== undefined ? JSON.stringify(body) : undefined });#const noBody = method === 'GET' || method === 'HEAD';\\n  const res = await fetch(B + path, { method, headers, body: noBody ? undefined : rawBody !== undefined ? rawBody : body !== undefined ? JSON.stringify(body) : undefined });#\" audit.mjs && node audit.mjs 2>&1 | grep -v \"^PASS\"; echo \"--- 5xx stack traces in server log ---\"; grep -B1 -A2 \"^\\(Error\\|TypeError\\|RangeError\\)\" a.log | grep -v node_modules | head -40",
+  "description": "Fix script and rerun full audit",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+=== 1. Registration validation ===
+
+=== 2. Login: only correct credentials get in ===
+FAIL  long passwords: different characters after byte 72 must NOT log in  → register 201, login 200
+
+=== 3. Malformed requests ===
+
+=== 4. Tokens: forged, tampered, expired ===
+FAIL  token forged with the default secret from the public repo must be rejected  → LOGGED IN AS demo@tiffin.app
+FAIL  token for a non-existent user cannot create data  → 500
+
+=== 5. Every protected endpoint needs login ===
+
+=== 6. Users cannot see or change each other's data ===
+
+=== 7. Input validation on data endpoints (crash hunting) ===
+FAIL  no crash: subscribe plan_id object  → 500 Internal server error
+FAIL  no crash: subscribe plan_id array  → 500 Internal server error
+FAIL  no crash: transfer to_customer_id object  → 500 Internal server error
+FAIL  no crash: transfer to_customer_id array  → 500 Internal server error
+FAIL  no invalid plan price was saved
+
+=== 8. Logout & session ===
+
+Server still alive: true
+
+139 passed, 8 failed, 5 server errors (5xx)
+
+FAILURES:
+- long passwords: different characters after byte 72 must NOT log in → register 201, login 200
+- token forged with the default secret from the public repo must be rejected → LOGGED IN AS demo@tiffin.app
+- token for a non-existent user cannot create data → 500
+- no crash: subscribe plan_id object → 500 Internal server error
+- no crash: subscribe plan_id array → 500 Internal server error
+- no crash: transfer to_customer_id object → 500 Internal server error
+- no crash: transfer to_customer_id array → 500 Internal server error
+- no invalid plan price was saved
+
+5xx RESPONSES:
+- POST /api/plans {"name":"Ghost","price_paise":100}
+- POST /api/customers/33/subscriptions {"plan_id":{"id":1}}
+- POST /api/customers/33/subscriptions {"plan_id":[1,2]}
+- POST /api/subscriptions/31/transfer {"effective_date":"2026-09-25","to_customer_id":{"id":1}}
+- POST /api/subscriptions/31/transfer {"effective_date":"2026-09-25","to_customer_id":[1]}
+--- 5xx stack traces in server log ---
+GET /api/customers -> 401 (1ms)
+Error: FOREIGN KEY constraint failed
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/plans.js:42:8
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js:17:17
+--
+GET /api/customers -> 401 (1ms)
+Error: FOREIGN KEY constraint failed
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/plans.js:42:8
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js:17:17
+--
+GET /api/customers/1%20OR%201=1 -> 404 (2ms)
+Error: Unknown named parameter 'id'
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:34:82
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js:17:17
+--
+POST /api/customers/33/subscriptions -> 500 (2ms)
+Error: Unknown named parameter '0'
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:34:82
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/http.js:17:17
+--
+POST /api/subscriptions/31/pause -> 400 (1ms)
+Error: Unknown named parameter 'id'
+    at resolveTargetCustomer (file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:209:90)
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:139:22
+--
+POST /api/subscriptions/31/transfer -> 500 (1ms)
+Error: Unknown named parameter '0'
+    at resolveTargetCustomer (file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:209:90)
+    at file:///C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src/routes/subscriptions.js:139:22
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\http.js",
+  "offset": 20,
+  "limit": 25
+}
+```
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\auth.js"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+1	import { Router } from 'express';
+2	import bcrypt from 'bcryptjs';
+3	import jwt from 'jsonwebtoken';
+4	import { badRequest, h, HttpError, jwtSecret, requireAuth, str } from '../http.js';
+5	
+6	const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+7	
+8	export default function authRoutes(db) {
+9	  const r = Router();
+10	
+11	  const sign = (user) => jwt.sign({ sub: user.id }, jwtSecret(), { expiresIn: '7d' });
+12	  const publicUser = (u) => ({ id: u.id, name: u.name, business_name: u.business_name, email: u.email });
+13	
+14	  r.post('/register', h((req, res) => {
+15	    const name = str(req.body.name, 100);
+16	    const business_name = str(req.body.business_name, 100);
+17	    const email = str(req.body.email, 200).toLowerCase();
+18	    const password = typeof req.body.password === 'string' ? req.body.password : '';
+19	
+20	    const errors = {};
+21	    if (!name) errors.name = 'Name is required';
+22	    if (!EMAIL_RE.test(email)) errors.email = 'A valid email is required';
+23	    if (password.length < 8) errors.password = 'Password must be at least 8 characters';
+24	    if (Object.keys(errors).length) throw badRequest('Validation failed', errors);
+25	
+26	    if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
+27	      throw new HttpError(409, 'An account with this email already exists');
+28	    }
+29	
+30	    const hash = bcrypt.hashSync(password, 10);
+31	    const { lastInsertRowid } = db
+32	      .prepare('INSERT INTO users (name, business_name, email, password_hash) VALUES (?, ?, ?, ?)')
+33	      .run(name, business_name, email, hash);
+34	    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(lastInsertRowid);
+35	    res.status(201).json({ token: sign(user), user: publicUser(user) });
+36	  }));
+37	
+38	  r.post('/login', h((req, res) => {
+39	    const email = str(req.body.email, 200).toLowerCase();
+40	    const password = typeof req.body.password === 'string' ? req.body.password : '';
+41	    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+42	    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+43	      throw new HttpError(401, 'Invalid email or password');
+44	    }
+45	    res.json({ token: sign(user), user: publicUser(user) });
+46	  }));
+47	
+48	  r.get('/me', requireAuth, h((req, res) => {
+49	    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId);
+50	    if (!user) throw new HttpError(401, 'User no longer exists');
+51	    res.json({ user: publicUser(user) });
+52	  }));
+53	
+54	  return r;
+55	}
+56
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+20	    next(err);
+21	  }
+22	};
+23	
+24	export function jwtSecret() {
+25	  return process.env.JWT_SECRET || 'dev-only-secret-change-me';
+26	}
+27	
+28	export function requireAuth(req, _res, next) {
+29	  const header = req.headers.authorization || '';
+30	  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+31	  if (!token) return next(new HttpError(401, 'Authentication required'));
+32	  try {
+33	    const payload = jwt.verify(token, jwtSecret());
+34	    req.userId = payload.sub;
+35	    next();
+36	  } catch {
+37	    next(new HttpError(401, 'Invalid or expired token'));
+38	  }
+39	}
+40	
+41	/**
+42	 * Parse page/limit/sort/order from the query string. `sortable` maps public
+43	 * sort keys to trusted SQL expressions, so user input never reaches SQL.
+44	 */
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\http.js",
+  "old_string": "export function jwtSecret() {\n  return process.env.JWT_SECRET || 'dev-only-secret-change-me';\n}\n\nexport function requireAuth(req, _res, next) {\n  const header = req.headers.authorization || '';\n  const token = header.startsWith('Bearer ') ? header.slice(7) : null;\n  if (!token) return next(new HttpError(401, 'Authentication required'));\n  try {\n    const payload = jwt.verify(token, jwtSecret());\n    req.userId = payload.sub;\n    next();\n  } catch {\n    next(new HttpError(401, 'Invalid or expired token'));\n  }\n}",
+  "new_string": "let secret = null;\nlet userExists = () => false;\n\n/**\n * Set up token signing for this database. Uses JWT_SECRET when provided;\n * otherwise a random 384-bit secret is generated once and kept in the\n * settings table. There is deliberately no hard-coded fallback: a secret\n * that appears in the public source code would let anyone forge a login.\n */\nexport function initAuth(db) {\n  if (process.env.JWT_SECRET) {\n    if (process.env.JWT_SECRET.length < 32) console.warn('[warn] JWT_SECRET is shorter than 32 characters; use a long random value');\n    secret = process.env.JWT_SECRET;\n  } else {\n    const row = db.prepare(\"SELECT value FROM settings WHERE key = 'jwt_secret'\").get();\n    secret = row?.value;\n    if (!secret) {\n      secret = crypto.randomBytes(48).toString('hex');\n      db.prepare(\"INSERT INTO settings (key, value) VALUES ('jwt_secret', ?)\").run(secret);\n    }\n  }\n  const stmt = db.prepare('SELECT 1 FROM users WHERE id = ?');\n  userExists = (id) => Boolean(stmt.get(id));\n}\n\nexport function jwtSecret() {\n  if (!secret) throw new Error('initAuth(db) must be called before signing tokens');\n  return secret;\n}\n\nexport function requireAuth(req, _res, next) {\n  const header = req.headers.authorization || '';\n  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : null;\n  if (!token) return next(new HttpError(401, 'Authentication required'));\n  let payload;\n  try {\n    payload = jwt.verify(token, jwtSecret(), { algorithms: ['HS256'] });\n  } catch {\n    return next(new HttpError(401, 'Invalid or expired token'));\n  }\n  // A validly signed token is not enough: the account must still exist.\n  if (!Number.isSafeInteger(payload.sub) || !userExists(payload.sub)) {\n    return next(new HttpError(401, 'Account no longer exists; please log in again'));\n  }\n  req.userId = payload.sub;\n  next();\n}\n\n/** Positive integer id from a JSON value or string, else null (never throws). */\nexport function toId(v) {\n  const n = typeof v === 'number' ? v : typeof v === 'string' && /^\\s*\\d+\\s*$/.test(v) ? Number(v) : NaN;\n  return Number.isSafeInteger(n) && n > 0 ? n : null;\n}"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\http.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\http.js",
+  "old_string": "import jwt from 'jsonwebtoken';",
+  "new_string": "import crypto from 'node:crypto';\nimport jwt from 'jsonwebtoken';"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\http.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\src\\routes\\auth.js",
+  "content": "import { Router } from 'express';\nimport bcrypt from 'bcryptjs';\nimport jwt from 'jsonwebtoken';\nimport { badRequest, h, HttpError, jwtSecret, requireAuth, str } from '../http.js';\n\nconst EMAIL_RE = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n// bcrypt only looks at the first 72 bytes; longer passwords would silently\n// match anything sharing that prefix, so they are refused instead.\nconst MAX_PASSWORD_BYTES = 72;\n\nconst WINDOW_MS = 15 * 60 * 1000;\nconst maxAttempts = () => Number(process.env.LOGIN_MAX_ATTEMPTS) || 10;\n\nexport default function authRoutes(db) {\n  const r = Router();\n\n  const sign = (user) => jwt.sign({ sub: user.id }, jwtSecret(), { expiresIn: '7d', algorithm: 'HS256' });\n  const publicUser = (u) => ({ id: u.id, name: u.name, business_name: u.business_name, email: u.email });\n\n  // Failed-login throttle per (client IP, email): slows password guessing.\n  const failures = new Map();\n  const throttleKey = (req, email) => `${req.ip}|${email}`;\n  const recentFailures = (key) => {\n    const now = Date.now();\n    const list = (failures.get(key) || []).filter((t) => now - t < WINDOW_MS);\n    if (list.length) failures.set(key, list); else failures.delete(key);\n    return list;\n  };\n\n  r.post('/register', h((req, res) => {\n    const name = str(req.body.name, 100);\n    const business_name = str(req.body.business_name, 100);\n    const email = str(req.body.email, 200).toLowerCase();\n    const password = typeof req.body.password === 'string' ? req.body.password : '';\n\n    const errors = {};\n    if (!name) errors.name = 'Name is required';\n    if (!EMAIL_RE.test(email)) errors.email = 'A valid email is required';\n    if (password.length < 8) errors.password = 'Password must be at least 8 characters';\n    else if (!password.trim()) errors.password = 'Password cannot be only spaces';\n    else if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) errors.password = 'Password is too long (maximum 72 bytes, about 72 English characters)';\n    if (Object.keys(errors).length) throw badRequest('Validation failed', errors);\n\n    if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {\n      throw new HttpError(409, 'An account with this email already exists');\n    }\n\n    const hash = bcrypt.hashSync(password, 10);\n    const { lastInsertRowid } = db\n      .prepare('INSERT INTO users (name, business_name, email, password_hash) VALUES (?, ?, ?, ?)')\n      .run(name, business_name, email, hash);\n    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(lastInsertRowid);\n    res.status(201).json({ token: sign(user), user: publicUser(user) });\n  }));\n\n  r.post('/login', h((req, res) => {\n    const email = str(req.body.email, 200).toLowerCase();\n    const password = typeof req.body.password === 'string' ? req.body.password : '';\n\n    const key = throttleKey(req, email);\n    const recent = recentFailures(key);\n    if (recent.length >= maxAttempts()) {\n      const waitMin = Math.ceil((WINDOW_MS - (Date.now() - recent[0])) / 60000);\n      res.set('Retry-After', String(waitMin * 60));\n      throw new HttpError(429, `Too many failed login attempts. Try again in ${waitMin} minute${waitMin === 1 ? '' : 's'}.`);\n    }\n\n    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);\n    const valid = user\n      && password.length > 0\n      && Buffer.byteLength(password, 'utf8') <= MAX_PASSWORD_BYTES\n      && bcrypt.compareSync(password, user.password_hash);\n    if (!valid) {\n      recent.push(Date.now());\n      failures.set(key, recent);\n      throw new HttpError(401, 'Invalid email or password');\n    }\n    failures.delete(key);\n    res.json({ token: sign(user), user: publicUser(user) });\n  }));\n\n  r.get('/me', requireAuth, h((req, res) => {\n    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId);\n    res.json({ user: publicUser(user) });\n  }));\n\n  return r;\n}\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\src\routes\auth.js has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src\" && node - <<'EOF'\nconst fs=require('fs');\nconst edit=(f,pairs)=>{let s=fs.readFileSync(f,'utf8');for(const [a,b] of pairs){if(!s.includes(a))throw new Error(f+' missing '+a);s=s.replace(a,b);}fs.writeFileSync(f,s);};\nedit('app.js',[[\"import { HttpError, requireAuth } from './http.js';\",\"import { HttpError, initAuth, requireAuth } from './http.js';\"],[\"  loadClock(db);\",\"  loadClock(db);\\n  initAuth(db);\"]]);\nedit('index.js',[[\"if (!process.env.JWT_SECRET) console.warn('[warn] JWT_SECRET not set; using an insecure development secret');\",\"if (!process.env.JWT_SECRET) console.log('JWT_SECRET not set; using a random secret generated for this database');\"]]);\nedit('routes/subscriptions.js',[\n [\"import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str } from '../http.js';\",\"import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str, toId } from '../http.js';\"],\n [\".get(req.body.plan_id, req.userId);\",\".get(toId(req.body.plan_id), req.userId);\"],\n [\"    const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(body.to_customer_id, owner);\\n    if (!customer) throw badRequest('to_customer_id must reference one of your customers');\",\n  \"    const id = toId(body.to_customer_id);\\n    const customer = id && db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(id, owner);\\n    if (!customer) throw badRequest('to_customer_id must reference one of your customers');\"],\n]);\nedit('routes/plans.js',[[\"if (!Number.isInteger(price_paise) || price_paise <= 0) errors.price_paise = 'Price must be a positive whole number of paise';\",\n \"if (!Number.isInteger(price_paise) || price_paise <= 0) errors.price_paise = 'Price must be a positive whole number of paise';\\n    else if (price_paise > MAX_PRICE_PAISE) errors.price_paise = 'Price cannot exceed ₹10,00,000 per month';\"],\n [\"export default function planRoutes(db) {\",\"const MAX_PRICE_PAISE = 100_000_000; // ₹10,00,000\\n\\nexport default function planRoutes(db) {\"]]);\nconsole.log('ok');\nEOF\ngrep -n \"plan_id\" routes/subscriptions.js | head -3",
+  "description": "Wire auth init, safe ids, and price cap"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+[stdin]:2
+const edit=(f,pairs)=>{let s=fs.readFileSync(f,'utf8');for(const [a,b] of pairs){if(!s.includes(a))throw new Error(f+' missing '+a);s=s.replace(a,b);}fs.writeFileSync(f,s);};
+                                                                                                   ^
+
+Error: routes/subscriptions.js missing     const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(body.to_customer_id, owner);
+    if (!customer) throw badRequest('to_customer_id must reference one of your customers');
+    at edit ([stdin]:2:106)
+    at [stdin]:5:1
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
+    at [stdin]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at evalTypeScript (node:internal/process/execution:295:3)
+    at node:internal/main/eval_stdin:51:5
+    at Socket.<anonymous> (node:internal/process/execution:205:5)
+
+Node.js v24.20.0
+16:      JOIN plans pl ON pl.id = s.plan_id
+30:  // POST /api/customers/:customerId/subscriptions  { plan_id, start_date }
+34:    const plan = db.prepare('SELECT * FROM plans WHERE id = ? AND owner_id = ?').get(req.body.plan_id, req.userId);
+```
+
+</details>
+
+The multi-line match failed because of Windows line endings. `app.js` and `index.js` were patched; I'm redoing the other two with line endings normalised:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server/src\" && grep -n \"JWT_SECRET\" index.js && node - <<'EOF'\nconst fs=require('fs');\nconst edit=(f,pairs)=>{let s=fs.readFileSync(f,'utf8').replace(/\\r\\n/g,'\\n');for(const [a,b] of pairs){if(!s.includes(a))throw new Error(f+' missing '+a);s=s.replace(a,b);}fs.writeFileSync(f,s);};\nedit('routes/subscriptions.js',[\n [\"import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str } from '../http.js';\",\"import { badRequest, h, HttpError, normalizePhone, notFound, PHONE_RE, str, toId } from '../http.js';\"],\n [\".get(req.body.plan_id, req.userId);\",\".get(toId(req.body.plan_id), req.userId);\"],\n [\"    const customer = db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(body.to_customer_id, owner);\\n    if (!customer) throw badRequest('to_customer_id must reference one of your customers');\",\n  \"    const id = toId(body.to_customer_id);\\n    const customer = id && db.prepare('SELECT * FROM customers WHERE id = ? AND owner_id = ?').get(id, owner);\\n    if (!customer) throw badRequest('to_customer_id must reference one of your customers');\"],\n]);\nedit('routes/plans.js',[[\"if (!Number.isInteger(price_paise) || price_paise <= 0) errors.price_paise = 'Price must be a positive whole number of paise';\",\n \"if (!Number.isInteger(price_paise) || price_paise <= 0) errors.price_paise = 'Price must be a positive whole number of paise';\\n    else if (price_paise > MAX_PRICE_PAISE) errors.price_paise = 'Price cannot exceed ₹10,00,000 per month';\"],\n [\"export default function planRoutes(db) {\",\"const MAX_PRICE_PAISE = 100_000_000; // ₹10,00,000\\n\\nexport default function planRoutes(db) {\"]]);\nconsole.log('ok');\nEOF\ncd .. && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|not ok|Error\" | head",
+  "description": "Apply remaining fixes and run tests",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+6:if (!process.env.JWT_SECRET) console.log('JWT_SECRET not set; using a random secret generated for this database');
+ok
+ℹ tests 22
+ℹ pass 22
+ℹ fail 0
+```
+
+</details>
+
+Existing tests still pass. Now I'll extend the audit to cover brute-force throttling, restart the audit server with the fixes, and run it again:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && node - <<'EOF'\nconst fs=require('fs');let s=fs.readFileSync('audit.mjs','utf8');\ns=s.replace(\"ok(r.status === 401 && !r.body?.token, `login refused: ${label}`, `${r.status}`);\",\"ok((r.status === 401 || r.status === 429) && !r.body?.token, `login refused: ${label}`, `${r.status}`);\");\n// use a fresh account for the \"correct credentials\" checks, since alice may now be throttled\ns=s.replace(\"ok((await post('/api/auth/login', { email: alice.email, password: alice.password })).status === 200, 'correct credentials log in');\",\n\"ok((await post('/api/auth/login', { email: bob.email, password: bob.password })).status === 200, 'correct credentials log in');\");\ns=s.replace(\"ok((await post('/api/auth/login', { email: `  ${alice.email.toUpperCase()} `, password: alice.password })).status === 200, 'email is case/space-insensitive (by design)');\",\n\"ok((await post('/api/auth/login', { email: `  ${bob.email.toUpperCase()} `, password: bob.password })).status === 200, 'email is case/space-insensitive (by design)');\");\ns=s.replace(\"const sameMsg = (await post('/api/auth/login', { email: alice.email, password: 'wrongpass1' })).body.error\",\"const sameMsg = (await post('/api/auth/login', { email: `x${stamp}@q.com`, password: 'wrongpass1' })).body.error\");\ns=s.replace(\"console.log('\\\\n=== 3. Malformed requests ===');\",\n`const spaces = await post('/api/auth/register', { name: 'S', email: \\`sp\\${stamp}@t.com\\`, password: '          ' });\nok(spaces.status === 400, 'password of only spaces rejected', \\`\\${spaces.status}\\`);\n\nconsole.log('\\\\n=== 2b. Brute-force protection ===');\nconst victim = { name: 'V', email: \\`victim\\${stamp}@t.com\\`, password: 'victimpass99' };\nawait post('/api/auth/register', victim);\nlet lastStatus;\nfor (let i = 1; i <= 12; i++) lastStatus = (await post('/api/auth/login', { email: victim.email, password: 'guess' + i })).status;\nok(lastStatus === 429, 'after 10 wrong guesses further attempts are blocked (429)', \\`\\${lastStatus}\\`);\nconst lockedCorrect = await post('/api/auth/login', { email: victim.email, password: victim.password });\nok(lockedCorrect.status === 429 && !lockedCorrect.body?.token, 'even the right password is refused while locked (attacker gains nothing)', \\`\\${lockedCorrect.status}\\`);\nok((await post('/api/auth/login', { email: bob.email, password: bob.password })).status === 200, 'other accounts are not affected by the lock');\n\nconsole.log('\\\\n=== 3. Malformed requests ===');`);\nfs.writeFileSync('audit.mjs',s);console.log('audit updated');\nEOF\npid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); [ -n \"$pid\" ] && taskkill //PID $pid //F >/dev/null\ncd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && rm -f C:/Users/Dell/tt-guide/a.db* && DB_FILE=C:/Users/Dell/tt-guide/a.db node src/seed.js >/dev/null && (env -u JWT_SECRET PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/a.db node src/index.js > C:/Users/Dell/tt-guide/a.log 2>&1 &); sleep 2\nnode C:/Users/Dell/tt-guide/audit.mjs 2>&1 | grep -v \"^PASS\"; echo \"--- server errors ---\"; grep -c \"^Error\\|TypeError\" C:/Users/Dell/tt-guide/a.log; head -2 C:/Users/Dell/tt-guide/a.log",
+  "description": "Restart fixed server and rerun full audit",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+audit updated
+
+=== 1. Registration validation ===
+
+=== 2. Login: only correct credentials get in ===
+
+=== 3. Malformed requests ===
+
+=== 4. Tokens: forged, tampered, expired ===
+
+=== 5. Every protected endpoint needs login ===
+
+=== 6. Users cannot see or change each other's data ===
+
+=== 7. Input validation on data endpoints (crash hunting) ===
+
+=== 8. Logout & session ===
+
+Server still alive: true
+
+147 passed, 0 failed, 0 server errors (5xx)
+--- server errors ---
+0
+JWT_SECRET not set; using a random secret generated for this database
+Tiffin Tracker API listening on http://localhost:4100
+```
+
+</details>
+
+All 147 checks pass with 0 server errors. But the brute-force section I added didn't appear in the output, so my edit to the script didn't take. Checking:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd C:/Users/Dell/tt-guide && grep -n \"Malformed requests\\|2b\\|password of only spaces\" audit.mjs",
+  "description": "Check whether brute-force section was inserted"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+100:console.log('\n=== 3. Malformed requests ===');
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:/Users/Dell/tt-guide/audit.mjs",
+  "old_string": "console.log('\\n=== 3. Malformed requests ===');",
+  "new_string": "const spaces = await post('/api/auth/register', { name: 'S', email: `sp${stamp}@t.com`, password: '          ' });\nok(spaces.status === 400, 'password of only spaces rejected', `${spaces.status}`);\n\nconsole.log('\\n=== 2b. Brute-force protection ===');\nconst victim = { name: 'V', email: `victim${stamp}@t.com`, password: 'victimpass99' };\nawait post('/api/auth/register', victim);\nlet lastStatus;\nfor (let i = 1; i <= 12; i++) lastStatus = (await post('/api/auth/login', { email: victim.email, password: 'guess' + i })).status;\nok(lastStatus === 429, 'after 10 wrong guesses further attempts are blocked (429)', `${lastStatus}`);\nconst lockedCorrect = await post('/api/auth/login', { email: victim.email, password: victim.password });\nok(lockedCorrect.status === 429 && !lockedCorrect.body?.token, 'even the right password is refused while locked (attacker gains nothing)', `${lockedCorrect.status}`);\nok((await post('/api/auth/login', { email: bob.email, password: bob.password })).status === 200, 'other accounts are not affected by the lock');\n\nconsole.log('\\n=== 3. Malformed requests ===');"
+}
+```
+
+<details><summary>Tool result (error)</summary>
+
+```text
+<tool_use_error>File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.</tool_use_error>
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/audit.mjs 2>&1 | grep -v \"^PASS\" ; node C:/Users/Dell/tt-guide/audit.mjs 2>&1 | grep -E \"2b|429|spaces|forged|72|non-existent|plan_id|price\" ",
+  "description": "Rerun audit including brute-force checks",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+=== 1. Registration validation ===
+
+=== 2. Login: only correct credentials get in ===
+
+=== 3. Malformed requests ===
+
+=== 4. Tokens: forged, tampered, expired ===
+
+=== 5. Every protected endpoint needs login ===
+
+=== 6. Users cannot see or change each other's data ===
+
+=== 7. Input validation on data endpoints (crash hunting) ===
+
+=== 8. Logout & session ===
+
+Server still alive: true
+
+147 passed, 0 failed, 0 server errors (5xx)
+PASS  register rejects: email with spaces inside  → 400
+PASS  register rejects duplicate email with spaces
+PASS  login refused: empty body  → 429
+PASS  login refused: object in email  → 429
+PASS  login refused: null everything  → 429
+PASS  long passwords: different characters after byte 72 must NOT log in  → register 400, login 401
+PASS  login with JSON array → 4xx, no token  → 429
+PASS  login with plain text body → 4xx, no token  → 429
+PASS  login with form-encoded body → 4xx, no token  → 429
+PASS  login with no content type → 4xx, no token  → 429
+=== 4. Tokens: forged, tampered, expired ===
+PASS  token forged with the default secret from the public repo must be rejected  → 401
+PASS  token for a non-existent user cannot create data  → 401
+PASS  no crash: plan price huge number  → 400 Validation failed
+PASS  no crash: plan price negative  → 400 Validation failed
+PASS  no crash: plan price decimal  → 400 Validation failed
+PASS  no crash: plan price string  → 400 Validation failed
+PASS  no crash: subscribe plan_id object  → 400 plan_id must reference one of your plans
+PASS  no crash: subscribe plan_id array  → 400 plan_id must reference one of your plans
+PASS  no crash: import default_plan_id object  → 400 default_plan_id must reference one of your plans
+PASS  no invalid plan price was saved
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Read`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/audit.mjs",
+  "offset": 96,
+  "limit": 6
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+96	const trunc = await post('/api/auth/register', { name: 'T', email: `trunc${stamp}@t.com`, password: p72 + 'SECRET-PART' });
+97	const truncLogin = await post('/api/auth/login', { email: `trunc${stamp}@t.com`, password: p72 + 'totally-different' });
+98	ok(trunc.status === 400 || truncLogin.status === 401, 'long passwords: different characters after byte 72 must NOT log in', `register ${trunc.status}, login ${truncLogin.status}`);
+99	
+100	console.log('\n=== 3. Malformed requests ===');
+101	const malformed = [
+```
+
+</details>
+
+**Tool call — `Edit`**
+
+```json
+{
+  "replace_all": false,
+  "file_path": "C:/Users/Dell/tt-guide/audit.mjs",
+  "old_string": "console.log('\\n=== 3. Malformed requests ===');",
+  "new_string": "const spaces = await post('/api/auth/register', { name: 'S', email: `sp${stamp}@t.com`, password: '          ' });\nok(spaces.status === 400, 'password of only spaces rejected', `${spaces.status}`);\n\nconsole.log('\\n=== 2b. Brute-force protection ===');\nconst victim = { name: 'V', email: `victim${stamp}@t.com`, password: 'victimpass99' };\nawait post('/api/auth/register', victim);\nlet lastStatus;\nfor (let i = 1; i <= 12; i++) lastStatus = (await post('/api/auth/login', { email: victim.email, password: 'guess' + i })).status;\nok(lastStatus === 429, 'after 10 wrong guesses further attempts are blocked (429)', `${lastStatus}`);\nconst lockedCorrect = await post('/api/auth/login', { email: victim.email, password: victim.password });\nok(lockedCorrect.status === 429 && !lockedCorrect.body?.token, 'even the right password is refused while locked (attacker gains nothing)', `${lockedCorrect.status}`);\nok((await post('/api/auth/login', { email: bob.email, password: bob.password })).status === 200, 'other accounts are not affected by the lock');\n\nconsole.log('\\n=== 3. Malformed requests ===');"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/audit.mjs 2>&1 | sed -n '/2b/,/=== 3/p'; node C:/Users/Dell/tt-guide/audit.mjs 2>&1 | tail -3",
+  "description": "Run audit with brute-force section",
+  "timeout": 240000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+The file C:/Users/Dell/tt-guide/audit.mjs has been updated successfully. (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+=== 2b. Brute-force protection ===
+PASS  after 10 wrong guesses further attempts are blocked (429)  → 429
+PASS  even the right password is refused while locked (attacker gains nothing)  → 429
+PASS  other accounts are not affected by the lock
+
+=== 3. Malformed requests ===
+Server still alive: true
+
+151 passed, 0 failed, 0 server errors (5xx)
+Shell cwd was reset to C:\Users\Dell\AppData\Roaming\Claude\scratch-workspaces\541a60de-58d0-4608-bdf2-2380cd2289d6\27d73f48-4d7b-43a9-9022-d394e6de5686\scratch-2026-09-17-9d9c86
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "B=localhost:4100; TOK=$(curl -s -X POST $B/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"demo@tiffin.app\",\"password\":\"demo1234\"}' | node -pe 'JSON.parse(require(\"fs\").readFileSync(0)).token')\npid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); taskkill //PID $pid //F >/dev/null\ncd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && (env -u JWT_SECRET PORT=4100 DB_FILE=C:/Users/Dell/tt-guide/a.db node src/index.js > C:/Users/Dell/tt-guide/a2.log 2>&1 &); sleep 2\necho \"token after restart: $(curl -s -o /dev/null -w '%{http_code}' $B/api/auth/me -H \"Authorization: Bearer $TOK\")\"\necho \"secret differs between databases: $(node -e \"\nconst {DatabaseSync}=require('node:sqlite');\nconst a=new DatabaseSync('C:/Users/Dell/tt-guide/a.db').prepare(\\\"select value from settings where key='jwt_secret'\\\").get()?.value;\nconst b=new DatabaseSync('C:/Users/Dell/tt-guide/v.db').prepare(\\\"select value from settings where key='jwt_secret'\\\").get()?.value;\nconsole.log(Boolean(a) && a!==b, 'len', a?.length)\")\"",
+  "description": "Verify token survives restart with stored secret",
+  "timeout": 60000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+token after restart: 200
+secret differs between databases: true len 96
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/client\" && node -e \"\nconst fs=require('fs');const f='src/pages/Auth.jsx';let s=fs.readFileSync(f,'utf8');\nconst a='<label>Password<input type=\\\"password\\\" required minLength={8} autoComplete=\\\"new-password\\\" value={form.password} onChange={set(\\'password\\')} /></label>';\nif(!s.includes(a)) throw new Error('missing');\ns=s.replace(a,'<label>Password<input type=\\\"password\\\" required minLength={8} maxLength={72} autoComplete=\\\"new-password\\\" value={form.password} onChange={set(\\'password\\')} /><span className=\\\"muted small\\\">8 to 72 characters</span></label>');\nfs.writeFileSync(f,s);console.log('ok')\" && npx vite build 2>&1 | grep -E \"built|rror\"",
+  "description": "Add password length hint and rebuild client",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ok
+[32m✓ built in 2.31s[39m
+```
+
+</details>
+
+Checking the real forms in the browser. I'll try logging in as different users, with wrong passwords and injection strings, and confirm that only correct details get in:
+
+**Tool call — `mcp__Claude_Browser__navigate`**
+
+```json
+{
+  "url": "http://localhost:4100/login"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+navigated to http://localhost:4100
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `mcp__Claude_Browser__javascript_tool`**
+
+```json
+{
+  "action": "javascript_exec",
+  "text": "localStorage.clear();\nconst w=(ms)=>new Promise(r=>setTimeout(r,ms));\nconst frame = async (path) => { const f=document.createElement('iframe'); f.style.cssText='width:1000px;height:700px'; f.src=path; document.body.appendChild(f); await w(1500); return f; };\nconst setVal=(el,v)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}));};\nasync function tryLogin(email, password) {\n  localStorage.removeItem('tiffin_token');\n  const f = await frame('/login'); const d=f.contentDocument;\n  const ins=d.querySelectorAll('input'); setVal(ins[0],email); setVal(ins[1],password);\n  d.querySelector('form').noValidate = true; d.querySelector('form').requestSubmit(); await w(1500);\n  const r = { email, url: f.contentWindow.location.pathname, error: d.querySelector('.alert')?.innerText || null, tokenStored: !!localStorage.getItem('tiffin_token'), header: d.querySelector('.brand span')?.innerText || null };\n  f.remove(); return r;\n}\nasync function tryRegister(form) {\n  localStorage.removeItem('tiffin_token');\n  const f = await frame('/register'); const d=f.contentDocument;\n  const ins=d.querySelectorAll('input'); [form.name, form.biz, form.email, form.password].forEach((v,i)=>setVal(ins[i],v));\n  d.querySelector('form').noValidate = true; d.querySelector('form').requestSubmit(); await w(1800);\n  const r = { email: form.email, url: f.contentWindow.location.pathname, error: d.querySelector('.alert')?.innerText.replace(/\\n/g,' | ') || null, tokenStored: !!localStorage.getItem('tiffin_token'), header: d.querySelector('.brand span')?.innerText || null };\n  f.remove(); return r;\n}\nconst s = Date.now();\nconst out = {};\nout.reg_ok_1 = await tryRegister({ name:'Ravi Owner', biz:'Ravi Dabba', email:`ravi${s}@ui.com`, password:'ravipass123' });\nout.reg_ok_2 = await tryRegister({ name:'Sita Owner', biz:'Sita Kitchen', email:`sita${s}@ui.com`, password:'sitapass123' });\nout.reg_dup = await tryRegister({ name:'Dup', biz:'', email:`RAVI${s}@ui.com`, password:'whatever123' });\nout.reg_short = await tryRegister({ name:'Short', biz:'', email:`short${s}@ui.com`, password:'abc' });\nout.reg_bad_email = await tryRegister({ name:'', biz:'', email:'not-an-email', password:'password123' });\nout.reg_spaces = await tryRegister({ name:'Sp', biz:'', email:`sp${s}@ui.com`, password:'          ' });\nout.login_ravi = await tryLogin(`ravi${s}@ui.com`, 'ravipass123');\nout.login_sita = await tryLogin(`sita${s}@ui.com`, 'sitapass123');\nout.login_demo = await tryLogin('demo@tiffin.app', 'demo1234');\nout.login_wrong_pw = await tryLogin(`sita${s}@ui.com`, 'ravipass123');\nout.login_sqli = await tryLogin(\"' OR '1'='1' --\", \"' OR '1'='1\");\nout.login_random = await tryLogin('anything@anything.com', 'anything123');\nout.login_empty = await tryLogin('', '');\nout;"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+{
+  "login_demo": {
+    "email": "demo@tiffin.app",
+    "error": null,
+    "header": "Annapurna Tiffins",
+    "tokenStored": true,
+    "url": "/app"
+  },
+  "login_empty": {
+    "email": "",
+    "error": "Invalid email or password",
+    "header": null,
+    "tokenStored": false,
+    "url": "/login"
+  },
+  "login_random": {
+    "email": "anything@anything.com",
+    "error": "Invalid email or password",
+    "header": null,
+    "tokenStored": false,
+    "url": "/login"
+  },
+  "login_ravi": {
+    "email": "ravi1789644367272@ui.com",
+    "error": null,
+    "header": "Ravi Dabba",
+    "tokenStored": true,
+    "url": "/app"
+  },
+  "login_sita": {
+    "email": "sita1789644367272@ui.com",
+    "error": null,
+    "header": "Sita Kitchen",
+    "tokenStored": true,
+    "url": "/app"
+  },
+  "login_sqli": {
+    "email": "' OR '1'='1' --",
+    "error": "Invalid email or password",
+    "header": null,
+    "tokenStored": false,
+    "url": "/login"
+  },
+  "login_wrong_pw": {
+    "email": "sita1789644367272@ui.com",
+    "error": "Invalid email or password",
+    "header": null,
+    "tokenStored": false,
+    "url": "/login"
+  },
+  "reg_bad_email": {
+    "email": "not-an-email",
+    "error": "Validation failed | Name is required | A valid email is required",
+    "header": null,
+    "tokenStored": false,
+    "url": "/register"
+  },
+  "reg_dup": {
+    "email": "RAVI1789644367272@ui.com",
+    "error": "An account with this email already exists",
+    "header": null,
+    "tokenStored": false,
+    "url": "/register"
+  },
+  "reg_ok_1": {
+    "email": "ravi1789644367272@ui.com",
+    "error": null,
+    "header": "Ravi Dabba",
+    "tokenStored": true,
+    "url": "/app/plans"
+  },
+  "reg_ok_2": {
+    "email": "sita1789644367272@ui.com",
+    "error": null,
+    "header": "Sita Kitchen",
+    "tokenStored": true,
+    "url": "/app/plans"
+  },
+  "reg_short": {
+    "email": "short1789644367272@ui.com",
+    "error": "Validation failed | Password must be at least 8 characters",
+    "header": null,
+    "tokenStored": false,
+    "url": "/register"
+  },
+  "reg_spaces": {
+    "email": "sp1789644367272@ui.com",
+    "error": "Validation failed | Password cannot be only spaces",
+    "header": null,
+    "tokenStored": false,
+    "url": "/register"
+  }
+}
+
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Tiffin Tracker" (http://localhost:4100)
+```
+
+</details>
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:\\Users\\Dell\\Desktop\\tiffin-tracker\\tiffin-tracker\\server\\test\\auth-security.test.js",
+  "content": "import { test, before, after } from 'node:test';\nimport assert from 'node:assert/strict';\nimport jwt from 'jsonwebtoken';\nimport { openDb } from '../src/db.js';\nimport { createApp } from '../src/app.js';\n\nlet server;\nlet base;\n\nbefore(async () => {\n  delete process.env.JWT_SECRET;\n  process.env.LOGIN_MAX_ATTEMPTS = '5';\n  const app = createApp(openDb(':memory:'), { log: false });\n  await new Promise((resolve) => { server = app.listen(0, resolve); });\n  base = `http://127.0.0.1:${server.address().port}/api`;\n});\nafter(() => server.close());\n\nasync function call(method, path, body, token, rawBody) {\n  const res = await fetch(base + path, {\n    method,\n    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },\n    body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)),\n  });\n  const text = await res.text();\n  let json = null; try { json = JSON.parse(text); } catch { /* not JSON */ }\n  return { status: res.status, body: json };\n}\n\nconst register = async (email, password = 'password123') => (await call('POST', '/auth/register', { name: 'Owner', email, password })).body.token;\n\ntest('only the right password logs in; injection and wrong types never do', async () => {\n  await register('a@test.com', 'correct-horse-1');\n  const attempts = [\n    { email: 'a@test.com', password: 'wrong-horse-1' },\n    { email: 'a@test.com', password: 'CORRECT-HORSE-1' },\n    { email: \"' OR '1'='1\", password: \"' OR '1'='1\" },\n    { email: 'a@test.com', password: { $ne: '' } },\n    { email: 'a@test.com', password: ['correct-horse-1'] },\n  ];\n  for (const body of attempts) {\n    const r = await call('POST', '/auth/login', body);\n    assert.equal(r.status, 401, JSON.stringify(body));\n    assert.equal(r.body.token, undefined);\n  }\n  assert.equal((await call('POST', '/auth/login', { email: ' A@TEST.com ', password: 'correct-horse-1' })).status, 200);\n  assert.equal((await call('POST', '/auth/login', null, undefined, '{\"email\": broken')).status, 400);\n});\n\ntest('tokens: forged with the old default secret, tampered, alg none, expired, deleted user → 401', async () => {\n  const token = await register('b@test.com');\n  const me = (await call('GET', '/auth/me', undefined, token)).body.user;\n  assert.equal(me.email, 'b@test.com');\n\n  const [h, , sig] = token.split('.');\n  const otherPayload = Buffer.from(JSON.stringify({ sub: me.id + 1 })).toString('base64url');\n  const none = `${Buffer.from('{\"alg\":\"none\",\"typ\":\"JWT\"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: me.id })).toString('base64url')}.`;\n  const bad = [\n    jwt.sign({ sub: me.id }, 'dev-only-secret-change-me'), // previously hard-coded fallback\n    `${h}.${otherPayload}.${sig}`,\n    none,\n    jwt.sign({ sub: me.id, exp: Math.floor(Date.now() / 1000) - 10 }, 'dev-only-secret-change-me'),\n    'not-a-token',\n  ];\n  for (const t of bad) assert.equal((await call('GET', '/customers', undefined, t)).status, 401, t.slice(0, 30));\n});\n\ntest('valid signature for a user that does not exist is refused (no 500)', async () => {\n  // Sign with the real server secret by registering, then deleting the user directly is not\n  // exposed via API, so emulate with a token whose sub was never issued.\n  const token = await register('c@test.com');\n  const { sub } = jwt.decode(token);\n  // Re-sign is impossible without the secret, so tamper-free check: an unknown sub in a real token cannot exist.\n  // Instead verify that the server checks existence by creating data only for existing ids.\n  assert.equal((await call('POST', '/plans', { name: 'P', price_paise: 100 }, token)).status, 201);\n  assert.ok(Number.isInteger(sub));\n});\n\ntest('password rules: min 8, not only spaces, max 72 bytes (bcrypt truncation)', async () => {\n  assert.equal((await call('POST', '/auth/register', { name: 'x', email: 'd1@test.com', password: 'short' })).status, 400);\n  assert.equal((await call('POST', '/auth/register', { name: 'x', email: 'd2@test.com', password: '          ' })).status, 400);\n  assert.equal((await call('POST', '/auth/register', { name: 'x', email: 'd3@test.com', password: 'a'.repeat(73) })).status, 400);\n  assert.equal((await call('POST', '/auth/register', { name: 'x', email: 'd4@test.com', password: 'a'.repeat(72) })).status, 201);\n  // A 72-byte password plus extra characters must not log in to that account.\n  assert.equal((await call('POST', '/auth/login', { email: 'd4@test.com', password: 'a'.repeat(72) + 'extra' })).status, 401);\n});\n\ntest('brute force: repeated failures lock that email for this client', async () => {\n  await register('e@test.com', 'right-password-1');\n  for (let i = 0; i < 5; i++) assert.equal((await call('POST', '/auth/login', { email: 'e@test.com', password: `guess-${i}` })).status, 401);\n  const locked = await call('POST', '/auth/login', { email: 'e@test.com', password: 'right-password-1' });\n  assert.equal(locked.status, 429);\n  assert.equal(locked.body.token, undefined);\n  await register('f@test.com', 'other-password-1');\n  assert.equal((await call('POST', '/auth/login', { email: 'f@test.com', password: 'other-password-1' })).status, 200);\n});\n\ntest('malformed ids and prices return 400, never 500', async () => {\n  const token = await register('g@test.com');\n  const plan = (await call('POST', '/plans', { name: 'Veg', price_paise: 250000 }, token)).body;\n  const cust = (await call('POST', '/customers', { name: 'C', phone: '9000000001' }, token)).body;\n  const sub = (await call('POST', `/customers/${cust.id}/subscriptions`, { plan_id: plan.id, start_date: '2026-09-01' }, token)).body;\n\n  for (const plan_id of [{ id: plan.id }, [plan.id], 'abc', -1, 1.5, null]) {\n    assert.equal((await call('POST', `/customers/${cust.id}/subscriptions`, { plan_id }, token)).status, 400, JSON.stringify(plan_id));\n  }\n  for (const to_customer_id of [{ id: 1 }, [1], 'x']) {\n    assert.equal((await call('POST', `/subscriptions/${sub.id}/transfer`, { effective_date: '2026-09-20', to_customer_id }, token)).status, 400, JSON.stringify(to_customer_id));\n  }\n  for (const price_paise of [1e20, -5, 10.5, 'abc']) {\n    assert.equal((await call('POST', '/plans', { name: 'Bad', price_paise }, token)).status, 400, String(price_paise));\n  }\n  assert.equal((await call('GET', '/customers/abc', undefined, token)).status, 404);\n});\n"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:\Users\Dell\Desktop\tiffin-tracker\tiffin-tracker\server\test\auth-security.test.js (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+The "user that doesn't exist" test I just wrote doesn't really test anything. I'll rewrite it to delete the user directly in the database and then use their old token:
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/server\" && node - <<'EOF'\nconst fs=require('fs');const f='test/auth-security.test.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\"let server;\\nlet base;\",\"let server;\\nlet base;\\nlet db;\");\ns=s.replace(\"const app = createApp(openDb(':memory:'), { log: false });\",\"db = openDb(':memory:');\\n  const app = createApp(db, { log: false });\");\ns=s.replace(/test\\('valid signature for a user that does not exist[\\s\\S]*?\\n\\}\\);\\n/, `test('token of a deleted account is refused (no 500)', async () => {\n  const token = await register('c@test.com');\n  assert.equal((await call('POST', '/plans', { name: 'P', price_paise: 100 }, token)).status, 201);\n  db.prepare(\"DELETE FROM users WHERE email = 'c@test.com'\").run();\n  assert.equal((await call('GET', '/auth/me', undefined, token)).status, 401);\n  assert.equal((await call('POST', '/plans', { name: 'P2', price_paise: 100 }, token)).status, 401);\n});\n`);\nfs.writeFileSync(f,s);\nEOF\nnpm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|not ok|AssertionError|expected|actual\" | head -20",
+  "description": "Strengthen deleted-user test and run suite",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+ℹ tests 28
+ℹ pass 28
+ℹ fail 0
+```
+
+</details>
+
+28 of 28 tests pass (6 new security tests). Updating the README and REASONING:
+
+**Tool call — `Write`**
+
+```json
+{
+  "file_path": "C:/Users/Dell/tt-guide/patch-docs2.cjs",
+  "content": "const fs = require('fs');\nconst root = 'C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker/';\nconst rep = (s, a, b) => { if (!s.includes(a)) throw new Error('missing: ' + a.slice(0, 70)); return s.replace(a, b); };\n\nlet r = fs.readFileSync(root + 'README.md', 'utf8').replace(/\\r\\n/g, '\\n');\nr = rep(r, '| `JWT_SECRET` | insecure dev value (warns at startup) | Signs login tokens; **set this in production** |',\n  '| `JWT_SECRET` | random secret generated once and stored in the database | Signs login tokens. Set a long random value (32+ characters) in production so tokens stay valid if the database is recreated |\\n| `LOGIN_MAX_ATTEMPTS` | `10` | Failed logins allowed per client + email in 15 minutes before login is locked (429) |');\nr = rep(r, '## 4. Billing rules', `## 4. Security and validation\n\n- **Passwords** are hashed with bcrypt. They must be 8–72 bytes and not only spaces (bcrypt ignores bytes after 72, so longer passwords are refused rather than silently truncated).\n- **Login** returns the same \"Invalid email or password\" for a wrong password and an unknown email. After \\`LOGIN_MAX_ATTEMPTS\\` failures for the same client and email within 15 minutes, login answers **429** (even with the right password) until the window passes. Other accounts are unaffected.\n- **Tokens** are HS256 JWTs valid for 7 days. The signing secret comes from \\`JWT_SECRET\\` or a random per-database secret; **there is no hard-coded fallback**. Tokens are rejected when forged, tampered, \\`alg: none\\`, expired, or when the account no longer exists.\n- **Owner isolation:** every query is scoped to the logged-in owner. Other owners' ids return 404.\n- **Input validation:** all ids are parsed as positive integers, dates must be real \\`YYYY-MM-DD\\` dates, prices are whole paise up to ₹10,00,000, and sort keys are whitelisted. Bad input returns 400, never 500.\n- **Audit:** a 151-check authentication and validation audit (wrong passwords, SQL/NoSQL-style injection, malformed JSON, forged and expired tokens, cross-owner access on every endpoint, type-confusion fuzzing) passed with 0 server errors. The key cases are kept as \\`server/test/auth-security.test.js\\`.\n\n## 4a. Billing rules`);\nr = rep(r, \"- `server/test/api.test.js`:\", \"- `server/test/auth-security.test.js`: login only with the right password, injection and wrong types, forged/tampered/`alg:none`/expired tokens, deleted accounts, password length rules, brute-force lock, malformed ids and prices never causing a 500.\\n- `server/test/api.test.js`:\");\nfs.writeFileSync(root + 'README.md', r);\n\nlet g = fs.readFileSync(root + 'REASONING.md', 'utf8').replace(/\\r\\n/g, '\\n');\ng = rep(g, \"## 7. Trade-offs and what I'd do with more time\", `## 7. Authentication and validation audit\n\nI wrote an audit script that attacks a freshly seeded server configured the way the app actually runs locally (no \\`JWT_SECRET\\` set) and records every non-4xx or wrongly accepted response. It covered: registration and login with wrong, blank, oversized, unicode and wrongly typed values; SQL and NoSQL-style injection strings; broken JSON and wrong content types; forged, tampered, \\`alg: none\\` and expired tokens; every protected endpoint without a token; a second owner trying to read, edit, delete, pause, transfer or subscribe the first owner's data; and type-confusion fuzzing on every data endpoint. The first run gave **139 passed / 8 failed**, which came down to six real problems:\n\n| # | Problem found | Impact | Fix |\n|---|---|---|---|\n| 1 | With \\`JWT_SECRET\\` unset, tokens were signed with the hard-coded \\`dev-only-secret-change-me\\`, which is visible in the public repo. A token signed with it **logged in as demo@tiffin.app without a password**. | Critical: full account takeover | Removed the fallback. Without \\`JWT_SECRET\\`, a random 384-bit secret is generated once and stored in the database's \\`settings\\` table (so logins survive restarts). Verification is pinned to HS256. |\n| 2 | bcrypt only uses the first 72 bytes, so a different password sharing the first 72 characters logged in. | Weakened passwords | Registration refuses passwords over 72 bytes, and login rejects them before comparing. |\n| 3 | A validly signed token for a user id that doesn't exist caused a **500** (foreign-key failure when creating a plan). | Crash | \\`requireAuth\\` now checks the account still exists and returns 401. |\n| 4 | \\`plan_id\\` or \\`to_customer_id\\` sent as an object or array crashed with **500** (\"Unknown named parameter\"): the SQLite driver treats objects as named-parameter maps. | Crash | A shared \\`toId()\\` parses ids as positive integers, and anything else becomes a 400. |\n| 5 | A plan price of \\`1e20\\` passed \\`Number.isInteger\\` and was saved. | Bad data | Prices are capped at ₹10,00,000/month. |\n| 6 | Nothing limited password guessing. | Brute force | Per client+email throttle: after 10 failures in 15 minutes login returns 429 (even with the right password, so the lock gives an attacker nothing). Other accounts are unaffected. |\n\nAlso tightened: passwords that are only spaces are refused, and the register form shows the 8–72 character rule.\n\n**After the fixes:** the audit passed 151/151 (4 brute-force checks added) with 0 server errors. A token issued before a restart still worked afterwards. In the browser, three owners (two newly registered plus demo) each landed in their own business, while a wrong password, an SQL-injection login, random details and empty fields all stayed on the login page with no token stored. The key cases are now permanent tests in \\`auth-security.test.js\\` (28 tests total).\n\n**Known limits (deliberate for this scope):** logging out deletes the token in the browser but doesn't revoke it on the server, so a stolen token works until it expires (7 days). The login throttle is in memory, so it resets on restart and isn't shared across multiple servers. Registration reveals whether an email is already registered, which is normal for sign-up forms.\n\n## 8. Trade-offs and what I'd do with more time`);\nfs.writeFileSync(root + 'REASONING.md', g);\nconsole.log('docs updated');\n"
+}
+```
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "node C:/Users/Dell/tt-guide/patch-docs2.cjs && pid=$(netstat -ano | grep \":4100 \" | grep LISTENING | awk '{print $5}' | head -1); [ -n \"$pid\" ] && taskkill //PID $pid //F >/dev/null && echo \"stopped 4100\"; cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\" && git status --short",
+  "description": "Update docs, stop audit server, final tests",
+  "timeout": 180000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+File created successfully at: C:/Users/Dell/tt-guide/patch-docs2.cjs (file state is current in your context — no need to Read it back)
+```
+
+</details>
+
+<details><summary>Tool result</summary>
+
+```text
+docs updated
+stopped 4100
+ℹ tests 28
+ℹ pass 28
+ℹ fail 0
+ M README.md
+ M REASONING.md
+ M client/src/pages/Auth.jsx
+ M server/src/app.js
+ M server/src/http.js
+ M server/src/index.js
+ M server/src/routes/auth.js
+ M server/src/routes/plans.js
+ M server/src/routes/subscriptions.js
+?? server/test/auth-security.test.js
+```
+
+</details>
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git add -A README.md REASONING.md client/src/pages/Auth.jsx server && git commit -q -F - <<'MSG'\nHarden authentication and input validation after security audit\n\n- Remove hard-coded JWT secret fallback (tokens could be forged to log in\n  as any user); generate and store a random per-database secret instead\n- Pin JWT verification to HS256 and reject tokens for deleted accounts\n- Refuse passwords over 72 bytes (bcrypt truncation) or only spaces\n- Throttle repeated failed logins per client and email (429)\n- Parse ids safely so object/array values return 400 instead of 500\n- Cap plan prices at 10 lakh rupees per month\n- Add auth-security tests (28 tests total) and document the audit\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nMSG\ngit log --oneline -1 && git status --short",
+  "description": "Commit security fixes locally"
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'REASONING.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/app.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/routes/auth.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/routes/plans.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/src/routes/subscriptions.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/test/auth-security.test.js', LF will be replaced by CRLF the next time Git touches it
+029c1f3 Harden authentication and input validation after security audit
+```
+
+</details>
+
+I tested login, signup and validation, and found and fixed six real problems. The most serious one let anyone log in as any user without a password. After the fixes, all 151 audit checks pass with no server errors, and all 28 automated tests pass.
+
+## What was already safe
+- **Wrong details never got in:** wrong passwords, a password with different upper/lower case, another user's password, blank fields, SQL-injection strings like `' OR '1'='1`, and passwords sent as objects, arrays or `true`. The same goes for broken or garbage requests.
+- **Bad tokens were refused:** garbage, tampered, `alg: none`, expired, or signed with the wrong secret.
+- **Every protected page and API endpoint** (24 of them) refuses requests without a login.
+- **Users can't touch each other's data.** A second user couldn't read, edit, delete, pause, resume, end, transfer, subscribe, look up by phone, or see bills or messages belonging to another user. Those attempts return "not found".
+
+## Problems found and fixed
+
+| # | Problem | How bad | Fix |
+|---|---|---|---|
+| 1 | With no `JWT_SECRET` set (your setup), logins were signed with a secret that's written in the public GitHub code. **I made my own token with it and got in as `demo@tiffin.app` without the password.** | 🔴 Critical | Removed that secret. Each database now generates its own random secret and keeps it, so logins still survive a restart. |
+| 2 | Passwords longer than 72 characters: anything after the 72nd character was ignored, so a different password could log in. | 🟠 | Passwords over 72 characters are now refused. |
+| 3 | No limit on password guessing. | 🟠 | After 10 wrong tries, that email is locked for 15 minutes from the same connection (even the right password is refused). Other accounts aren't affected. |
+| 4 | A login token for a deleted account caused a server crash (500). | 🟡 | Refused with "please log in again". |
+| 5 | Sending `plan_id` or `to_customer_id` as an object or array crashed the server (500). | 🟡 | Now returns a normal error (400). |
+| 6 | A plan price of `1e20` was saved. | 🟡 | Prices are capped at ₹10,00,000 a month. Passwords made only of spaces are also refused. |
+
+## Checked in the real website
+- Two new owners and the demo owner each logged in and saw only their own business name.
+- A wrong password, an SQL-injection login, random details and empty fields all stayed on the login page with "Invalid email or password", and nothing was saved in the browser.
+- The signup form showed clear errors for a duplicate email (even in capitals), a short password, a bad email and an all-spaces password.
+
+## Two things to do
+- **You'll need to log in again** after restarting your server. Old tokens used the exposed secret, so they no longer work, which is intended.
+- **This is committed locally (`029c1f3`) but not pushed yet.** The live GitHub code still has the critical login problem, so it's worth pushing. Say "push" and I'll do it.
+
+**Still open, on purpose (documented in REASONING.md):**
+- **Logout:** logging out doesn't cancel the token on the server, so a stolen token keeps working for up to 7 days.
+- **Guessing limit:** it resets when the server restarts.
+
+---
+
+## 👤 User
+
+commit and push the changes to github
+
+## 🤖 Assistant
+
+**Tool call — `Bash`**
+
+```json
+{
+  "command": "cd \"C:/Users/Dell/Desktop/tiffin-tracker/tiffin-tracker\" && git status --short && git push 2>&1 | tail -1 && git fetch -q && echo \"local $(git rev-parse --short HEAD) / github $(git rev-parse --short origin/main)\" && git status -sb | head -1",
+  "description": "Push security commit and verify sync",
+  "timeout": 120000
+}
+```
+
+<details><summary>Tool result</summary>
+
+```text
+3024ebe..029c1f3  main -> main
+local 029c1f3 / github 029c1f3
+## main...origin/main
+```
+
+</details>
+
+I've pushed the security fixes to GitHub, so the problem that let anyone log in without a password is now fixed there too. GitHub and your local project are both on commit `029c1f3`, and there are no leftover changes.
+
+On GitHub now:
+- The login and validation fixes
+- The new security tests (28 tests in total, all passing)
+- README and REASONING updates describing the audit
+
+**Next steps:**
+1. **Restart your local server** to pick up the fixes: press `Ctrl+C` in the VS Code terminal, then run `npm start`. You'll need to log in again, because tokens made with the old exposed secret no longer work.
+2. **Update `AI_LOGS.md` last.** It stops before this security work. When you're completely finished, ask me to update it one final time.
+
+---
+
+## 👤 User
+
+update the AI_LOGS.md and update it one final time
