@@ -23,9 +23,12 @@ At month-end the owner generates a bill for every customer in one click, and eac
 git clone <this-repo-url> tiffin-tracker
 cd tiffin-tracker
 npm run install:all        # installs server/ and client/ dependencies
-cp server/.env.example server/.env   # optional; defaults work for local dev
 npm run seed               # optional demo data
+npm run build              # builds the website (required before npm start)
+npm start                  # open http://localhost:4000
 ```
+
+> **Seeing `Cannot GET /`?** The website hasn't been built. `client/dist` is not stored in git, so every fresh clone needs `npm run build` once (and again after changing frontend code), then restart `npm start`. In development mode (`npm run dev:server` + `npm run dev:client`, see below) no build is needed.
 
 Demo login after seeding: **demo@tiffin.app / demo1234** (3 plans, 32 customers with active, paused, upcoming and ended subscriptions).
 
@@ -39,7 +42,7 @@ Demo login after seeding: **demo@tiffin.app / demo1234** (3 plans, 32 customers 
 | `DB_FILE` | `./data/tiffin.db` | SQLite file path (`:memory:` for throwaway runs) |
 | `PUBLIC_SIM_ENDPOINTS` | `true` | Allows `/clock` and `/outbox` without a token (for the grading harness). Set to `false` in production |
 
-The server doesn't read `.env` files by itself. Export the variables in your shell, or run with `node --env-file=.env src/index.js`.
+All variables are optional for local use. The server doesn't read `.env` files by itself: copy `server/.env.example` to `server/.env`, edit it, and start with `node --env-file=.env src/index.js` from `server/`, or export the variables in your shell.
 
 ## 2. Run
 
